@@ -1,0 +1,16 @@
+{
+  "session_id": "notebook-session-1750539655",
+  "user_uuid": "bb47dc1e-495c-401b-b359-8c3d77f3a876",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! It's great to connect with you. Let's start by learning about your favorite works of art, media, or creative pieces from the past that you still hold dear. What comes to mind?"
+    }
+  ],
+  "created_at": "2025-06-21T21:00:56.878142Z",
+  "updated_at": "2025-06-21T21:00:56.878144Z"
+}

@@ -1,0 +1,20 @@
+{
+  "session_id": "notebook-session-1750539153",
+  "user_uuid": "cc1e6cad-8a55-461c-b253-d16b1d5a7b91",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! Let's dive right in\u2014what are some works of art, books, movies, or music that you absolutely loved in the past and still do?"
+    },
+    {
+      "role": "user",
+      "content": "donnie darko"
+    }
+  ],
+  "created_at": "2025-06-21T20:52:39.519126Z",
+  "updated_at": "2025-06-21T20:52:39.519129Z"
+}
