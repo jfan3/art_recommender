@@ -4,30 +4,36 @@
 # 3. Main loop: recommend 5 items at a time, collect feedback, update user embedding, repeat
 # 4. Stop when all candidates are seen or user quits, then output final personalized recommendations
 
-from .embedding import generate_user_embedding
-from .art_embedding import batch_generate_embeddings
-from .retriever import retrieve_top_candidates
-from .reranker import update_user_embedding
-from .formatter import format_for_user
+from embedding import generate_user_embedding
+from art_embedding import batch_generate_embeddings
+from retriever import retrieve_top_candidates, load_user_profile, save_user_profile
+from reranker import update_user_embedding
+from formatter import format_for_user
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import json
 
-# Step 1: Generate user embedding from JSON profile
+# Step 1: Load user profile and generate user embedding
 # Updated path to read from user_profiles.json in art_recommender folder
-user_profile_path = "art_recommender/user_profiles.json"
+user_profile_path = "../../user_profiles.json"
+
+# Load and validate user profile
+user_profile = load_user_profile(user_profile_path)
+print(f"--- Loaded user profile (UUID: {user_profile.get('uuid', 'N/A')}) ---")
+print(f"--- Profile completion status: {'Complete' if user_profile.get('complete', False) else 'Incomplete'} ---")
+
 user_embedding = generate_user_embedding(user_profile_path)
 print("--- Initial user profile embedding generated. ---")
 
 # Step 2: Retrieve an initial pool of candidates from each domain
 print("--- Retrieving initial candidates from various domains... ---")
-movie_candidates = retrieve_top_candidates("movies", user_embedding)
-book_candidates = retrieve_top_candidates("books", user_embedding)
-music_candidates = retrieve_top_candidates("music", user_embedding)
-art_candidates = retrieve_top_candidates("art", user_embedding)
-poetry_candidates = retrieve_top_candidates("poetry", user_embedding)
-podcast_candidates = retrieve_top_candidates("podcasts", user_embedding)
-musical_candidates = retrieve_top_candidates("musicals", user_embedding)
+movie_candidates = retrieve_top_candidates("movies", user_embedding, user_profile)
+book_candidates = retrieve_top_candidates("books", user_embedding, user_profile)
+music_candidates = retrieve_top_candidates("music", user_embedding, user_profile)
+art_candidates = retrieve_top_candidates("art", user_embedding, user_profile)
+poetry_candidates = retrieve_top_candidates("poetry", user_embedding, user_profile)
+podcast_candidates = retrieve_top_candidates("podcasts", user_embedding, user_profile)
+musical_candidates = retrieve_top_candidates("musicals", user_embedding, user_profile)
 
 # Step 3: Merge and enrich the pool with embeddings
 # 拼接所有候选项，批量生成 embedding（包含 title/description/creator/category/release_date/metadata 等）
@@ -39,6 +45,7 @@ print(f"--- Pool of {len(top_candidates)} candidates ready for interaction. ---"
 current_embedding = user_embedding
 seen_urls = set()
 running = True
+feedback_count = 0
 
 while running:
     # 1. 用当前 user embedding 对剩余候选项计算相似度，排序
@@ -83,7 +90,14 @@ while running:
     # 4. 用这5个反馈更新 user embedding，提升个性化
     batch_embeddings = [c['embedding'] for c in batch[:len(batch_feedback)]]
     current_embedding = update_user_embedding(current_embedding, batch_feedback, batch_embeddings)
+    
+    # 5. 更新用户配置文件
+    feedback_count += len(batch_feedback)
+    user_profile["complete"] = feedback_count >= 10  # Mark as complete after 10 feedbacks
+    save_user_profile(user_profile, user_profile_path)
+    
     print("--- Profile updated! Your next recommendations will be more tailored. ---")
+    print(f"--- Feedback count: {feedback_count}/10 (Profile {'Complete' if user_profile['complete'] else 'Incomplete'}) ---")
 
 # Step 5: 输出最终 personalized 推荐结果
 print("\n=================================================")

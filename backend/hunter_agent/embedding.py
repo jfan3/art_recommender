@@ -40,6 +40,11 @@ def extract_profile_text(json_path):
     # Use the correct field name for future aspirations
     profile_text += f"Future aspirations: {data.get('future_aspirations', '')}. "
     
+    # Add profile completion status if available
+    if 'complete' in data:
+        completion_status = "complete" if data.get('complete', False) else "incomplete"
+        profile_text += f"Profile status: {completion_status}. "
+    
     return profile_text.strip()
 
 def generate_user_embedding(json_path):

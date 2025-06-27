@@ -5,6 +5,7 @@ import requests
 import base64
 from dotenv import load_dotenv  # pip install python-dotenv
 from typing import List, Dict
+from datetime import datetime
 
 load_dotenv()
 SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY")
@@ -15,23 +16,67 @@ SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 
 def load_user_profile(profile_path="art_recommender/user_profiles.json") -> dict:
     with open(profile_path, "r") as f:
-        return json.load(f)
+        data = json.load(f)
+    
+    # Handle the format where user_profiles.json contains a dict with UUID keys
+    if isinstance(data, dict) and len(data) > 0:
+        # Get the first user profile
+        first_uuid = list(data.keys())[0]
+        profile = data[first_uuid]
+        print(f"Loaded profile for UUID: {first_uuid}")
+    else:
+        # Fallback to direct profile format
+        profile = data
+    
+    # Map actual field names to expected field names
+    field_mapping = {
+        "favorite_taste_genre_description": "taste_genre",
+        "current_state_of_mind": "state_of_mind"
+    }
+    
+    # Apply field mapping
+    for actual_field, expected_field in field_mapping.items():
+        if actual_field in profile and expected_field not in profile:
+            profile[expected_field] = profile[actual_field]
+    
+    # Validate required fields exist
+    required_fields = ["past_favorite_work", "taste_genre", "current_obsession", "state_of_mind", "future_aspirations"]
+    for field in required_fields:
+        if field not in profile:
+            print(f"Warning: Missing required field '{field}' in user profile")
+            profile[field] = "" if field != "past_favorite_work" and field != "current_obsession" else []
+    
+    # Handle new fields with defaults
+    if "uuid" not in profile:
+        profile["uuid"] = ""
+    if "complete" not in profile:
+        profile["complete"] = False
+    if "created_at" not in profile:
+        profile["created_at"] = ""
+    if "updated_at" not in profile:
+        profile["updated_at"] = ""
+    
+    return profile
 
 def build_query(category: str, profile: dict) -> str:
     taste = profile.get("taste_genre", "")
     favorites = ", ".join(profile.get("past_favorite_work", []))
     obsession = ", ".join(profile.get("current_obsession", []))
     state = profile.get("state_of_mind", "")
+    
+    # Add profile completion context
+    profile_status = "complete profile" if profile.get("complete", False) else "developing profile"
+    
     if category == "movies":
-        return f"{taste} movies like {favorites} and {obsession} {state}"
+        return f"{taste} movies like {favorites} and {obsession} {state} {profile_status}"
     elif category == "books":
-        return f"{taste} books such as {favorites} and {obsession} {state}"
+        return f"{taste} books such as {favorites} and {obsession} {state} {profile_status}"
     elif category == "music":
-        return f"{taste} music similar to {favorites} and {obsession} {state}"
+        return f"{taste} music similar to {favorites} and {obsession} {state} {profile_status}"
     elif category == "musicals":
-        return f"{taste} musical theatre recommendations {favorites} {obsession} {state}"
+        return f"{taste} musical theatre recommendations {favorites} {obsession} {state} {profile_status}"
     else:
-        return f"{taste} {category} recommendations {favorites} {obsession} {state}"
+        return f"{taste} {category} recommendations {favorites} {obsession} {state} {profile_status}"
 
 def search_openlibrary(query: str, num_results: int = 10) -> List[Dict]:
     url = "https://openlibrary.org/search.json"
@@ -186,9 +231,8 @@ def search_spotify(query: str, num_results: int = 10) -> List[Dict]:
         print(f"[Spotify] Search Error: {response.status_code}", response.text)
         return []
 
-def retrieve_top_candidates(category: str, user_embedding: List[float]) -> List[Dict]:
-    profile = load_user_profile()
-    query = build_query(category, profile)
+def retrieve_top_candidates(category: str, user_embedding: List[float], user_profile: dict) -> List[Dict]:
+    query = build_query(category, user_profile)
     # Select the appropriate data source for each category
     if category == "books":
         results = search_openlibrary(query, num_results=20)
@@ -214,4 +258,73 @@ def retrieve_top_candidates(category: str, user_embedding: List[float]) -> List[
         if key not in seen:
             unique_results.append(item)
             seen.add(key)
-    return unique_results[:100] 
+    return unique_results[:100]
+
+def save_user_profile(profile: dict, profile_path="art_recommender/user_profiles.json") -> bool:
+    """
+    Save user profile with updated timestamp
+    """
+    try:
+        # Update the timestamp
+        profile["updated_at"] = datetime.utcnow().isoformat() + "Z"
+        
+        # Ensure all required fields exist
+        required_fields = ["past_favorite_work", "taste_genre", "current_obsession", "state_of_mind", "future_aspirations"]
+        for field in required_fields:
+            if field not in profile:
+                profile[field] = "" if field != "past_favorite_work" and field != "current_obsession" else []
+        
+        # Ensure new fields exist
+        if "uuid" not in profile:
+            profile["uuid"] = ""
+        if "complete" not in profile:
+            profile["complete"] = False
+        if "created_at" not in profile:
+            profile["created_at"] = datetime.utcnow().isoformat() + "Z"
+        
+        # Load existing data to preserve the UUID-keyed structure
+        try:
+            with open(profile_path, "r") as f:
+                existing_data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            existing_data = {}
+        
+        # If existing_data is a dict with UUID keys, update the specific profile
+        if isinstance(existing_data, dict) and len(existing_data) > 0:
+            # Find the profile to update (use the first one if UUID not specified)
+            profile_uuid = profile.get("uuid", "")
+            if profile_uuid and profile_uuid in existing_data:
+                # Map back to original field names for saving
+                original_profile = existing_data[profile_uuid].copy()
+                original_profile.update(profile)
+                # Map expected field names back to original field names
+                if "taste_genre" in profile and "favorite_taste_genre_description" not in profile:
+                    original_profile["favorite_taste_genre_description"] = profile["taste_genre"]
+                if "state_of_mind" in profile and "current_state_of_mind" not in profile:
+                    original_profile["current_state_of_mind"] = profile["state_of_mind"]
+                existing_data[profile_uuid] = original_profile
+            else:
+                # Update the first profile
+                first_uuid = list(existing_data.keys())[0]
+                original_profile = existing_data[first_uuid].copy()
+                original_profile.update(profile)
+                # Map expected field names back to original field names
+                if "taste_genre" in profile and "favorite_taste_genre_description" not in profile:
+                    original_profile["favorite_taste_genre_description"] = profile["taste_genre"]
+                if "state_of_mind" in profile and "current_state_of_mind" not in profile:
+                    original_profile["current_state_of_mind"] = profile["state_of_mind"]
+                existing_data[first_uuid] = original_profile
+                profile["uuid"] = first_uuid
+            data_to_save = existing_data
+        else:
+            # Fallback to direct profile format
+            data_to_save = profile
+        
+        # Save to file
+        with open(profile_path, "w") as f:
+            json.dump(data_to_save, f, indent=2)
+        
+        return True
+    except Exception as e:
+        print(f"Error saving user profile: {e}")
+        return False 

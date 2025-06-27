@@ -1,12 +1,17 @@
 {
-    "b6d09b9f-3f69-47b7-bada-233f16665ad5": {
-        "uuid": "b6d09b9f-3f69-47b7-bada-233f16665ad5",
-        "past_favorite_work": [
-            "donnie darko"
-        ],
-        "favorite_taste_genre_description": "love and peace",
-        "current_obsession": [],
-        "current_state_of_mind": "",
-        "future_aspirations": ""
-    }
+  "b6d09b9f-3f69-47b7-bada-233f16665ad5": {
+    "uuid": "b6d09b9f-3f69-47b7-bada-233f16665ad5",
+    "past_favorite_work": [
+      "donnie darko"
+    ],
+    "favorite_taste_genre_description": "love and peace",
+    "current_obsession": [],
+    "current_state_of_mind": "",
+    "future_aspirations": "",
+    "taste_genre": "love and peace",
+    "state_of_mind": "",
+    "complete": false,
+    "created_at": "",
+    "updated_at": "2025-06-27T23:45:12.535477Z"
+  }
 }
