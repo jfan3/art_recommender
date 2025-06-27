@@ -12,7 +12,7 @@ def update_user_embedding(user_embedding: List[float], feedback: List[int], cand
     user_vector = np.array(user_embedding)
     for i, signal in enumerate(feedback):
         if signal == 1:
-            user_vector += 0.1 * np.array(candidate_embeddings[i])  # reinforcement
+            user_vector += 0.1 * np.array(candidate_embeddings[i])  # reinforce
         elif signal == 0:
             user_vector -= 0.05 * np.array(candidate_embeddings[i])  # discourage
     return (user_vector / np.linalg.norm(user_vector)).tolist()

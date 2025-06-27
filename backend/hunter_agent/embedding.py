@@ -2,6 +2,10 @@
 import json
 import openai
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Make sure your OpenAI API key is set in the environment
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -12,15 +16,30 @@ def extract_profile_text(json_path):
 
     # The 'data' object is the user profile itself.
     profile_text = ""
-    # The 'past_favorite_work' is a string, not a list.
-    profile_text += f"Past favorites: {data.get('past_favorite_work', '')}. "
-    # Correcting the key for genre preference.
-    profile_text += f"Genre: {data.get('descriptions_of_users_taste_genre_preference', '')}. "
-    # 'current_obsession' is not in the sample JSON, so we'll skip it for now.
-    # Correcting the key for state of mind.
-    profile_text += f"Current state of mind: {data.get('users_current_state_of_mind', '')}. "
-    # Correcting the key for future aspirations.
-    profile_text += f"Future aspirations: {data.get('users_future_aspirations', '')}. "
+    
+    # Handle past_favorite_work as a list
+    past_favorites = data.get('past_favorite_work', [])
+    if isinstance(past_favorites, list):
+        profile_text += f"Past favorites: {', '.join(past_favorites)}. "
+    else:
+        profile_text += f"Past favorites: {past_favorites}. "
+    
+    # Use the correct field name for genre preference
+    profile_text += f"Genre: {data.get('taste_genre', '')}. "
+    
+    # Handle current_obsession as a list
+    current_obsession = data.get('current_obsession', [])
+    if isinstance(current_obsession, list):
+        profile_text += f"Current obsession: {', '.join(current_obsession)}. "
+    else:
+        profile_text += f"Current obsession: {current_obsession}. "
+    
+    # Use the correct field name for state of mind
+    profile_text += f"Current state of mind: {data.get('state_of_mind', '')}. "
+    
+    # Use the correct field name for future aspirations
+    profile_text += f"Future aspirations: {data.get('future_aspirations', '')}. "
+    
     return profile_text.strip()
 
 def generate_user_embedding(json_path):

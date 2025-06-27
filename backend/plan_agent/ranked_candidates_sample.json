@@ -1,0 +1,65 @@
+[
+  {
+    "title": "Eternal Sunshine of the Spotless Mind",
+    "type": "movie",
+    "description": "A surreal and poignant exploration of memory and love. The film's non-linear narrative and visual style are highly artistic.",
+    "source_url": "https://www.imdb.com/title/tt0338013/",
+    "image_url": "https://m.media-amazon.com/images/M/MV5BMTY4NzcwODg3Nl5BMl5BanBnXkFtZTcwNTEwOTMyMw@@._V1_.jpg",
+    "score": 0.95,
+    "category": "movie"
+  },
+  {
+    "title": "The House of the Spirits by Isabel Allende",
+    "type": "book",
+    "description": "A classic of magical realism that weaves together the personal and the political in a sweeping family saga.",
+    "source_url": "https://www.goodreads.com/book/show/9328.The_House_of_the_Spirits",
+    "image_url": "https://images.gr-assets.com/books/1327872432l/9328.jpg",
+    "score": 0.92,
+    "category": "book"
+  },
+  {
+    "title": "Blade Runner 2049 Soundtrack by Hans Zimmer & Benjamin Wallfisch",
+    "type": "music",
+    "description": "An atmospheric and immersive soundscape that perfectly captures the film's dystopian yet beautiful world.",
+    "source_url": "https://open.spotify.com/album/4kZrYEMf3n6sT3zGsoFOfA",
+    "image_url": "https://i.scdn.co/image/ab67616d0000b27382e8e7343a4a159f4296b349",
+    "score": 0.89,
+    "category": "music"
+  },
+  {
+    "title": "Visit the Yayoi Kusama: Infinity Mirror Rooms Exhibition",
+    "type": "art",
+    "description": "An immersive art experience that explores themes of infinity, self-reflection, and obsession through dazzling installations.",
+    "source_url": "https://www.tate.org.uk/whats-on/tate-modern/yayoi-kusama-infinity-mirror-rooms",
+    "image_url": "https://www.tate.org.uk/sites/default/files/styles/width-1200/public/kusama_infinity_room_photo_by_tate_photography_2.jpg",
+    "score": 0.88,
+    "category": "art"
+  },
+  {
+    "title": "Her (2013)",
+    "type": "movie",
+    "description": "A sensitive and thoughtful look at a near-future where a man falls in love with an advanced AI operating system.",
+    "source_url": "https://www.imdb.com/title/tt1798709/",
+    "image_url": "https://m.media-amazon.com/images/M/MV5BMjA1Nzk0OTM2OF5BMl5BanBnXkFtZTgwNjU2NjEwMDE@._V1_.jpg",
+    "score": 0.85,
+    "category": "movie"
+  },
+  {
+    "title": "Listen to the 'Song Exploder' Podcast",
+    "type": "podcast",
+    "description": "Musicians deconstruct their songs, and tell the story of how they were made. A deep dive into the creative process.",
+    "source_url": "https://songexploder.net/",
+    "image_url": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts113/v4/64/03/49/640349f7-2933-2832-1596-98928d32b0f4/mza_1013854194354271895.jpg/1200x1200bb.jpg",
+    "score": 0.81,
+    "category": "podcast"
+  },
+  {
+    "title": "Read 'One Hundred Years of Solitude' by Gabriel García Márquez",
+    "type": "book",
+    "description": "The landmark novel that defined a genre and tells the story of the Buendía family, and the mythical town of Macondo.",
+    "source_url": "https://www.goodreads.com/book/show/320.One_Hundred_Years_of_Solitude",
+    "image_url": "https://images.gr-assets.com/books/1327881361l/320.jpg",
+    "score": 0.79,
+    "category": "book"
+  }
+] 

@@ -1,15 +1,21 @@
 # main.py
-from embedding import generate_user_embedding
-from art_embedding import batch_generate_embeddings
-from retriever import retrieve_top_candidates
-from reranker import update_user_embedding
-from formatter import format_for_user
+# 1. Load user profile and generate user embedding
+# 2. Retrieve candidates from each domain and batch-generate embeddings
+# 3. Main loop: recommend 5 items at a time, collect feedback, update user embedding, repeat
+# 4. Stop when all candidates are seen or user quits, then output final personalized recommendations
+
+from .embedding import generate_user_embedding
+from .art_embedding import batch_generate_embeddings
+from .retriever import retrieve_top_candidates
+from .reranker import update_user_embedding
+from .formatter import format_for_user
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import json
 
 # Step 1: Generate user embedding from JSON profile
-user_profile_path = "hunter-agent/profiling_output_sample.json"
+# Updated path to read from user_profiles.json in art_recommender folder
+user_profile_path = "art_recommender/user_profiles.json"
 user_embedding = generate_user_embedding(user_profile_path)
 print("--- Initial user profile embedding generated. ---")
 
@@ -24,73 +30,65 @@ podcast_candidates = retrieve_top_candidates("podcasts", user_embedding)
 musical_candidates = retrieve_top_candidates("musicals", user_embedding)
 
 # Step 3: Merge and enrich the pool with embeddings
+# 拼接所有候选项，批量生成 embedding（包含 title/description/creator/category/release_date/metadata 等）
 top_candidates = movie_candidates + book_candidates + music_candidates + art_candidates + poetry_candidates + podcast_candidates + musical_candidates
-top_candidates = batch_generate_embeddings(top_candidates, text_field="title")
+top_candidates = batch_generate_embeddings(top_candidates)
 print(f"--- Pool of {len(top_candidates)} candidates ready for interaction. ---")
 
-
-# --- Main Interaction Loop ---
+# Step 4: 主推荐-反馈-更新循环
 current_embedding = user_embedding
 seen_urls = set()
-feedback_batch = []
 running = True
 
-while running and len(seen_urls) < len(top_candidates):
-    # Re-rank all candidates based on the current embedding
-    candidate_embeddings = [c['embedding'] for c in top_candidates if 'embedding' in c]
-    similarities = cosine_similarity([current_embedding], candidate_embeddings)[0]
-    for i, c in enumerate(top_candidates):
-        c['score'] = similarities[i]
-
-    sorted_candidates = sorted(top_candidates, key=lambda x: x.get('score', 0), reverse=True)
-
-    # Find the next best candidate that hasn't been seen
-    next_candidate = None
-    for candidate in sorted_candidates:
-        if candidate.get('source_url') not in seen_urls:
-            next_candidate = candidate
-            break
-    
-    if not next_candidate:
+while running:
+    # 1. 用当前 user embedding 对剩余候选项计算相似度，排序
+    candidates_to_rank = [c for c in top_candidates if c.get('source_url') not in seen_urls and 'embedding' in c]
+    if not candidates_to_rank:
         print("\n--- You've seen all available recommendations. ---")
         break
+    candidate_embeddings = [c['embedding'] for c in candidates_to_rank]
+    similarities = cosine_similarity([current_embedding], candidate_embeddings)[0]
+    for i, c in enumerate(candidates_to_rank):
+        c['score'] = similarities[i]
+    sorted_candidates = sorted(candidates_to_rank, key=lambda x: x.get('score', 0), reverse=True)
 
-    # Step 4: Present candidate and get swipe feedback
-    print("\n=================================================")
-    print(f"Title: {next_candidate.get('title')}")
-    print(f"Description: {next_candidate.get('description', 'No description available.')}")
-    print(f"Image URL: {next_candidate.get('image_url', 'N/A')}")
-    
-    feedback_input = ""
-    while feedback_input not in ['r', 'l', 'q']:
-        feedback_input = input("Swipe right (r), left (l), or (q)uit: ").lower()
+    # 2. 取前5个未展示过的推荐项
+    batch = sorted_candidates[:5]
+    if not batch:
+        break
 
-    if feedback_input == 'q':
-        running = False
-        continue
+    # 3. 展示5个推荐项，收集用户反馈（r/l/q）
+    batch_feedback = []
+    print("\n===== New Recommendation Batch =====")
+    for idx, candidate in enumerate(batch, 1):
+        print(f"\n[{idx}/5] Title: {candidate.get('title')}")
+        print(f"Description: {candidate.get('description', 'No description available.')}")
+        print(f"Creator: {candidate.get('creator', '')}")
+        print(f"Category: {candidate.get('category', '')}")
+        print(f"Release Date: {candidate.get('release_date', '')}")
+        print(f"Source URL: {candidate.get('source_url', '')}")
+        feedback = ""
+        while feedback not in ['r', 'l', 'q']:
+            feedback = input("Swipe right (r), left (l), or (q)uit: ").lower()
+        if feedback == 'q':
+            running = False
+            break
+        score = 1 if feedback == 'r' else 0
+        batch_feedback.append(score)
+        seen_urls.add(candidate.get('source_url'))
 
-    # Record feedback
-    feedback_score = 1 if feedback_input == 'r' else 0
-    feedback_batch.append({"candidate": next_candidate, "feedback": feedback_score})
-    seen_urls.add(next_candidate.get('source_url'))
+    if not running or not batch_feedback:
+        break
 
-    # Step 5: Update user embedding every 5 swipes
-    if len(feedback_batch) == 5:
-        print("\n--- 5 swipes recorded. Updating your profile... ---")
-        
-        batch_embeddings = [fb['candidate']['embedding'] for fb in feedback_batch]
-        batch_scores = [fb['feedback'] for fb in feedback_batch]
-        
-        current_embedding = update_user_embedding(current_embedding, batch_scores, batch_embeddings)
-        print("--- Profile updated! Your next recommendations will be more tailored. ---")
-        
-        feedback_batch = [] # Reset for the next batch
+    # 4. 用这5个反馈更新 user embedding，提升个性化
+    batch_embeddings = [c['embedding'] for c in batch[:len(batch_feedback)]]
+    current_embedding = update_user_embedding(current_embedding, batch_feedback, batch_embeddings)
+    print("--- Profile updated! Your next recommendations will be more tailored. ---")
 
-# --- End of Loop ---
+# Step 5: 输出最终 personalized 推荐结果
 print("\n=================================================")
 print("--- Interaction ended. Here is your final personalized journey. ---")
-final_output = format_for_user(sorted_candidates)
-# We can use print(json.dumps(final_output, indent=2)) for better readability if needed
+final_output = format_for_user([c for c in top_candidates if c.get('source_url') in seen_urls])
 print(json.dumps(final_output, indent=2))
 
 # Tool Suggestions & APIs Used:

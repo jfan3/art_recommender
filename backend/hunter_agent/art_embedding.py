@@ -14,13 +14,29 @@ def generate_text_embedding(text: str, model: str = "text-embedding-3-small") ->
     return response.data[0].embedding
 
 
-def batch_generate_embeddings(candidates: List[Dict], text_field: str = "title") -> List[Dict]:
+def make_embedding_text(item: dict) -> str:
+    parts = [
+        item.get("title", ""),
+        item.get("description", ""),
+        f"By {item.get('creator', '')}" if item.get("creator") else "",
+        f"Category: {item.get('category', '')}" if item.get("category") else "",
+        f"Released: {item.get('release_date', '')}" if item.get("release_date") else "",
+    ]
+    metadata = item.get("metadata", {})
+    if metadata:
+        for k, v in metadata.items():
+            if v:
+                parts.append(f"{k}: {v}")
+    return ". ".join([p for p in parts if p])
+
+
+def batch_generate_embeddings(candidates: List[Dict]) -> List[Dict]:
     """
-    Converts candidate items into embedding-enriched data.
+    Converts candidate items into embedding-enriched data using all available fields.
     """
     enriched_candidates = []
     for item in candidates:
-        text = item.get(text_field, "")
+        text = make_embedding_text(item)
         if not text:
             continue
         embedding = generate_text_embedding(text)
