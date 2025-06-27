@@ -42,21 +42,21 @@ def search_openlibrary(query: str, num_results: int = 10) -> List[Dict]:
         results = []
         for doc in data.get("docs", []):
             results.append({
-                "title": doc.get("title"),
-                "description": doc.get("first_sentence", {}).get("value", "") if doc.get("first_sentence") else "",
-                "source_url": f"https://openlibrary.org{doc.get('key')}",
+                "title": doc.get("title") or "",
+                "description": (doc.get("first_sentence", {}) or {}).get("value", "") if doc.get("first_sentence") else "",
+                "source_url": f"https://openlibrary.org{doc.get('key') or ''}",
                 "image_url": f"https://covers.openlibrary.org/b/id/{doc.get('cover_i')}-L.jpg" if doc.get("cover_i") else "",
                 "type": "book",
                 "category": "book",
-                "creator": ", ".join(doc.get("author_name", [])) if doc.get("author_name") else "",
-                "release_date": doc.get("first_publish_year", ""),
+                "creator": ", ".join(doc.get("author_name", []) or []) or "",
+                "release_date": str(doc.get("first_publish_year") or ""),
                 "metadata": {
-                    "genre": ", ".join(doc.get("subject", [])) if doc.get("subject") else "",
-                    "language": ", ".join(doc.get("language", [])) if doc.get("language") else "",
-                    "country": doc.get("publish_country", ""),
-                    "tags": ", ".join(doc.get("subject", [])) if doc.get("subject") else "",
-                    "rating": doc.get("ratings_average", ""),
-                    "awards": doc.get("awards", ""),
+                    "genre": ", ".join(doc.get("subject", []) or []) or "",
+                    "language": ", ".join(doc.get("language", []) or []) or "",
+                    "country": doc.get("publish_country") or "",
+                    "tags": ", ".join(doc.get("subject", []) or []) or "",
+                    "rating": str(doc.get("ratings_average") or ""),
+                    "awards": doc.get("awards") or "",
                 }
             })
         return results
@@ -77,20 +77,20 @@ def search_google(query: str, num_results: int = 10) -> List[Dict]:
         results = []
         for item in data.get("organic_results", []):
             results.append({
-                "title": item.get("title"),
-                "description": item.get("snippet", ""),
-                "source_url": item.get("link"),
-                "image_url": item.get("thumbnail") or item.get("image", {}).get("src", ""),
+                "title": item.get("title") or "",
+                "description": item.get("snippet", "") or "",
+                "source_url": item.get("link") or "",
+                "image_url": item.get("thumbnail") or (item.get("image", {}) or {}).get("src", "") or "",
                 "type": "web",
                 "category": "web",
                 "creator": "",
                 "release_date": "",
                 "metadata": {
-                    "displayed_link": item.get("displayed_link"),
-                    "position": item.get("position"),
-                    "tags": ", ".join(item.get("rich_snippet", {}).get("top", {}).get("tags", [])) if item.get("rich_snippet", {}).get("top", {}).get("tags") else "",
-                    "rating": item.get("rating", ""),
-                    "mood": item.get("mood", ""),
+                    "displayed_link": item.get("displayed_link") or "",
+                    "position": str(item.get("position") or ""),
+                    "tags": ", ".join((item.get("rich_snippet", {}) or {}).get("top", {}).get("tags", []) or []) or "",
+                    "rating": str(item.get("rating") or ""),
+                    "mood": item.get("mood") or "",
                 }
             })
         return results
@@ -113,19 +113,19 @@ def search_tmdb(query: str, num_results: int = 10) -> List[Dict]:
         results = []
         for movie in data.get("results", [])[:num_results]:
             results.append({
-                "title": movie.get("title"),
-                "description": movie.get("overview", ""),
-                "source_url": f"https://www.themoviedb.org/movie/{movie.get('id')}",
-                "image_url": f"https://image.tmdb.org/t/p/w500{movie.get('poster_path')}" if movie.get("poster_path") else "",
+                "title": movie.get("title") or "",
+                "description": movie.get("overview", "") or "",
+                "source_url": f"https://www.themoviedb.org/movie/{movie.get('id') or ''}",
+                "image_url": f"https://image.tmdb.org/t/p/w500{movie.get('poster_path') or ''}" if movie.get("poster_path") else "",
                 "type": "movie",
                 "category": "movie",
                 "creator": "",
-                "release_date": movie.get("release_date", ""),
+                "release_date": movie.get("release_date") or "",
                 "metadata": {
-                    "original_language": movie.get("original_language", ""),
-                    "genre": ", ".join([g["name"] for g in movie.get("genre_ids", [])]) if movie.get("genre_ids") else "",
-                    "country": movie.get("origin_country", ""),
-                    "rating": movie.get("vote_average", ""),
+                    "original_language": movie.get("original_language") or "",
+                    "genre": ", ".join([g["name"] for g in movie.get("genre_ids", [])] if movie.get("genre_ids") else []) or "",
+                    "country": movie.get("origin_country") or "",
+                    "rating": str(movie.get("vote_average") or ""),
                     "tags": "",
                     "awards": "",
                 }
@@ -148,7 +148,7 @@ def get_spotify_access_token() -> str:
         return response.json()["access_token"]
     else:
         print(f"[Spotify] Token Error: {response.status_code}", response.text)
-        return None
+        return ""
 
 def search_spotify(query: str, num_results: int = 10) -> List[Dict]:
     token = get_spotify_access_token()
@@ -161,22 +161,22 @@ def search_spotify(query: str, num_results: int = 10) -> List[Dict]:
         data = response.json()
         results = []
         for item in data.get("tracks", {}).get("items", []):
-            album = item.get("album", {})
+            album = item.get("album", {}) or {}
             results.append({
-                "title": item.get("name"),
-                "description": album.get("name", ""),
-                "source_url": item.get("external_urls", {}).get("spotify", ""),
-                "image_url": album.get("images", [{}])[0].get("url", ""),
+                "title": item.get("name") or "",
+                "description": album.get("name") or "",
+                "source_url": item.get("external_urls", {}).get("spotify", "") or "",
+                "image_url": (album.get("images", [{}]) or [{}])[0].get("url", "") or "",
                 "type": "music",
                 "category": "music",
-                "creator": ", ".join([a["name"] for a in item.get("artists", [])]),
-                "release_date": album.get("release_date", ""),
+                "creator": ", ".join([a["name"] for a in item.get("artists", [])] if item.get("artists") else []) or "",
+                "release_date": album.get("release_date") or "",
                 "metadata": {
-                    "genre": ", ".join(album.get("genres", [])) if album.get("genres") else "",
+                    "genre": ", ".join(album.get("genres", []) or []) or "",
                     "tags": "",
-                    "country": album.get("country", ""),
-                    "language": album.get("languages", ""),
-                    "rating": album.get("popularity", ""),
+                    "country": album.get("country") or "",
+                    "language": album.get("languages") or "",
+                    "rating": str(album.get("popularity") or ""),
                     "mood": "",
                     "awards": "",
                 }
