@@ -168,7 +168,7 @@ def search_tmdb(query: str, num_results: int = 10) -> List[Dict]:
                 "release_date": movie.get("release_date") or "",
                 "metadata": {
                     "original_language": movie.get("original_language") or "",
-                    "genre": ", ".join([g["name"] for g in movie.get("genre_ids", [])] if movie.get("genre_ids") else []) or "",
+                    "genre": ", ".join([str(g) for g in movie.get("genre_ids", [])] if movie.get("genre_ids") else []) or "",
                     "country": movie.get("origin_country") or "",
                     "rating": str(movie.get("vote_average") or ""),
                     "tags": "",
