@@ -1,0 +1,52 @@
+{
+  "session_id": "frontend-session-1751150394860",
+  "user_uuid": "996e050b-ab58-454e-843d-509984f35263",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hi there! What's a work of art\u2014whether it's a movie, song, book, or painting\u2014that has stayed with you over time and you still love?"
+    },
+    {
+      "role": "user",
+      "content": "pride and prejudice"
+    },
+    {
+      "role": "assistant",
+      "content": "Great choice! How would you describe your overall taste in art, books, or entertainment?"
+    },
+    {
+      "role": "user",
+      "content": "bright"
+    },
+    {
+      "role": "assistant",
+      "content": "Thanks for sharing! What art, ideas, or topics are you currently obsessed with or can't stop thinking about?"
+    },
+    {
+      "role": "user",
+      "content": "labubu"
+    },
+    {
+      "role": "assistant",
+      "content": "That's fascinating! Could you share a quick snapshot of how you're feeling or the state of your life right now?"
+    },
+    {
+      "role": "user",
+      "content": "happy"
+    },
+    {
+      "role": "assistant",
+      "content": "I'm glad to hear that! Where do you see yourself in the future, or what aspirations do you have for your life?"
+    },
+    {
+      "role": "user",
+      "content": "astronaut"
+    }
+  ],
+  "created_at": "2025-06-28T22:40:25.429385Z",
+  "updated_at": "2025-06-28T22:40:25.429387Z"
+}

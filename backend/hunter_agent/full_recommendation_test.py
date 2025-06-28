@@ -23,7 +23,8 @@ def test_full_recommendation_pipeline():
     # Step 1: Load user profile
     print("1. Loading user profile...")
     try:
-        user_profile = load_user_profile("../../user_profiles.json")
+        user_uuid = "your_test_uuid_here"  # Replace with actual uuid or pass as argument
+        user_profile = load_user_profile(user_uuid)
         print(f"   ✅ Profile loaded for UUID: {user_profile.get('uuid', 'N/A')}")
         print(f"   📝 Taste: {user_profile.get('taste_genre', 'N/A')}")
         print(f"   ❤️  Favorites: {user_profile.get('past_favorite_work', [])}")
@@ -38,7 +39,7 @@ def test_full_recommendation_pipeline():
     # Step 2: Generate user embedding
     print("2. Generating user embedding...")
     try:
-        user_embedding = generate_user_embedding("../../user_profiles.json")
+        user_embedding = generate_user_embedding(user_uuid)
         print(f"   ✅ User embedding generated (length: {len(user_embedding)})")
         print()
     except Exception as e:

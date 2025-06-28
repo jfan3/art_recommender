@@ -1,0 +1,56 @@
+{
+  "session_id": "frontend-session-1751152318032",
+  "user_uuid": "73696ebc-e984-47b5-9809-16be52af7eaf",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hi there! What's a piece of art\u2014like a book, movie, or music\u2014that's been a longtime favorite of yours?"
+    },
+    {
+      "role": "user",
+      "content": "pride and prejudice"
+    },
+    {
+      "role": "assistant",
+      "content": "Great choice! What kinds of genres or themes tend to consistently draw you in?"
+    },
+    {
+      "role": "user",
+      "content": "romance"
+    },
+    {
+      "role": "assistant",
+      "content": "Romance is such a classic genre. Is there any art or idea you're currently obsessed with or can't stop thinking about?"
+    },
+    {
+      "role": "user",
+      "content": "labubu"
+    },
+    {
+      "role": "assistant",
+      "content": "Labubu sounds intriguing! How would you describe your current state of mind or life lately?"
+    },
+    {
+      "role": "user",
+      "content": "happy"
+    },
+    {
+      "role": "assistant",
+      "content": "That's lovely to hear you're feeling happy! What are your future aspirations\u2014who you want to be or where you'd like to go?"
+    },
+    {
+      "role": "user",
+      "content": "astronaut"
+    },
+    {
+      "role": "assistant",
+      "content": "Thanks for sharing\u2014your profile is complete! Wishing you all the best for your future as an astronaut!"
+    }
+  ],
+  "created_at": "2025-06-28T23:12:32.241312Z",
+  "updated_at": "2025-06-28T23:12:32.241313Z"
+}

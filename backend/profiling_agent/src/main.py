@@ -13,8 +13,8 @@ try:
 except ImportError:
     from chat_loop import ChatLoop
 
-# Load environment variables
-load_dotenv()
+# Load environment variables from .env in the root folder
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'))
 
 app = FastAPI(title="Profiling Agent MCP Server", version="1.0.0")
 
@@ -105,7 +105,9 @@ async def list_profiles():
 @app.post("/profiles")
 async def create_profile():
     """Create a new profile and return the UUID."""
+    print("[DEBUG] /profiles POST called: creating new profile")
     user_uuid = chat_loop.storage.create_profile()
+    print(f"[DEBUG] New profile created with UUID: {user_uuid}")
     return {"uuid": user_uuid}
 
 @app.get("/conversations")

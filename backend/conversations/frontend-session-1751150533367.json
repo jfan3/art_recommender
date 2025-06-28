@@ -1,0 +1,16 @@
+{
+  "session_id": "frontend-session-1751150533367",
+  "user_uuid": "597c09f0-1809-45f3-8f96-9581fef1e395",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! Hope you're doing well. What's a piece of art, movie, book, or music that you've loved for a long time and still feel connected to?"
+    }
+  ],
+  "created_at": "2025-06-28T22:42:14.277922Z",
+  "updated_at": "2025-06-28T22:42:14.277923Z"
+}

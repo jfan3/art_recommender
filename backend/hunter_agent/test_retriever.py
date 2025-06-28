@@ -186,7 +186,8 @@ def test_retrieve_top_candidates():
     
     # Load the actual user profile instead of using a sample
     try:
-        profile = load_user_profile("../../user_profiles.json")
+        user_uuid = "your_test_uuid_here"  # Replace with actual uuid or pass as argument
+        profile = load_user_profile(user_uuid)
         print("Using actual user profile:")
         print(f"  Taste: {profile.get('taste_genre', 'N/A')}")
         print(f"  Past favorites: {profile.get('past_favorite_work', [])}")
@@ -227,7 +228,8 @@ def test_load_user_profile():
     
     try:
         # Use the correct path to user_profiles.json in the root directory
-        profile = load_user_profile("../../user_profiles.json")
+        user_uuid = "your_test_uuid_here"  # Replace with actual uuid or pass as argument
+        profile = load_user_profile(user_uuid)
         print("Profile loaded successfully")
         print(f"Profile keys: {list(profile.keys())}")
         

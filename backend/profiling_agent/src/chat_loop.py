@@ -3,6 +3,7 @@ import json
 from typing import Dict, Any, Generator, List
 from openai import AzureOpenAI
 import traceback
+import requests
 
 # Handle imports for both direct execution and package import
 try:
@@ -172,7 +173,6 @@ Rules:
             # If we got a tool request and **no** text, execute & loop again
             if tool_call and not text_chunks:
                 print(f"DEBUG: Executing tool call: {tool_call['name']}")
-                
                 # 1) record assistant's request
                 convo.append({
                     "role": "assistant",
@@ -186,16 +186,21 @@ Rules:
                         }
                     }]
                 })
-
                 # 2) run the tool
                 try:
                     args = json.loads(tool_call["args"])
                     if tool_call["name"] == "save_profile":
                         tool_result = self._handle_save_profile(user_uuid, args)
-                        
                         # Check if profile is complete
                         if tool_result.get("complete", False):
-                            yield f"data: {json.dumps({'type':'complete','user_uuid':user_uuid})}\n\n"
+                            yield f"data: {{\"type\":\"complete\",\"user_uuid\":\"{user_uuid}\"}}\n\n"
+                            # --- Trigger hunter agent here ---
+                            try:
+                                hunter_url = os.getenv("HUNTER_AGENT_API_URL", "http://localhost:8090")
+                                resp = requests.post(f"{hunter_url}/api/generate_candidates/{user_uuid}")
+                                print(f"[INFO] Triggered Hunter Agent for UUID {user_uuid}. Status: {resp.status_code}, Response: {resp.text}")
+                            except Exception as e:
+                                print(f"[WARN] Could not trigger hunter agent candidate generation: {e}")
                             return
                 except json.JSONDecodeError as e:
                     print(f"ERROR: Failed to parse tool call arguments: {e}")
@@ -231,7 +236,13 @@ Rules:
             "state_of_mind",
             "future_aspirations",
         ]
-        return all(prof.get(f) for f in required)
+        is_complete = all(prof.get(f) for f in required)
+        
+        if is_complete:
+            # Update profile and Supabase to mark as complete
+            self.storage.merge_profile(user_uuid, {"complete": True})
+            
+        return is_complete
     
     def _handle_save_profile(self, user_uuid: str, args: Dict[str, Any]) -> dict:
         """Handle the save_profile tool call."""

@@ -5,6 +5,8 @@ from datetime import datetime
 from typing import Dict, Any, Optional, List
 from pathlib import Path
 import hashlib
+from backend.db.supabase_client import upsert_user_profile
+import requests
 
 class ConversationStorage:
     """Handles local JSON storage for conversation history."""
@@ -148,6 +150,8 @@ class ProfileStorage:
             "updated_at": datetime.utcnow().isoformat() + "Z"
         }
         self._save_profile(profile)
+        # --- Supabase logging ---
+        upsert_user_profile({k: v for k, v in profile.items() if k != "filename"})
         return user_uuid
     
     def _find_profile_file(self, user_uuid: str) -> Optional[Path]:
@@ -193,6 +197,8 @@ class ProfileStorage:
         profile["updated_at"] = datetime.utcnow().isoformat() + "Z"
         
         self._save_profile(profile)
+        # --- Supabase logging ---
+        upsert_user_profile({k: v for k, v in profile.items() if k != "filename"})
         return True
     
     def is_profile_complete(self, user_uuid: str) -> bool:

@@ -1,0 +1,52 @@
+{
+  "session_id": "frontend-session-1751150574203",
+  "user_uuid": "c0686cb3-04a4-4f4b-9f9e-969f9883d269",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! Nice to meet you. What's a piece of art, music, or literature that you've loved for a long time and still enjoy?"
+    },
+    {
+      "role": "user",
+      "content": "pride and prejudice"
+    },
+    {
+      "role": "assistant",
+      "content": "Thanks for sharing! How would you describe your overall taste in art, music, literature, or ideas? What's timeless for you?"
+    },
+    {
+      "role": "user",
+      "content": "happy"
+    },
+    {
+      "role": "assistant",
+      "content": "Got it! Could you share what kind of art, ideas, or themes you're currently obsessed with? Anything you can't stop thinking about lately?"
+    },
+    {
+      "role": "user",
+      "content": "labubu"
+    },
+    {
+      "role": "assistant",
+      "content": "Thanks for letting me know! How would you describe your state of mind or emotions these days?"
+    },
+    {
+      "role": "user",
+      "content": "happier"
+    },
+    {
+      "role": "assistant",
+      "content": "Thanks for sharing that! What are your future aspirations\u2014what kind of person do you want to be or goals you're aiming for?"
+    },
+    {
+      "role": "user",
+      "content": "data scientist"
+    }
+  ],
+  "created_at": "2025-06-28T22:43:22.957227Z",
+  "updated_at": "2025-06-28T22:43:22.957228Z"
+}

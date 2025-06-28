@@ -1,0 +1,16 @@
+{
+  "session_id": "frontend-session-1751150985463",
+  "user_uuid": "72ef07cb-87e2-4b82-ad8d-0a310f62fc3b",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! Great to see you here. Let's start\u2014what\u2019s a piece of art, literature, music, or film that\u2019s stood the test of time for you and remains a favorite?"
+    }
+  ],
+  "created_at": "2025-06-28T22:49:46.462983Z",
+  "updated_at": "2025-06-28T22:49:46.462985Z"
+}

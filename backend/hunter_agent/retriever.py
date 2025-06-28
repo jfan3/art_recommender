@@ -6,56 +6,42 @@ import base64
 from dotenv import load_dotenv  # pip install python-dotenv
 from typing import List, Dict
 from datetime import datetime
+from backend.db.supabase_client import get_user_profile
 
-load_dotenv()
+# Load environment variables from .env in the root folder
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'))
+
 SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 
 
-def load_user_profile(profile_path="art_recommender/user_profiles.json") -> dict:
-    with open(profile_path, "r") as f:
-        data = json.load(f)
-    
-    # Handle the format where user_profiles.json contains a dict with UUID keys
-    if isinstance(data, dict) and len(data) > 0:
-        # Get the first user profile
-        first_uuid = list(data.keys())[0]
-        profile = data[first_uuid]
-        print(f"Loaded profile for UUID: {first_uuid}")
-    else:
-        # Fallback to direct profile format
-        profile = data
-    
+def load_user_profile(user_uuid: str) -> dict:
+    profile = get_user_profile(user_uuid)
+    if not profile:
+        print(f"Warning: No profile found in Supabase for UUID: {user_uuid}")
+        return {}
     # Map actual field names to expected field names
     field_mapping = {
         "favorite_taste_genre_description": "taste_genre",
         "current_state_of_mind": "state_of_mind"
     }
-    
-    # Apply field mapping
     for actual_field, expected_field in field_mapping.items():
         if actual_field in profile and expected_field not in profile:
             profile[expected_field] = profile[actual_field]
-    
-    # Validate required fields exist
     required_fields = ["past_favorite_work", "taste_genre", "current_obsession", "state_of_mind", "future_aspirations"]
     for field in required_fields:
         if field not in profile:
-            print(f"Warning: Missing required field '{field}' in user profile")
-            profile[field] = "" if field != "past_favorite_work" and field != "current_obsession" else []
-    
-    # Handle new fields with defaults
+            profile[field] = "" if field not in ["past_favorite_work", "current_obsession"] else []
     if "uuid" not in profile:
-        profile["uuid"] = ""
+        profile["uuid"] = user_uuid
     if "complete" not in profile:
         profile["complete"] = False
     if "created_at" not in profile:
         profile["created_at"] = ""
     if "updated_at" not in profile:
         profile["updated_at"] = ""
-    
     return profile
 
 def build_query(category: str, profile: dict) -> str:
