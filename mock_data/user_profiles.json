@@ -1,0 +1,57 @@
+[
+  {
+    "uuid": "ff51fc1d-97bf-415b-aeea-22ceb5bceef8",
+    "past_favorite_work": ["donnie darko", "the matrix", "inception"],
+    "taste_genre": "horror and romance",
+    "current_obsession": ["labubu", "astronomy", "dreams"],
+    "state_of_mind": "pretty happy!",
+    "future_aspirations": "astronaut",
+    "complete": true,
+    "created_at": "2025-06-27T23:27:07.025648Z",
+    "updated_at": "2025-06-27T23:27:38.255736Z"
+  },
+  {
+    "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "past_favorite_work": ["the great gatsby", "1984", "brave new world"],
+    "taste_genre": "literary fiction and dystopian",
+    "current_obsession": ["poetry", "social commentary", "classic literature"],
+    "state_of_mind": "contemplative and introspective",
+    "future_aspirations": "writer",
+    "complete": false,
+    "created_at": "2025-06-28T10:15:30.123456Z",
+    "updated_at": "2025-06-28T10:15:30.123456Z"
+  },
+  {
+    "uuid": "b2c3d4e5-f6g7-8901-bcde-f23456789012",
+    "past_favorite_work": ["bohemian rhapsody", "stairway to heaven", "comfortably numb"],
+    "taste_genre": "classic rock and progressive",
+    "current_obsession": ["vinyl records", "music production", "guitar"],
+    "state_of_mind": "nostalgic and creative",
+    "future_aspirations": "musician",
+    "complete": true,
+    "created_at": "2025-06-28T14:20:45.789012Z",
+    "updated_at": "2025-06-28T16:30:15.456789Z"
+  },
+  {
+    "uuid": "c3d4e5f6-g7h8-9012-cdef-345678901234",
+    "past_favorite_work": ["the starry night", "guernica", "the persistence of memory"],
+    "taste_genre": "surrealism and expressionism",
+    "current_obsession": ["contemporary art", "digital art", "art history"],
+    "state_of_mind": "inspired and artistic",
+    "future_aspirations": "artist",
+    "complete": false,
+    "created_at": "2025-06-28T18:45:22.345678Z",
+    "updated_at": "2025-06-28T18:45:22.345678Z"
+  },
+  {
+    "uuid": "d4e5f6g7-h8i9-0123-defg-456789012345",
+    "past_favorite_work": ["hamilton", "les miserables", "phantom of the opera"],
+    "taste_genre": "musical theatre and drama",
+    "current_obsession": ["broadway", "singing", "theatre history"],
+    "state_of_mind": "passionate and dramatic",
+    "future_aspirations": "actor",
+    "complete": true,
+    "created_at": "2025-06-28T20:10:33.567890Z",
+    "updated_at": "2025-06-28T22:25:44.123456Z"
+  }
+] 

@@ -1,0 +1,207 @@
+[
+  {
+    "item_id": "movie_001",
+    "item_name": "Donnie Darko",
+    "description": "A troubled teenager is plagued by visions of a man in a large rabbit suit who manipulates him to commit a series of crimes.",
+    "source_url": "https://www.themoviedb.org/movie/141",
+    "image_url": "https://image.tmdb.org/t/p/w500/aWHrJdmyH7qR7gKgEDwqXm3Q8Ge.jpg",
+    "category": "movie",
+    "creator": "Richard Kelly",
+    "release_date": "2001-10-26",
+    "metadata": {
+      "original_language": "en",
+      "genre": "28, 18, 878",
+      "country": "US",
+      "rating": "7.8",
+      "tags": "psychological thriller, sci-fi, drama",
+      "awards": "Sundance Film Festival"
+    }
+  },
+  {
+    "item_id": "book_001",
+    "item_name": "The Great Gatsby",
+    "description": "A story of the fabulously wealthy Jay Gatsby and his love for the beautiful Daisy Buchanan.",
+    "source_url": "https://openlibrary.org/works/OL45804W",
+    "image_url": "https://covers.openlibrary.org/b/id/8231456-L.jpg",
+    "category": "book",
+    "creator": "F. Scott Fitzgerald",
+    "release_date": "1925",
+    "metadata": {
+      "genre": "Fiction, Classics, Romance",
+      "language": "en",
+      "country": "US",
+      "tags": "american literature, jazz age, tragedy",
+      "rating": "4.2",
+      "awards": "Modern Library 100 Best Novels"
+    }
+  },
+  {
+    "item_id": "music_001",
+    "item_name": "Bohemian Rhapsody",
+    "description": "Queen's epic rock opera featuring multiple sections and genres.",
+    "source_url": "https://open.spotify.com/track/3z8h0TU7ReDPLIbEnYhWZb",
+    "image_url": "https://i.scdn.co/image/ab67616d0000b273ce4f1737e6c5a7197f0a9617",
+    "category": "music",
+    "creator": "Queen",
+    "release_date": "1975-10-31",
+    "metadata": {
+      "genre": "Rock, Progressive Rock",
+      "tags": "classic rock, opera, epic",
+      "country": "GB",
+      "language": "en",
+      "rating": "95",
+      "mood": "epic, dramatic",
+      "awards": "Grammy Hall of Fame"
+    }
+  },
+  {
+    "item_id": "art_001",
+    "item_name": "The Starry Night",
+    "description": "Vincent van Gogh's iconic painting depicting the view from his asylum window.",
+    "source_url": "https://www.moma.org/collection/works/79802",
+    "image_url": "https://www.moma.org/media/W1siZiIsIjQ2ODk5ZiJdLFsicCIsImNvbnZlcnQiLCItcmVzaXplIDIwMDB4MjAwMFx1MDAzZSJdXQ.jpg",
+    "category": "art",
+    "creator": "Vincent van Gogh",
+    "release_date": "1889",
+    "metadata": {
+      "displayed_link": "moma.org",
+      "position": "1",
+      "tags": "post-impressionism, landscape, night",
+      "rating": "9.5",
+      "mood": "contemplative, dreamy",
+      "domain": "moma.org",
+      "quality_score": "high"
+    }
+  },
+  {
+    "item_id": "poetry_001",
+    "item_name": "The Road Not Taken",
+    "description": "Robert Frost's famous poem about choices and life's journey.",
+    "source_url": "https://www.poetryfoundation.org/poems/44272/the-road-not-taken",
+    "image_url": "",
+    "category": "poetry",
+    "creator": "Robert Frost",
+    "release_date": "1916",
+    "metadata": {
+      "displayed_link": "poetryfoundation.org",
+      "position": "1",
+      "tags": "american poetry, choices, nature",
+      "rating": "9.0",
+      "mood": "contemplative",
+      "domain": "poetryfoundation.org",
+      "quality_score": "high"
+    }
+  },
+  {
+    "item_id": "musical_001",
+    "item_name": "Hamilton",
+    "description": "Lin-Manuel Miranda's revolutionary musical about American founding father Alexander Hamilton.",
+    "source_url": "https://www.broadway.com/shows/hamilton/",
+    "image_url": "https://www.broadway.com/images/show/hamilton.jpg",
+    "category": "musical",
+    "creator": "Lin-Manuel Miranda",
+    "release_date": "2015-08-06",
+    "metadata": {
+      "displayed_link": "broadway.com",
+      "position": "1",
+      "tags": "hip-hop, history, revolutionary",
+      "rating": "9.8",
+      "mood": "energetic, revolutionary",
+      "domain": "broadway.com",
+      "quality_score": "high"
+    }
+  },
+  {
+    "item_id": "podcast_001",
+    "item_name": "This American Life",
+    "description": "Weekly public radio program and podcast featuring compelling stories.",
+    "source_url": "https://www.thisamericanlife.org/",
+    "image_url": "https://www.thisamericanlife.org/sites/default/files/styles/medium/public/2019-01/tal-logo.png",
+    "category": "podcast",
+    "creator": "Ira Glass",
+    "release_date": "1995",
+    "metadata": {
+      "displayed_link": "thisamericanlife.org",
+      "position": "1",
+      "tags": "storytelling, journalism, human interest",
+      "rating": "9.2",
+      "mood": "thoughtful, engaging",
+      "domain": "thisamericanlife.org",
+      "quality_score": "high"
+    }
+  },
+  {
+    "item_id": "movie_002",
+    "item_name": "Inception",
+    "description": "A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+    "source_url": "https://www.themoviedb.org/movie/27205",
+    "image_url": "https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
+    "category": "movie",
+    "creator": "Christopher Nolan",
+    "release_date": "2010-07-16",
+    "metadata": {
+      "original_language": "en",
+      "genre": "28, 878, 12",
+      "country": "US",
+      "rating": "8.4",
+      "tags": "sci-fi, thriller, mind-bending",
+      "awards": "Academy Award for Best Visual Effects"
+    }
+  },
+  {
+    "item_id": "book_002",
+    "item_name": "1984",
+    "description": "George Orwell's dystopian novel about totalitarianism and surveillance society.",
+    "source_url": "https://openlibrary.org/works/OL45883W",
+    "image_url": "https://covers.openlibrary.org/b/id/8575601-L.jpg",
+    "category": "book",
+    "creator": "George Orwell",
+    "release_date": "1949",
+    "metadata": {
+      "genre": "Fiction, Dystopian, Political",
+      "language": "en",
+      "country": "GB",
+      "tags": "dystopian, political, surveillance",
+      "rating": "4.5",
+      "awards": "Modern Library 100 Best Novels"
+    }
+  },
+  {
+    "item_id": "music_002",
+    "item_name": "Stairway to Heaven",
+    "description": "Led Zeppelin's epic rock ballad with mystical themes.",
+    "source_url": "https://open.spotify.com/track/5CQ30WqJwcep0pYcV4AMNc",
+    "image_url": "https://i.scdn.co/image/ab67616d0000b273c8a11e48c91a1c0b2b8c0b8c",
+    "category": "music",
+    "creator": "Led Zeppelin",
+    "release_date": "1971-11-08",
+    "metadata": {
+      "genre": "Rock, Hard Rock",
+      "tags": "classic rock, epic, mystical",
+      "country": "GB",
+      "language": "en",
+      "rating": "98",
+      "mood": "epic, mystical",
+      "awards": "Grammy Hall of Fame"
+    }
+  },
+  {
+    "item_id": "art_002",
+    "item_name": "Guernica",
+    "description": "Pablo Picasso's powerful anti-war painting depicting the horrors of the Spanish Civil War.",
+    "source_url": "https://www.museoreinasofia.es/en/collection/artwork/guernica",
+    "image_url": "https://www.museoreinasofia.es/sites/default/files/obras/DE00050_0.jpg",
+    "category": "art",
+    "creator": "Pablo Picasso",
+    "release_date": "1937",
+    "metadata": {
+      "displayed_link": "museoreinasofia.es",
+      "position": "1",
+      "tags": "cubism, anti-war, political",
+      "rating": "9.7",
+      "mood": "intense, political",
+      "domain": "museoreinasofia.es",
+      "quality_score": "high"
+    }
+  }
+] 
