@@ -192,3 +192,7 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+
+backend/profiling_agent/conversations/*
+backend/profiling_agent/profiles/*

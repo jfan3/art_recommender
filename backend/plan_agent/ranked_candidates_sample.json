@@ -1,0 +1,380 @@
+[
+  {
+    "title": "Eternal Sunshine of the Spotless Mind",
+    "type": "movie",
+    "description": "A surreal and poignant exploration of memory and love. The film's non-linear narrative and visual style are highly artistic.",
+    "source_url": "https://www.imdb.com/title/tt0338013/",
+    "image_url": "https://m.media-amazon.com/images/M/MV5BMTY4NzcwODg3Nl5BMl5BanBnXkFtZTcwNTEwOTMyMw@@._V1_.jpg",
+    "score": 0.95,
+    "category": "movie"
+  },
+  {
+    "title": "The House of the Spirits by Isabel Allende",
+    "type": "book",
+    "description": "A classic of magical realism that weaves together the personal and the political in a sweeping family saga.",
+    "source_url": "https://www.goodreads.com/book/show/9328.The_House_of_the_Spirits",
+    "image_url": "https://images.gr-assets.com/books/1327872432l/9328.jpg",
+    "score": 0.92,
+    "category": "book"
+  },
+  {
+    "title": "Blade Runner 2049 Soundtrack by Hans Zimmer & Benjamin Wallfisch",
+    "type": "music",
+    "description": "An atmospheric and immersive soundscape that perfectly captures the film's dystopian yet beautiful world.",
+    "source_url": "https://open.spotify.com/album/4kZrYEMf3n6sT3zGsoFOfA",
+    "image_url": "https://i.scdn.co/image/ab67616d0000b27382e8e7343a4a159f4296b349",
+    "score": 0.89,
+    "category": "music"
+  },
+  {
+    "title": "Visit the Yayoi Kusama: Infinity Mirror Rooms Exhibition",
+    "type": "art",
+    "description": "An immersive art experience that explores themes of infinity, self-reflection, and obsession through dazzling installations.",
+    "source_url": "https://www.tate.org.uk/whats-on/tate-modern/yayoi-kusama-infinity-mirror-rooms",
+    "image_url": "https://www.tate.org.uk/sites/default/files/styles/width-1200/public/kusama_infinity_room_photo_by_tate_photography_2.jpg",
+    "score": 0.88,
+    "category": "art"
+  },
+  {
+    "title": "Her (2013)",
+    "type": "movie",
+    "description": "A sensitive and thoughtful look at a near-future where a man falls in love with an advanced AI operating system.",
+    "source_url": "https://www.imdb.com/title/tt1798709/",
+    "image_url": "https://m.media-amazon.com/images/M/MV5BMjA1Nzk0OTM2OF5BMl5BanBnXkFtZTgwNjU2NjEwMDE@._V1_.jpg",
+    "score": 0.85,
+    "category": "movie"
+  },
+  {
+    "title": "Listen to the 'Song Exploder' Podcast",
+    "type": "podcast",
+    "description": "Musicians deconstruct their songs, and tell the story of how they were made. A deep dive into the creative process.",
+    "source_url": "https://songexploder.net/",
+    "image_url": "https://is1-ssl.mzstatic.com/image/thumb/Podcasts113/v4/64/03/49/640349f7-2933-2832-1596-98928d32b0f4/mza_1013854194354271895.jpg/1200x1200bb.jpg",
+    "score": 0.81,
+    "category": "podcast"
+  },
+  {
+    "title": "Read 'One Hundred Years of Solitude' by Gabriel García Márquez",
+    "type": "book",
+    "description": "The landmark novel that defined a genre and tells the story of the Buendía family, and the mythical town of Macondo.",
+    "source_url": "https://www.goodreads.com/book/show/320.One_Hundred_Years_of_Solitude",
+    "image_url": "https://images.gr-assets.com/books/1327881361l/320.jpg",
+    "score": 0.79,
+    "category": "book"
+  },
+  {
+    "title": "Hamilton: An American Musical",
+    "type": "musicals",
+    "description": "A revolutionary musical that tells the story of American founding father Alexander Hamilton through hip-hop and R&B.",
+    "source_url": "https://hamiltonmusical.com/",
+    "image_url": "https://hamiltonmusical.com/wp-content/uploads/2015/08/hamilton-broadway.jpg",
+    "score": 0.87,
+    "category": "musicals"
+  },
+  {
+    "title": "The Waste Land by T.S. Eliot",
+    "type": "poetry",
+    "description": "A landmark modernist poem that captures the disillusionment of post-World War I society through fragmented imagery.",
+    "source_url": "https://www.poetryfoundation.org/poems/47311/the-waste-land",
+    "image_url": "https://www.poetryfoundation.org/harriet/wp-content/uploads/2015/04/eliot.jpg",
+    "score": 0.83,
+    "category": "poetry"
+  },
+  {
+    "title": "Inception (2010)",
+    "type": "movie",
+    "description": "A mind-bending thriller about dreams within dreams, featuring stunning visual effects and complex narrative structure.",
+    "source_url": "https://www.imdb.com/title/tt1375666/",
+    "image_url": "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg",
+    "score": 0.82,
+    "category": "movie"
+  },
+  {
+    "title": "The Great Gatsby by F. Scott Fitzgerald",
+    "type": "book",
+    "description": "A classic American novel about the Jazz Age, exploring themes of wealth, love, and the American Dream.",
+    "source_url": "https://www.goodreads.com/book/show/4671.The_Great_Gatsby",
+    "image_url": "https://images.gr-assets.com/books/1490528560l/4671.jpg",
+    "score": 0.80,
+    "category": "book"
+  },
+  {
+    "title": "Dark Side of the Moon by Pink Floyd",
+    "type": "music",
+    "description": "A concept album exploring themes of greed, time, death, and mental illness through progressive rock.",
+    "source_url": "https://open.spotify.com/album/4LH4d3cOWNNsVw41Gqt2kv",
+    "image_url": "https://i.scdn.co/image/ab67616d0000b273c8a11e48c91a2c4d2e1b5b5a",
+    "score": 0.78,
+    "category": "music"
+  },
+  {
+    "title": "The Metamorphosis by Franz Kafka",
+    "type": "book",
+    "description": "A surreal novella about a man who wakes up one morning to find himself transformed into a giant insect.",
+    "source_url": "https://www.goodreads.com/book/show/485894.The_Metamorphosis",
+    "image_url": "https://images.gr-assets.com/books/1359061917l/485894.jpg",
+    "score": 0.76,
+    "category": "book"
+  },
+  {
+    "title": "Les Misérables Musical",
+    "type": "musicals",
+    "description": "A sweeping musical adaptation of Victor Hugo's novel about redemption, love, and revolution in 19th century France.",
+    "source_url": "https://www.lesmis.com/",
+    "image_url": "https://www.lesmis.com/wp-content/uploads/2019/03/les-miserables-musical.jpg",
+    "score": 0.75,
+    "category": "musicals"
+  },
+  {
+    "title": "The Love Song of J. Alfred Prufrock by T.S. Eliot",
+    "type": "poetry",
+    "description": "A dramatic monologue exploring themes of aging, social anxiety, and the search for meaning in modern life.",
+    "source_url": "https://www.poetryfoundation.org/poems/44212/the-love-song-of-j-alfred-prufrock",
+    "image_url": "https://www.poetryfoundation.org/harriet/wp-content/uploads/2015/04/eliot.jpg",
+    "score": 0.74,
+    "category": "poetry"
+  },
+  {
+    "title": "The '99% Invisible' Podcast",
+    "type": "podcast",
+    "description": "A podcast about the unnoticed architecture and design that shape our world.",
+    "source_url": "https://99percentinvisible.org/",
+    "image_url": "https://99percentinvisible.org/wp-content/uploads/2019/12/99pi-logo.png",
+    "score": 0.73,
+    "category": "podcast"
+  },
+  {
+    "title": "Visit the Louvre Museum",
+    "type": "art",
+    "description": "Explore one of the world's largest and most famous art museums, home to the Mona Lisa and countless masterpieces.",
+    "source_url": "https://www.louvre.fr/en",
+    "image_url": "https://www.louvre.fr/sites/default/files/2019-10/louvre-pyramid.jpg",
+    "score": 0.72,
+    "category": "art"
+  },
+  {
+    "title": "The Matrix (1999)",
+    "type": "movie",
+    "description": "A groundbreaking sci-fi film about reality, consciousness, and the nature of existence.",
+    "source_url": "https://www.imdb.com/title/tt0133093/",
+    "image_url": "https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg",
+    "score": 0.71,
+    "category": "movie"
+  },
+  {
+    "title": "Howl by Allen Ginsberg",
+    "type": "poetry",
+    "description": "A powerful Beat Generation poem that captures the spirit of rebellion and the search for authenticity.",
+    "source_url": "https://www.poetryfoundation.org/poems/49303/howl",
+    "image_url": "https://www.poetryfoundation.org/harriet/wp-content/uploads/2015/04/allen-ginsberg.jpg",
+    "score": 0.70,
+    "category": "poetry"
+  },
+  {
+    "title": "The 'Radiolab' Podcast",
+    "type": "podcast",
+    "description": "A podcast that explores scientific and philosophical questions through storytelling and sound design.",
+    "source_url": "https://www.wnycstudios.org/podcasts/radiolab",
+    "image_url": "https://www.wnycstudios.org/sites/default/files/2019-12/radiolab-logo.png",
+    "score": 0.69,
+    "category": "podcast"
+  },
+  {
+    "title": "Bohemian Rhapsody by Queen",
+    "type": "music",
+    "description": "An operatic rock masterpiece that defies genre conventions and tells a complex narrative through music.",
+    "source_url": "https://open.spotify.com/track/3z8h0TU7ReDPLIbEnYhWZb",
+    "image_url": "https://i.scdn.co/image/ab67616d0000b273ce4f1737e8c31a12a8cc5a5a",
+    "score": 0.68,
+    "category": "music"
+  },
+  {
+    "title": "The Shawshank Redemption",
+    "type": "movie",
+    "description": "A powerful story of hope and friendship set in a prison, exploring themes of redemption and the human spirit.",
+    "source_url": "https://www.imdb.com/title/tt0111161/",
+    "image_url": "https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiNDMtZDViZWM2MzIxZDYwXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_.jpg",
+    "score": 0.67,
+    "category": "movie"
+  },
+  {
+    "title": "1984 by George Orwell",
+    "type": "book",
+    "description": "A dystopian novel that explores themes of surveillance, totalitarianism, and the manipulation of truth.",
+    "source_url": "https://www.goodreads.com/book/show/5470.1984",
+    "image_url": "https://images.gr-assets.com/books/1532714506l/5470.jpg",
+    "score": 0.66,
+    "category": "book"
+  },
+  {
+    "title": "The Beatles - Abbey Road",
+    "type": "music",
+    "description": "The iconic album featuring the famous medley and showcasing the band's musical evolution.",
+    "source_url": "https://open.spotify.com/album/0ETFjACtuP2ADo6LFhL6HN",
+    "image_url": "https://i.scdn.co/image/ab67616d0000b273dc3058ba0c7c5c559309a9b5",
+    "score": 0.65,
+    "category": "music"
+  },
+  {
+    "title": "Visit the MoMA (Museum of Modern Art)",
+    "type": "art",
+    "description": "Explore modern and contemporary art at one of the world's most influential museums.",
+    "source_url": "https://www.moma.org/",
+    "image_url": "https://www.moma.org/d/assets/W1siZiIsIjIwMTkvMDMvMjEvMTJfNDdfNTdfNzE5X01PTUFfTmV3WW9ya19FbnRyYW5jZS5qcGciXSxbInAiLCJjb252ZXJ0IiwiLXF1YWxpdHkgOTAgLWF1dG8tb3JpZW50Il1d/MOMA%20New%20York%20Entrance.jpg",
+    "score": 0.64,
+    "category": "art"
+  },
+  {
+    "title": "The Phantom of the Opera Musical",
+    "type": "musicals",
+    "description": "A romantic musical about a masked figure who haunts the Paris Opera House.",
+    "source_url": "https://www.thephantomoftheopera.com/",
+    "image_url": "https://www.thephantomoftheopera.com/wp-content/uploads/2019/03/phantom-logo.png",
+    "score": 0.63,
+    "category": "musicals"
+  },
+  {
+    "title": "The Road Not Taken by Robert Frost",
+    "type": "poetry",
+    "description": "A beloved poem about choices and the paths we take in life.",
+    "source_url": "https://www.poetryfoundation.org/poems/44272/the-road-not-taken",
+    "image_url": "https://www.poetryfoundation.org/harriet/wp-content/uploads/2015/04/robert-frost.jpg",
+    "score": 0.62,
+    "category": "poetry"
+  },
+  {
+    "title": "The 'This American Life' Podcast",
+    "type": "podcast",
+    "description": "A weekly public radio program and podcast featuring compelling stories about real people.",
+    "source_url": "https://www.thisamericanlife.org/",
+    "image_url": "https://www.thisamericanlife.org/sites/default/files/2019-12/this-american-life-logo.png",
+    "score": 0.61,
+    "category": "podcast"
+  },
+  {
+    "title": "Pulp Fiction",
+    "type": "movie",
+    "description": "A groundbreaking crime film with non-linear storytelling and memorable dialogue.",
+    "source_url": "https://www.imdb.com/title/tt0110912/",
+    "image_url": "https://m.media-amazon.com/images/M/MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg",
+    "score": 0.60,
+    "category": "movie"
+  },
+  {
+    "title": "The Catcher in the Rye by J.D. Salinger",
+    "type": "book",
+    "description": "A classic coming-of-age novel about teenage alienation and loss of innocence.",
+    "source_url": "https://www.goodreads.com/book/show/5107.The_Catcher_in_the_Rye",
+    "image_url": "https://images.gr-assets.com/books/1398034300l/5107.jpg",
+    "score": 0.59,
+    "category": "book"
+  },
+  {
+    "title": "Mozart - Symphony No. 40",
+    "type": "music",
+    "description": "One of Mozart's most famous symphonies, known for its emotional depth and beauty.",
+    "source_url": "https://open.spotify.com/album/4kZrYEMf3n6sT3zGsoFOfA",
+    "image_url": "https://i.scdn.co/image/ab67616d0000b27382e8e7343a4a159f4296b349",
+    "score": 0.58,
+    "category": "music"
+  },
+  {
+    "title": "Visit the Guggenheim Museum",
+    "type": "art",
+    "description": "Experience the iconic spiral architecture and modern art collection.",
+    "source_url": "https://www.guggenheim.org/",
+    "image_url": "https://www.guggenheim.org/wp-content/uploads/2019/12/guggenheim-exterior.jpg",
+    "score": 0.57,
+    "category": "art"
+  },
+  {
+    "title": "The Lion King Musical",
+    "type": "musicals",
+    "description": "A spectacular musical adaptation of the beloved Disney film with stunning visuals and music.",
+    "source_url": "https://www.lionking.com/",
+    "image_url": "https://www.lionking.com/wp-content/uploads/2019/03/lion-king-musical.jpg",
+    "score": 0.56,
+    "category": "musicals"
+  },
+  {
+    "title": "Still I Rise by Maya Angelou",
+    "type": "poetry",
+    "description": "A powerful poem about resilience and the indomitable human spirit.",
+    "source_url": "https://www.poetryfoundation.org/poems/46446/still-i-rise",
+    "image_url": "https://www.poetryfoundation.org/harriet/wp-content/uploads/2015/04/maya-angelou.jpg",
+    "score": 0.55,
+    "category": "poetry"
+  },
+  {
+    "title": "The 'Freakonomics' Podcast",
+    "type": "podcast",
+    "description": "A podcast that explores the hidden side of everything through economics.",
+    "source_url": "https://freakonomics.com/",
+    "image_url": "https://freakonomics.com/wp-content/uploads/2019/12/freakonomics-logo.png",
+    "score": 0.54,
+    "category": "podcast"
+  },
+  {
+    "title": "Fight Club",
+    "type": "movie",
+    "description": "A provocative film about consumerism, masculinity, and identity in modern society.",
+    "source_url": "https://www.imdb.com/title/tt0137523/",
+    "image_url": "https://m.media-amazon.com/images/M/MV5BMmEzNTkxYjQtZTc0MC00YTVjLTg5ZTEtZWMwOWVlYzY0NWIwXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg",
+    "score": 0.53,
+    "category": "movie"
+  },
+  {
+    "title": "To Kill a Mockingbird by Harper Lee",
+    "type": "book",
+    "description": "A classic novel about racial injustice and moral growth in the American South.",
+    "source_url": "https://www.goodreads.com/book/show/2657.To_Kill_a_Mockingbird",
+    "image_url": "https://images.gr-assets.com/books/1553383690l/2657.jpg",
+    "score": 0.52,
+    "category": "book"
+  },
+  {
+    "title": "Beethoven - Symphony No. 9",
+    "type": "music",
+    "description": "Beethoven's masterpiece featuring the famous 'Ode to Joy' chorus.",
+    "source_url": "https://open.spotify.com/album/4kZrYEMf3n6sT3zGsoFOfA",
+    "image_url": "https://i.scdn.co/image/ab67616d0000b27382e8e7343a4a159f4296b349",
+    "score": 0.51,
+    "category": "music"
+  },
+  {
+    "title": "Visit the British Museum",
+    "type": "art",
+    "description": "Explore world history and culture through one of the world's largest museums.",
+    "source_url": "https://www.britishmuseum.org/",
+    "image_url": "https://www.britishmuseum.org/sites/default/files/2019-10/british-museum-exterior.jpg",
+    "score": 0.50,
+    "category": "art"
+  },
+  {
+    "title": "Wicked Musical",
+    "type": "musicals",
+    "description": "A reimagining of The Wizard of Oz from the perspective of the Wicked Witch of the West.",
+    "source_url": "https://www.wickedthemusical.com/",
+    "image_url": "https://www.wickedthemusical.com/wp-content/uploads/2019/03/wicked-musical.jpg",
+    "score": 0.49,
+    "category": "musicals"
+  },
+  {
+    "title": "The Raven by Edgar Allan Poe",
+    "type": "poetry",
+    "description": "A haunting narrative poem about loss and the supernatural.",
+    "source_url": "https://www.poetryfoundation.org/poems/48860/the-raven",
+    "image_url": "https://www.poetryfoundation.org/harriet/wp-content/uploads/2015/04/edgar-allan-poe.jpg",
+    "score": 0.48,
+    "category": "poetry"
+  },
+  {
+    "title": "The 'Serial' Podcast",
+    "type": "podcast",
+    "description": "A groundbreaking true crime podcast that revolutionized the medium.",
+    "source_url": "https://serialpodcast.org/",
+    "image_url": "https://serialpodcast.org/wp-content/uploads/2019/12/serial-logo.png",
+    "score": 0.47,
+    "category": "podcast"
+  }
+] 

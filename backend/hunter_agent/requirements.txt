@@ -1,0 +1,5 @@
+openai
+requests
+numpy
+scikit-learn
+python-dotenv 
