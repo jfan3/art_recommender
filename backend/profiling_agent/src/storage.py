@@ -4,16 +4,21 @@ import uuid
 from datetime import datetime
 from typing import Dict, Any, Optional, List
 from pathlib import Path
+import hashlib
 
 class ConversationStorage:
     """Handles local JSON storage for conversation history."""
     
     def __init__(self, conversations_dir: str = "conversations"):
+        if conversations_dir is None:
+            conversations_dir = ""
         self.conversations_dir = Path(conversations_dir)
         self.conversations_dir.mkdir(exist_ok=True)
     
     def save_conversation(self, session_id: str, messages: List[Dict[str, str]], user_uuid: str = None) -> bool:
         """Save conversation history to JSON file."""
+        if not session_id:
+            return False
         conversation = {
             "session_id": session_id,
             "user_uuid": user_uuid,
@@ -21,21 +26,21 @@ class ConversationStorage:
             "created_at": datetime.utcnow().isoformat() + "Z",
             "updated_at": datetime.utcnow().isoformat() + "Z"
         }
-        
         try:
             conversation_path = self.conversations_dir / f"{session_id}.json"
             with open(conversation_path, 'w') as f:
                 json.dump(conversation, f, indent=2)
             return True
-        except (IOError, json.JSONEncodeError):
+        except (IOError, TypeError):
             return False
     
     def load_conversation(self, session_id: str) -> Optional[Dict[str, Any]]:
         """Load conversation history from JSON file."""
+        if not session_id:
+            return None
         conversation_path = self.conversations_dir / f"{session_id}.json"
         if not conversation_path.exists():
             return None
-        
         try:
             with open(conversation_path, 'r') as f:
                 return json.load(f)
@@ -44,6 +49,8 @@ class ConversationStorage:
     
     def get_messages(self, session_id: str) -> List[Dict[str, str]]:
         """Get just the messages from a conversation."""
+        if not session_id:
+            return []
         conversation = self.load_conversation(session_id)
         if conversation:
             return conversation.get("messages", [])
@@ -51,8 +58,9 @@ class ConversationStorage:
     
     def append_message(self, session_id: str, message: Dict[str, str], user_uuid: str = None) -> bool:
         """Append a new message to existing conversation or create new one."""
+        if not session_id:
+            return False
         conversation = self.load_conversation(session_id)
-        
         if conversation:
             # Update existing conversation
             conversation["messages"].append(message)
@@ -68,11 +76,12 @@ class ConversationStorage:
                 "created_at": datetime.utcnow().isoformat() + "Z",
                 "updated_at": datetime.utcnow().isoformat() + "Z"
             }
-        
         return self.save_conversation(session_id, conversation["messages"], conversation["user_uuid"])
     
     def delete_conversation(self, session_id: str) -> bool:
         """Delete a conversation file."""
+        if not session_id:
+            return False
         conversation_path = self.conversations_dir / f"{session_id}.json"
         if conversation_path.exists():
             try:
@@ -111,16 +120,24 @@ class ProfileStorage:
     """Handles local JSON storage for user profiles."""
     
     def __init__(self, profiles_dir: str = "profiles"):
+        if profiles_dir is None:
+            profiles_dir = ""
         self.profiles_dir = Path(profiles_dir)
         self.profiles_dir.mkdir(exist_ok=True)
     
+    def _generate_profile_filename(self, user_uuid: str) -> str:
+        timestamp = int(datetime.utcnow().timestamp() * 1000)
+        short_hash = hashlib.sha256(user_uuid.encode()).hexdigest()[:8]
+        return f"{timestamp}_{short_hash}.json"
+
     def create_profile(self, user_uuid: str = None) -> str:
         """Create a new profile with a UUID and return the UUID."""
         if user_uuid is None:
             user_uuid = str(uuid.uuid4())
-        
+        filename = self._generate_profile_filename(user_uuid)
         profile = {
             "uuid": user_uuid,
+            "filename": filename,
             "past_favorite_work": [],
             "taste_genre": "",
             "current_obsession": [],
@@ -130,16 +147,29 @@ class ProfileStorage:
             "created_at": datetime.utcnow().isoformat() + "Z",
             "updated_at": datetime.utcnow().isoformat() + "Z"
         }
-        
         self._save_profile(profile)
         return user_uuid
     
+    def _find_profile_file(self, user_uuid: str) -> Optional[Path]:
+        if not user_uuid:
+            return None
+        for file_path in self.profiles_dir.glob("*.json"):
+            try:
+                with open(file_path, 'r') as f:
+                    profile = json.load(f)
+                    if profile.get("uuid") == user_uuid:
+                        return file_path
+            except (json.JSONDecodeError, IOError):
+                continue
+        return None
+
     def get_profile(self, user_uuid: str) -> Optional[Dict[str, Any]]:
         """Retrieve a profile by UUID."""
-        profile_path = self.profiles_dir / f"{user_uuid}.json"
-        if not profile_path.exists():
+        if not user_uuid:
             return None
-        
+        profile_path = self._find_profile_file(user_uuid)
+        if not profile_path:
+            return None
         try:
             with open(profile_path, 'r') as f:
                 return json.load(f)
@@ -148,6 +178,8 @@ class ProfileStorage:
     
     def merge_profile(self, user_uuid: str, updates: Dict[str, Any]) -> bool:
         """Merge updates into an existing profile."""
+        if not user_uuid:
+            return False
         profile = self.get_profile(user_uuid)
         if profile is None:
             return False
@@ -165,6 +197,8 @@ class ProfileStorage:
     
     def is_profile_complete(self, user_uuid: str) -> bool:
         """Check if all required fields are filled."""
+        if not user_uuid:
+            return False
         profile = self.get_profile(user_uuid)
         if profile is None:
             return False
@@ -186,7 +220,13 @@ class ProfileStorage:
     
     def _save_profile(self, profile: Dict[str, Any]):
         """Save profile to JSON file."""
-        profile_path = self.profiles_dir / f"{profile['uuid']}.json"
+        if not profile or not profile.get("uuid"):
+            return
+        filename = profile.get("filename")
+        if not filename:
+            filename = self._generate_profile_filename(profile["uuid"])
+            profile["filename"] = filename
+        profile_path = self.profiles_dir / filename
         with open(profile_path, 'w') as f:
             json.dump(profile, f, indent=2)
     
@@ -214,12 +254,18 @@ class StorageManager:
         return self.profiles.create_profile(user_uuid)
     
     def get_profile(self, user_uuid: str) -> Optional[Dict[str, Any]]:
+        if not user_uuid:
+            return None
         return self.profiles.get_profile(user_uuid)
     
     def merge_profile(self, user_uuid: str, updates: Dict[str, Any]) -> bool:
+        if not user_uuid:
+            return False
         return self.profiles.merge_profile(user_uuid, updates)
     
     def is_profile_complete(self, user_uuid: str) -> bool:
+        if not user_uuid:
+            return False
         return self.profiles.is_profile_complete(user_uuid)
     
     def list_profiles(self) -> list:
@@ -227,22 +273,34 @@ class StorageManager:
     
     # Conversation methods
     def save_conversation(self, session_id: str, messages: List[Dict[str, str]], user_uuid: str = None) -> bool:
+        if not session_id:
+            return False
         return self.conversations.save_conversation(session_id, messages, user_uuid)
     
     def load_conversation(self, session_id: str) -> Optional[Dict[str, Any]]:
+        if not session_id:
+            return None
         return self.conversations.load_conversation(session_id)
     
     def get_messages(self, session_id: str) -> List[Dict[str, str]]:
+        if not session_id:
+            return []
         return self.conversations.get_messages(session_id)
     
     def append_message(self, session_id: str, message: Dict[str, str], user_uuid: str = None) -> bool:
+        if not session_id:
+            return False
         return self.conversations.append_message(session_id, message, user_uuid)
     
     def delete_conversation(self, session_id: str) -> bool:
+        if not session_id:
+            return False
         return self.conversations.delete_conversation(session_id)
     
     def list_conversations(self) -> List[str]:
         return self.conversations.list_conversations()
     
     def get_conversations_by_user(self, user_uuid: str) -> List[Dict[str, Any]]:
+        if not user_uuid:
+            return []
         return self.conversations.get_conversations_by_user(user_uuid) 
