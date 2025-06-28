@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { FiSend } from 'react-icons/fi';
 import { Toaster, toast } from 'react-hot-toast';
+import SwipeFlow from './SwipeFlow';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -18,8 +19,14 @@ export default function Chat() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [userUuid, setUserUuid] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [profilingComplete, setProfilingComplete] = useState(false);
 
   useEffect(() => {
+    // Always start fresh: clear any previous session/profile
+    localStorage.removeItem('userUuid');
+    localStorage.removeItem('sessionId');
+
+    // Immediately create a new profile and start chat
     const startConversation = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/profiles`, { method: 'POST' });
@@ -28,44 +35,38 @@ export default function Chat() {
         }
         const data = await response.json();
         setUserUuid(data.uuid);
+        localStorage.setItem('userUuid', data.uuid);
         const newSessionId = `frontend-session-${Date.now()}`;
         setSessionId(newSessionId);
+        localStorage.setItem('sessionId', newSessionId);
         toast.success('New profile created!');
-        
         // Send initial message to get the conversation started
         const initialBotMessage: Message = { role: 'assistant', content: '' };
         setMessages([initialBotMessage]);
         setIsLoading(true);
-
         const payload = {
             session_id: newSessionId,
             messages: [{ role: 'user', content: 'Hi' }],
             user_uuid: data.uuid,
         };
-
         const chatResponse = await fetch(`${API_BASE_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
             body: JSON.stringify(payload),
         });
-
         if (!chatResponse.body) return;
-
         const reader = chatResponse.body.getReader();
         const decoder = new TextDecoder();
         let buffer = '';
-
         while (true) {
             const { done, value } = await reader.read();
             if (done) {
                 setIsLoading(false);
                 break;
             }
-
             buffer += decoder.decode(value, { stream: true });
             const lines = buffer.split('\n');
             buffer = lines.pop() || '';
-
             for (const line of lines) {
                 if (line.startsWith('data: ')) {
                     const dataStr = line.substring(6);
@@ -79,7 +80,8 @@ export default function Chat() {
                             });
                         } else if (data.type === 'complete') {
                             toast.success("Profiling complete!");
-                            setIsLoading(true);
+                            setProfilingComplete(true);
+                            setIsLoading(false);
                         }
                     } catch (e) {
                         console.error('Failed to parse stream data:', e);
@@ -167,6 +169,29 @@ export default function Chat() {
         setMessages(prev => prev.slice(0, -1)); // Remove the empty assistant message
     }
   };
+
+  // Poll for profile completion after chat stream finishes
+  useEffect(() => {
+    if (!userUuid || profilingComplete) return;
+    const interval = setInterval(() => {
+      fetch(`${API_BASE_URL}/profiles/${userUuid}`)
+        .then(res => res.json())
+        .then(profile => {
+          if (profile.complete) {
+            setProfilingComplete(true);
+            clearInterval(interval);
+          }
+        });
+    }, 1500);
+    return () => clearInterval(interval);
+  }, [userUuid, profilingComplete]);
+
+  if (profilingComplete && userUuid) {
+    return <SwipeFlow userUuid={userUuid} />;
+  }
+  if (!userUuid) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
