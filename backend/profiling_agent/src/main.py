@@ -2,6 +2,7 @@ import os
 from typing import List, Dict, Any
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import json
@@ -16,6 +17,15 @@ except ImportError:
 load_dotenv()
 
 app = FastAPI(title="Profiling Agent MCP Server", version="1.0.0")
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, replace with specific origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Initialize chat loop
 chat_loop = ChatLoop()
