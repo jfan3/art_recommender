@@ -1,0 +1,64 @@
+{
+  "session_id": "frontend-session-1751149697617",
+  "user_uuid": "cf639a81-affb-4256-88fc-f20549ce766c",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! It's great to connect. Let's start with something fun: Can you tell me about some books, movies, or artistic works you've loved for years and still do?"
+    },
+    {
+      "role": "user",
+      "content": "happy"
+    },
+    {
+      "role": "assistant",
+      "content": "I'm glad to hear you're feeling happy\u2014that's a lovely snapshot of your state of mind! I'll save that.\n\nCan you share one or two timeless favorites in books, movies, or art that still resonate with you?"
+    },
+    {
+      "role": "user",
+      "content": "pride and prejudice"
+    },
+    {
+      "role": "assistant",
+      "content": "Thank you for sharing that! \"Pride and Prejudice\" is a classic with enduring appeal.\n\nHow would you describe your timeless taste in art or storytelling? Is there a genre or theme you always enjoy?"
+    },
+    {
+      "role": "user",
+      "content": "romance"
+    },
+    {
+      "role": "assistant",
+      "content": "Romance\u2014such a beautiful and timeless genre!  \n\nRight now, is there any piece of art, book, idea, or project that you can't stop thinking about or are obsessed with?"
+    },
+    {
+      "role": "user",
+      "content": "laubu"
+    },
+    {
+      "role": "assistant",
+      "content": "Thanks for sharing! Can you give me a bit more detail about \"laubu\"? Is it a book, a movie, or perhaps an idea you're passionate about?"
+    },
+    {
+      "role": "user",
+      "content": "labubu"
+    },
+    {
+      "role": "assistant",
+      "content": "Got it\u2014Labubu specifically sparks your interest now! I'll note that as your current obsession.\n\nWhere do you see yourself in the future? Any dreams, goals, or aspirations you\u2019re working toward?"
+    },
+    {
+      "role": "user",
+      "content": "astronaut"
+    },
+    {
+      "role": "assistant",
+      "content": "You dream of exploring as an astronaut\u2014how inspiring! Your profile is now complete. Thanks so much for sharing! \ud83c\udf1f"
+    }
+  ],
+  "created_at": "2025-06-28T22:29:00.122352Z",
+  "updated_at": "2025-06-28T22:29:00.122356Z"
+}

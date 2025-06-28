@@ -1,0 +1,52 @@
+{
+  "session_id": "frontend-session-1751152471533",
+  "user_uuid": "bcb69211-8ca0-4a46-808d-4861cde753cc",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! To get to know you better, let's start with this: Is there any particular art, book, movie, or piece of music from your past that still holds a special place in your heart?"
+    },
+    {
+      "role": "user",
+      "content": "pride nad prejudice"
+    },
+    {
+      "role": "assistant",
+      "content": "Got it! \"Pride and Prejudice\" holds a special place for you. What kind of genres or themes do you tend to enjoy across any form of art\u2014timeless favorites?"
+    },
+    {
+      "role": "user",
+      "content": "romance"
+    },
+    {
+      "role": "assistant",
+      "content": "Romance\u2014classic and timeless! What are you currently obsessed with in terms of art, ideas, or books?"
+    },
+    {
+      "role": "user",
+      "content": "the time thief"
+    },
+    {
+      "role": "assistant",
+      "content": "Got it! You're into \"The Time Thief\" right now. How would you describe your current state of mind or emotions these days?"
+    },
+    {
+      "role": "user",
+      "content": "hapy"
+    },
+    {
+      "role": "assistant",
+      "content": "That's wonderful to hear! Where do you see yourself or hope to be in the future\u2014personally or professionally?"
+    },
+    {
+      "role": "user",
+      "content": "data scientist"
+    }
+  ],
+  "created_at": "2025-06-28T23:14:55.725505Z",
+  "updated_at": "2025-06-28T23:14:55.725507Z"
+}

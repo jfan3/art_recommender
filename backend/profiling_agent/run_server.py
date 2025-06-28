@@ -6,29 +6,37 @@ This script properly handles imports and starts the FastAPI server.
 
 import os
 import sys
+import uvicorn
 from pathlib import Path
 
-# Add the src directory to Python path
-src_path = Path(__file__).parent / "src"
-sys.path.insert(0, str(src_path))
+# --- Add project root to sys.path ---
+# This ensures that imports like `from backend.db...` work correctly.
+# The project root is three levels up from this script's directory.
+project_root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(project_root))
 
-# Load environment variables
+# Now that the path is set, we can import the FastAPI app using an absolute path
+from backend.profiling_agent.src.main import app
+
+# Load environment variables from the root .env file
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(dotenv_path=project_root / ".env")
 
 if __name__ == "__main__":
-    host = os.getenv("HOST", "0.0.0.0")
-    port = int(os.getenv("PORT", "8080"))
+    # Use a specific environment variable for this agent's port
+    host = os.getenv("HOST", "localhost")
+    port = int(os.getenv("PROFILING_AGENT_PORT", "8080"))
     
     print(f"🚀 Starting Profiling Agent MCP Server on http://{host}:{port}")
     print("Press Ctrl+C to stop the server")
     
-    # Use import string for proper reload functionality
-    import uvicorn
+    # We pass the app as a string to uvicorn for robust reloading.
+    # This is more stable than passing the app object directly.
     uvicorn.run(
-        "main:app", 
-        host=host, 
-        port=port, 
+        "backend.profiling_agent.src.main:app",
+        host=host,
+        port=port,
         reload=True,
-        reload_dirs=[str(src_path)]
+        # Specify the directory to watch for changes
+        reload_dirs=[str(project_root / "backend/profiling_agent/src")]
     ) 

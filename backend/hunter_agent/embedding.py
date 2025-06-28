@@ -3,12 +3,15 @@ import json
 import openai
 import os
 from dotenv import load_dotenv
+from backend.hunter_agent.retriever import load_user_profile
+import numpy as np
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env in the root folder
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'))
 
 # Make sure your OpenAI API key is set in the environment
 openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_type = "openai"
 
 def extract_profile_text(json_path):
     with open(json_path, "r") as f:
@@ -47,8 +50,27 @@ def extract_profile_text(json_path):
     
     return profile_text.strip()
 
-def generate_user_embedding(json_path):
-    profile_text = extract_profile_text(json_path)
+def extract_profile_text_from_dict(profile: dict) -> str:
+    # Concatenate relevant fields for embedding
+    fields = [
+        'past_favorite_work', 'taste_genre', 'current_obsession',
+        'state_of_mind', 'future_aspirations'
+    ]
+    text_parts = []
+    for field in fields:
+        value = profile.get(field, "")
+        if isinstance(value, list):
+            text_parts.append(", ".join(value))
+        else:
+            text_parts.append(str(value))
+    return "; ".join(text_parts)
+
+def generate_user_embedding(user_uuid_or_profile):
+    if isinstance(user_uuid_or_profile, dict):
+        profile = user_uuid_or_profile
+    else:
+        profile = load_user_profile(user_uuid_or_profile)
+    profile_text = extract_profile_text_from_dict(profile)
     
     response = openai.embeddings.create(
         input=profile_text,
@@ -56,4 +78,13 @@ def generate_user_embedding(json_path):
     )
     
     embedding = response.data[0].embedding
-    return embedding 
+    return embedding
+
+# For demonstration, return a dummy embedding (replace with real model call)
+def generate_user_embedding_dummy(user_uuid_or_profile):
+    if isinstance(user_uuid_or_profile, dict):
+        profile = user_uuid_or_profile
+    else:
+        profile = load_user_profile(user_uuid_or_profile)
+    profile_text = extract_profile_text_from_dict(profile)
+    return np.random.rand(128).tolist() 

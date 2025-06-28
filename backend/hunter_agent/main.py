@@ -12,17 +12,16 @@ from formatter import format_for_user
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import json
+from backend.db.supabase_client import upsert_item, upsert_user_item, update_user_item_status
 
 # Step 1: Load user profile and generate user embedding
 # Updated path to read from user_profiles.json in art_recommender folder
-user_profile_path = "../../user_profiles.json"
-
-# Load and validate user profile
-user_profile = load_user_profile(user_profile_path)
+user_uuid = "your_test_uuid_here"  # Replace with actual uuid or pass as argument
+user_profile = load_user_profile(user_uuid)
 print(f"--- Loaded user profile (UUID: {user_profile.get('uuid', 'N/A')}) ---")
 print(f"--- Profile completion status: {'Complete' if user_profile.get('complete', False) else 'Incomplete'} ---")
 
-user_embedding = generate_user_embedding(user_profile_path)
+user_embedding = generate_user_embedding(user_uuid)
 print("--- Initial user profile embedding generated. ---")
 
 # Step 2: Retrieve an initial pool of candidates from each domain
@@ -40,6 +39,27 @@ musical_candidates = retrieve_top_candidates("musicals", user_embedding, user_pr
 top_candidates = movie_candidates + book_candidates + music_candidates + art_candidates + poetry_candidates + podcast_candidates + musical_candidates
 top_candidates = batch_generate_embeddings(top_candidates)
 print(f"--- Pool of {len(top_candidates)} candidates ready for interaction. ---")
+
+# --- Supabase: Log all candidates as items and user_item (status='candidate') ---
+for candidate in top_candidates:
+    item_data = {
+        "item_id": candidate.get("source_url", ""),
+        "item_name": candidate.get("title", ""),
+        "description": candidate.get("description", ""),
+        "source_url": candidate.get("source_url", ""),
+        "image_url": candidate.get("image_url", ""),
+        "category": candidate.get("category", ""),
+        "creator": candidate.get("creator", ""),
+        "release_date": candidate.get("release_date", ""),
+        "metadata": candidate.get("metadata", {})
+    }
+    upsert_item(item_data)
+    user_item_data = {
+        "uuid": user_profile["uuid"],
+        "item_id": item_data["item_id"],
+        "status": "candidate"
+    }
+    upsert_user_item(user_item_data)
 
 # Step 4: 主推荐-反馈-更新循环
 current_embedding = user_embedding
@@ -95,6 +115,11 @@ while running:
             while feedback not in ['r', 'l', 'q']:
                 feedback = input("Swipe right (r), left (l), or (q)uit: ").lower()
         
+        # --- Supabase: Update user_item status on swipe ---
+        if feedback == 'r':
+            update_user_item_status(user_profile["uuid"], candidate.get("source_url", ""), "swipe_right")
+        elif feedback == 'l':
+            update_user_item_status(user_profile["uuid"], candidate.get("source_url", ""), "swipe_left")
         if feedback == 'q':
             running = False
             break
@@ -112,7 +137,7 @@ while running:
     # 5. 更新用户配置文件
     feedback_count += len(batch_feedback)
     user_profile["complete"] = feedback_count >= 10  # Mark as complete after 10 feedbacks
-    save_user_profile(user_profile, user_profile_path)
+    save_user_profile(user_profile, user_uuid)
     
     print("--- Profile updated! Your next recommendations will be more tailored. ---")
     print(f"--- Feedback count: {feedback_count}/10 (Profile {'Complete' if user_profile['complete'] else 'Incomplete'}) ---")

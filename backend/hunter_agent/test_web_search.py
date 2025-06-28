@@ -22,7 +22,8 @@ def test_web_search_quality():
     
     # Load user profile for context
     try:
-        profile = load_user_profile("user_profiles.json")
+        user_uuid = "your_test_uuid_here"  # Replace with actual uuid or pass as argument
+        profile = load_user_profile(user_uuid)
         print(f"Loaded profile for: {profile.get('uuid', 'N/A')}")
         print(f"Taste: {profile.get('taste_genre', 'N/A')}")
         print(f"Favorites: {profile.get('past_favorite_work', [])}")

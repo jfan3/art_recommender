@@ -1,0 +1,80 @@
+{
+  "session_id": "frontend-session-1751151422790",
+  "user_uuid": "72ef07cb-87e2-4b82-ad8d-0a310f62fc3b",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! It's nice to connect with you. Let's start with this\u2014can you tell me about a book, movie, artwork, or any other piece of media from your past that still holds a special place in your heart today?"
+    },
+    {
+      "role": "user",
+      "content": "pride and prejudice"
+    },
+    {
+      "role": "assistant",
+      "content": "Great choice! Jane Austen's timeless charm resonates with so many. Now, how would you describe your overall taste in art, media, or stories? Do you lean toward romance, thrillers, fantasy, or something completely different?"
+    },
+    {
+      "role": "user",
+      "content": "romance"
+    },
+    {
+      "role": "assistant",
+      "content": "Romance is a beautiful genre! Lately, is there any particular piece of art, story, or idea that you can\u2019t stop thinking about or are deeply into right now?"
+    },
+    {
+      "role": "user",
+      "content": "labubu"
+    },
+    {
+      "role": "assistant",
+      "content": "Labubu sounds intriguing! Thanks for sharing. Now shifting gears\u2014how would you describe your current state of mind or emotions in one sentence?"
+    },
+    {
+      "role": "user",
+      "content": "happy"
+    },
+    {
+      "role": "assistant",
+      "content": "That's wonderful to hear! Lastly, where do you see yourself in the future? What are your aspirations or dreams for the coming years?"
+    },
+    {
+      "role": "user",
+      "content": "astronaut"
+    },
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "user",
+      "content": "Hi"
+    }
+  ],
+  "created_at": "2025-06-28T23:03:54.445843Z",
+  "updated_at": "2025-06-28T23:03:54.445846Z"
+}

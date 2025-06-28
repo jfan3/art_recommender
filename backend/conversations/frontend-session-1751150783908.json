@@ -1,0 +1,16 @@
+{
+  "session_id": "frontend-session-1751150783908",
+  "user_uuid": "69297033-0844-417d-a9ab-81035cd90441",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! Let's talk about what makes you tick artistically and emotionally. What's an example of a book, film, or art piece that you've loved in the past and still hold dear today?"
+    }
+  ],
+  "created_at": "2025-06-28T22:46:24.883465Z",
+  "updated_at": "2025-06-28T22:46:24.883468Z"
+}

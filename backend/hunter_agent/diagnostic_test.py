@@ -22,7 +22,8 @@ def test_individual_apis():
     
     # Load user profile
     try:
-        profile = load_user_profile("../../user_profiles.json")
+        user_uuid = "your_test_uuid_here"  # Replace with actual uuid or pass as argument
+        profile = load_user_profile(user_uuid)
         print(f"✅ Profile loaded: {profile.get('taste_genre', 'N/A')}")
     except Exception as e:
         print(f"❌ Error loading profile: {e}")
@@ -87,7 +88,8 @@ def test_query_building():
     print("\n=== Query Building Test ===\n")
     
     try:
-        profile = load_user_profile("../../user_profiles.json")
+        user_uuid = "your_test_uuid_here"  # Replace with actual uuid or pass as argument
+        profile = load_user_profile(user_uuid)
         
         categories = ["movies", "books", "music", "art", "poetry", "musicals", "podcasts"]
         
