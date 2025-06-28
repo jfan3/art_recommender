@@ -91,12 +91,17 @@ def build_query(category: str, profile: dict) -> str:
                 components.extend(["and", obsession])
         elif category == "musicals":
             # More specific musical theatre search
-            components.extend(["musical theatre", "recommendations"])
-            if favorites:
-                components.append(favorites)
+            components.extend(["musical", "Broadway", "West End", "recommendations"])
+            
+            # Only include taste genre if it's not too specific
+            if taste and len(taste) < 30:
+                components.append(taste)
+            
             if obsession:
                 components.append(obsession)
-            components.extend(["Broadway", "West End"])
+            
+            # Add specific musical terms
+            components.extend(["musical", "theatre", "stage"])
         elif category == "art":
             # More specific art search
             components.extend(["contemporary art", "artists"])
@@ -224,13 +229,15 @@ def search_google(query: str, num_results: int = 10, category: str = "general") 
     else:
         enhanced_query = f"({query}) ({category_kw})"
     
-    # Add negative keywords to filter out low-quality sites
+    # Add negative keywords to filter out low-quality sites and non-content pages
     negative_keywords = [
         "-site:quora.com", "-site:reddit.com", "-site:youtube.com",
         "-site:facebook.com", "-site:twitter.com", "-site:instagram.com",
         "-site:linkedin.com", "-site:pinterest.com", "-site:tumblr.com",
         "-site:wikipedia.org", "-site:answers.com", "-site:yahoo.com",
-        "-site:ask.com", "-site:stackoverflow.com", "-site:medium.com"
+        "-site:ask.com", "-site:stackoverflow.com", "-site:medium.com",
+        "-sitemap", "-site:map", "-site-map", "-sitemap.xml", "-robots.txt",
+        "-privacy", "-terms", "-contact", "-about", "-help", "-faq"
     ]
     
     final_query = f"{enhanced_query} {' '.join(negative_keywords)}"
@@ -252,6 +259,8 @@ def search_google(query: str, num_results: int = 10, category: str = "general") 
         
         for item in data.get("organic_results", []):
             link = item.get("link", "")
+            title = item.get("title", "")
+            description = item.get("snippet", "")
             
             # Skip low-quality sites
             low_quality_domains = [
@@ -266,15 +275,21 @@ def search_google(query: str, num_results: int = 10, category: str = "general") 
                 continue
             
             # Skip if title or description is too short
-            title = item.get("title", "")
-            description = item.get("snippet", "")
-            
             if len(title) < 10 or len(description) < 20:
                 continue
             
             # Skip if title contains unwanted keywords
             unwanted_keywords = ["quora", "reddit", "youtube", "facebook", "twitter"]
             if any(keyword in title.lower() for keyword in unwanted_keywords):
+                continue
+            
+            # Skip sitemaps and other non-content pages
+            sitemap_keywords = ["sitemap", "site map", "site-map", "robots.txt", "privacy", "terms", "contact", "about", "help", "faq"]
+            if any(keyword in title.lower() for keyword in sitemap_keywords):
+                continue
+            
+            # Skip if URL contains sitemap patterns (but be less strict)
+            if "/sitemap" in link.lower() and "sitemap" in title.lower():
                 continue
             
             # Extract domain for metadata

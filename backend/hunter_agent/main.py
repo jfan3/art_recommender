@@ -47,6 +47,9 @@ seen_urls = set()
 running = True
 feedback_count = 0
 
+# For sample generation, we'll simulate some feedback automatically
+simulate_feedback = True  # Set to True for automatic sample generation
+
 while running:
     # 1. 用当前 user embedding 对剩余候选项计算相似度，排序
     candidates_to_rank = [c for c in top_candidates if c.get('source_url') not in seen_urls and 'embedding' in c]
@@ -74,9 +77,24 @@ while running:
         print(f"Category: {candidate.get('category', '')}")
         print(f"Release Date: {candidate.get('release_date', '')}")
         print(f"Source URL: {candidate.get('source_url', '')}")
-        feedback = ""
-        while feedback not in ['r', 'l', 'q']:
-            feedback = input("Swipe right (r), left (l), or (q)uit: ").lower()
+        
+        if simulate_feedback:
+            # Simulate feedback for sample generation
+            # Give positive feedback to first 2 items, negative to next 2, positive to last 1
+            if idx <= 2:
+                feedback = 'r'
+                print("Swipe right (r) - [SIMULATED]")
+            elif idx <= 4:
+                feedback = 'l'
+                print("Swipe left (l) - [SIMULATED]")
+            else:
+                feedback = 'r'
+                print("Swipe right (r) - [SIMULATED]")
+        else:
+            feedback = ""
+            while feedback not in ['r', 'l', 'q']:
+                feedback = input("Swipe right (r), left (l), or (q)uit: ").lower()
+        
         if feedback == 'q':
             running = False
             break
@@ -98,12 +116,27 @@ while running:
     
     print("--- Profile updated! Your next recommendations will be more tailored. ---")
     print(f"--- Feedback count: {feedback_count}/10 (Profile {'Complete' if user_profile['complete'] else 'Incomplete'}) ---")
+    
+    # For sample generation, stop after 2 batches (10 feedbacks)
+    if simulate_feedback and feedback_count >= 10:
+        print("--- Sample generation complete. Stopping after 10 feedbacks. ---")
+        break
 
 # Step 5: 输出最终 personalized 推荐结果
 print("\n=================================================")
 print("--- Interaction ended. Here is your final personalized journey. ---")
 final_output = format_for_user([c for c in top_candidates if c.get('source_url') in seen_urls])
 print(json.dumps(final_output, indent=2))
+
+# Save the final output to plan_agent/ranked_candidates_sample.json
+output_path = "../plan_agent/ranked_candidates_sample.json"
+try:
+    with open(output_path, 'w') as f:
+        json.dump(final_output, f, indent=2)
+    print(f"--- Final recommendations saved to {output_path} ---")
+except Exception as e:
+    print(f"--- Error saving to {output_path}: {e} ---")
+
 
 # Tool Suggestions & APIs Used:
 # - SerpAPI or Google Custom Search API: for long-tail web content

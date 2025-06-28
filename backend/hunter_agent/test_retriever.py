@@ -35,18 +35,22 @@ def test_search_openlibrary():
         results = search_openlibrary(query, num_results=5)
         print(f"Found {len(results)} results")
         
-        if results:
-            print("\nFirst result:")
-            first_result = results[0]
-            for key, value in first_result.items():
-                if key == "metadata":
-                    print(f"  {key}: {json.dumps(value, indent=4)}")
-                else:
-                    print(f"  {key}: {value}")
+        # FAIL if no results found - this should not happen
+        if len(results) == 0:
+            print(f"❌ ERROR: No results found for OpenLibrary - this should not happen!")
+            return False
         
-        return len(results) > 0
+        print("\nFirst result:")
+        first_result = results[0]
+        for key, value in first_result.items():
+            if key == "metadata":
+                print(f"  {key}: {json.dumps(value, indent=4)}")
+            else:
+                print(f"  {key}: {value}")
+        
+        return True
     except Exception as e:
-        print(f"Error testing search_openlibrary: {e}")
+        print(f"❌ Error testing search_openlibrary: {e}")
         return False
 
 def test_search_google():
@@ -62,18 +66,22 @@ def test_search_google():
         results = search_google(query, num_results=5)
         print(f"Found {len(results)} results")
         
-        if results:
-            print("\nFirst result:")
-            first_result = results[0]
-            for key, value in first_result.items():
-                if key == "metadata":
-                    print(f"  {key}: {json.dumps(value, indent=4)}")
-                else:
-                    print(f"  {key}: {value}")
+        # FAIL if no results found - this should not happen
+        if len(results) == 0:
+            print(f"❌ ERROR: No results found for Google search - this should not happen!")
+            return False
         
-        return len(results) > 0
+        print("\nFirst result:")
+        first_result = results[0]
+        for key, value in first_result.items():
+            if key == "metadata":
+                print(f"  {key}: {json.dumps(value, indent=4)}")
+            else:
+                print(f"  {key}: {value}")
+        
+        return True
     except Exception as e:
-        print(f"Error testing search_google: {e}")
+        print(f"❌ Error testing search_google: {e}")
         return False
 
 def test_search_tmdb():
@@ -89,18 +97,22 @@ def test_search_tmdb():
         results = search_tmdb(query, num_results=5)
         print(f"Found {len(results)} results")
         
-        if results:
-            print("\nFirst result:")
-            first_result = results[0]
-            for key, value in first_result.items():
-                if key == "metadata":
-                    print(f"  {key}: {json.dumps(value, indent=4)}")
-                else:
-                    print(f"  {key}: {value}")
+        # FAIL if no results found - this should not happen
+        if len(results) == 0:
+            print(f"❌ ERROR: No results found for TMDB - this should not happen!")
+            return False
         
-        return len(results) > 0
+        print("\nFirst result:")
+        first_result = results[0]
+        for key, value in first_result.items():
+            if key == "metadata":
+                print(f"  {key}: {json.dumps(value, indent=4)}")
+            else:
+                print(f"  {key}: {value}")
+        
+        return True
     except Exception as e:
-        print(f"Error testing search_tmdb: {e}")
+        print(f"❌ Error testing search_tmdb: {e}")
         return False
 
 def test_search_spotify():
@@ -125,18 +137,22 @@ def test_search_spotify():
         results = search_spotify(query, num_results=5)
         print(f"Found {len(results)} results")
         
-        if results:
-            print("\nFirst result:")
-            first_result = results[0]
-            for key, value in first_result.items():
-                if key == "metadata":
-                    print(f"  {key}: {json.dumps(value, indent=4)}")
-                else:
-                    print(f"  {key}: {value}")
+        # FAIL if no results found - this should not happen
+        if len(results) == 0:
+            print(f"❌ ERROR: No results found for Spotify - this should not happen!")
+            return False
         
-        return len(results) > 0
+        print("\nFirst result:")
+        first_result = results[0]
+        for key, value in first_result.items():
+            if key == "metadata":
+                print(f"  {key}: {json.dumps(value, indent=4)}")
+            else:
+                print(f"  {key}: {value}")
+        
+        return True
     except Exception as e:
-        print(f"Error testing search_spotify: {e}")
+        print(f"❌ Error testing search_spotify: {e}")
         return False
 
 def test_build_query():
@@ -168,14 +184,15 @@ def test_retrieve_top_candidates():
     print("Testing retrieve_top_candidates()")
     print("="*50)
     
-    # Create a sample user profile
-    profile = {
-        "taste_genre": "sci-fi and fantasy",
-        "past_favorite_work": ["Dune", "The Matrix"],
-        "current_obsession": ["cyberpunk aesthetics"],
-        "state_of_mind": "feeling adventurous",
-        "complete": True
-    }
+    # Load the actual user profile instead of using a sample
+    try:
+        profile = load_user_profile("../../user_profiles.json")
+        print("Using actual user profile:")
+        print(f"  Taste: {profile.get('taste_genre', 'N/A')}")
+        print(f"  Past favorites: {profile.get('past_favorite_work', [])}")
+    except Exception as e:
+        print(f"Error loading user profile: {e}")
+        return False
     
     # Create a dummy embedding (not actually used in the function)
     user_embedding = [0.1] * 384  # Assuming 384-dimensional embedding
@@ -188,12 +205,17 @@ def test_retrieve_top_candidates():
             results = retrieve_top_candidates(category, user_embedding, profile)
             print(f"Found {len(results)} results for {category}")
             
-            if results:
-                print(f"First result title: {results[0].get('title', 'N/A')}")
-                print(f"First result type: {results[0].get('type', 'N/A')}")
+            # FAIL if no results found - this should not happen
+            if len(results) == 0:
+                print(f"❌ ERROR: No results found for {category} - this should not happen!")
+                return False
+            
+            print(f"✓ First result title: {results[0].get('title', 'N/A')}")
+            print(f"✓ First result type: {results[0].get('type', 'N/A')}")
         
         except Exception as e:
-            print(f"Error testing {category}: {e}")
+            print(f"❌ Error testing {category}: {e}")
+            return False
     
     return True
 
@@ -231,14 +253,14 @@ def main():
     
     # Test individual search functions
     test_results["openlibrary"] = test_search_openlibrary()
-    # test_results["google"] = test_search_google()
-    # test_results["tmdb"] = test_search_tmdb()
-    # test_results["spotify"] = test_search_spotify()
+    test_results["google"] = test_search_google()
+    test_results["tmdb"] = test_search_tmdb()
+    test_results["spotify"] = test_search_spotify()
     
     # Test utility functions
-    # test_results["build_query"] = test_build_query()
-    # test_results["load_profile"] = test_load_user_profile()
-    # test_results["retrieve_candidates"] = test_retrieve_top_candidates()
+    test_results["build_query"] = test_build_query()
+    test_results["load_profile"] = test_load_user_profile()
+    test_results["retrieve_candidates"] = test_retrieve_top_candidates()
     
     # Summary
     print("\n" + "="*60)
