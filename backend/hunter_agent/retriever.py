@@ -59,35 +59,86 @@ def load_user_profile(profile_path="art_recommender/user_profiles.json") -> dict
     return profile
 
 def build_query(category: str, profile: dict) -> str:
-    taste = profile.get("taste_genre", "")
-    favorites = ", ".join(profile.get("past_favorite_work", []))
-    obsession = ", ".join(profile.get("current_obsession", []))
-    state = profile.get("state_of_mind", "")
+    taste = profile.get("taste_genre", "").strip()
+    favorites = ", ".join([f.strip() for f in profile.get("past_favorite_work", []) if f.strip()])
+    obsession = ", ".join([o.strip() for o in profile.get("current_obsession", []) if o.strip()])
+    state = profile.get("state_of_mind", "").strip()
     
     # Add profile completion context
     profile_status = "complete profile" if profile.get("complete", False) else "developing profile"
     
-    # Create category-specific queries with better targeting
-    if category == "movies":
-        return f"{taste} movies like {favorites} and {obsession} {state} {profile_status}"
-    elif category == "books":
-        return f"{taste} books such as {favorites} and {obsession} {state} {profile_status}"
-    elif category == "music":
-        return f"{taste} music similar to {favorites} and {obsession} {state} {profile_status}"
-    elif category == "musicals":
-        # More specific musical theatre search
-        return f"musical theatre {taste} recommendations {favorites} {obsession} {state} Broadway West End {profile_status}"
-    elif category == "art":
-        # More specific art search
-        return f"contemporary art {taste} artists {favorites} {obsession} {state} exhibitions galleries {profile_status}"
-    elif category == "poetry":
-        # More specific poetry search
-        return f"poetry {taste} poets {favorites} {obsession} {state} contemporary poems {profile_status}"
-    elif category == "podcasts":
-        # More specific podcast search
-        return f"podcasts {taste} {favorites} {obsession} {state} audio storytelling {profile_status}"
+    # For APIs like TMDB and OpenLibrary, use the simplest possible queries
+    if category in ["movies", "books"]:
+        # Use only the most relevant content for better API results
+        if favorites:
+            return favorites  # Just use the favorite work name
+        elif taste:
+            return taste  # Fallback to taste genre
+        else:
+            return category  # Last resort
     else:
-        return f"{taste} {category} recommendations {favorites} {obsession} {state} {profile_status}"
+        # For web search APIs, use more detailed queries
+        components = []
+        
+        if taste:
+            components.append(taste)
+        
+        if category == "music":
+            components.extend(["music"])
+            if favorites:
+                components.extend(["similar to", favorites])
+            if obsession:
+                components.extend(["and", obsession])
+        elif category == "musicals":
+            # More specific musical theatre search
+            components.extend(["musical theatre", "recommendations"])
+            if favorites:
+                components.append(favorites)
+            if obsession:
+                components.append(obsession)
+            components.extend(["Broadway", "West End"])
+        elif category == "art":
+            # More specific art search
+            components.extend(["contemporary art", "artists"])
+            if favorites:
+                components.append(favorites)
+            if obsession:
+                components.append(obsession)
+            components.extend(["exhibitions", "galleries"])
+        elif category == "poetry":
+            # More specific poetry search
+            components.extend(["poetry", "poets"])
+            if favorites:
+                components.append(favorites)
+            if obsession:
+                components.append(obsession)
+            components.extend(["contemporary", "poems"])
+        elif category == "podcasts":
+            # More specific podcast search
+            components.extend(["podcasts"])
+            if favorites:
+                components.append(favorites)
+            if obsession:
+                components.append(obsession)
+            components.extend(["audio", "storytelling"])
+        else:
+            components.extend([category, "recommendations"])
+            if favorites:
+                components.append(favorites)
+            if obsession:
+                components.append(obsession)
+        
+        if state:
+            components.append(state)
+        
+        # Add profile status for web searches
+        components.append(profile_status)
+        
+        # Join components and clean up extra whitespace
+        query = " ".join(components)
+        query = " ".join(query.split())  # Remove extra whitespace
+        
+        return query
 
 def search_openlibrary(query: str, num_results: int = 10) -> List[Dict]:
     url = "https://openlibrary.org/search.json"
