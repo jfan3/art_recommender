@@ -67,6 +67,7 @@ def build_query(category: str, profile: dict) -> str:
     # Add profile completion context
     profile_status = "complete profile" if profile.get("complete", False) else "developing profile"
     
+    # Create category-specific queries with better targeting
     if category == "movies":
         return f"{taste} movies like {favorites} and {obsession} {state} {profile_status}"
     elif category == "books":
@@ -74,7 +75,17 @@ def build_query(category: str, profile: dict) -> str:
     elif category == "music":
         return f"{taste} music similar to {favorites} and {obsession} {state} {profile_status}"
     elif category == "musicals":
-        return f"{taste} musical theatre recommendations {favorites} {obsession} {state} {profile_status}"
+        # More specific musical theatre search
+        return f"musical theatre {taste} recommendations {favorites} {obsession} {state} Broadway West End {profile_status}"
+    elif category == "art":
+        # More specific art search
+        return f"contemporary art {taste} artists {favorites} {obsession} {state} exhibitions galleries {profile_status}"
+    elif category == "poetry":
+        # More specific poetry search
+        return f"poetry {taste} poets {favorites} {obsession} {state} contemporary poems {profile_status}"
+    elif category == "podcasts":
+        # More specific podcast search
+        return f"podcasts {taste} {favorites} {obsession} {state} audio storytelling {profile_status}"
     else:
         return f"{taste} {category} recommendations {favorites} {obsession} {state} {profile_status}"
 
@@ -109,25 +120,126 @@ def search_openlibrary(query: str, num_results: int = 10) -> List[Dict]:
         print(f"[OpenLibrary] Error: {response.status_code}")
         return []
 
-def search_google(query: str, num_results: int = 10) -> List[Dict]:
+def search_google(query: str, num_results: int = 10, category: str = "general") -> List[Dict]:
     url = "https://serpapi.com/search.json"
-    params = {
-        "q": query,
-        "num": num_results,
-        "api_key": SERPAPI_API_KEY
+    
+    # Define high-quality sites for different categories
+    quality_sites = {
+        "art": [
+            "artsy.net", "artnet.com", "theartstory.org", "tate.org.uk", 
+            "moma.org", "metmuseum.org", "guggenheim.org", "whitney.org",
+            "saatchiart.com", "artforum.com", "hyperallergic.com",
+            "artnews.com", "artspace.com", "artbasel.com", "frieze.com",
+            "contemporaryartdaily.com", "e-flux.com", "art-agenda.com"
+        ],
+        "poetry": [
+            "poetryfoundation.org", "poets.org", "poetryarchive.org", 
+            "poetrysociety.org.uk", "poetryinternational.org", "poetry.com",
+            "poetryoutloud.org", "poetryproject.org", "poetrymagazine.org",
+            "poetrysociety.org", "poetrylondon.co.uk", "poetryireland.ie",
+            "poetrynz.org.nz", "poetry.org.au", "poetrycanada.ca"
+        ],
+        "musicals": [
+            "broadway.com", "playbill.com", "broadwayworld.com", 
+            "tonyawards.com", "musicalschwartz.com", "mtishows.com",
+            "rnh.com", "broadwayleague.com", "newyorktheatreguide.com",
+            "londontheatre.co.uk", "whatsonstage.com", "theatremonkey.com",
+            "westendtheatre.com", "musicaltheatreinternational.com"
+        ],
+        "podcasts": [
+            "spotify.com", "apple.com", "npr.org", "bbc.co.uk", 
+            "radiolab.org", "thisamericanlife.org", "ted.com",
+            "wondery.com", "gimletmedia.com", "serialpodcast.org",
+            "gimletmedia.com", "earwolf.com", "maximumfun.org",
+            "stitcher.com", "audible.com", "anchor.fm"
+        ]
     }
+    
+    # Enhanced query construction with category-specific keywords
+    category_keywords = {
+        "art": "contemporary art exhibitions galleries museums artists",
+        "poetry": "contemporary poetry poets poems literary",
+        "musicals": "musical theatre Broadway West End stage",
+        "podcasts": "podcast audio storytelling radio"
+    }
+    
+    # Build enhanced query with site restrictions and category keywords
+    sites = quality_sites.get(category, [])
+    category_kw = category_keywords.get(category, "")
+    
+    if sites:
+        site_filter = " OR ".join([f"site:{site}" for site in sites])
+        enhanced_query = f"({query}) ({category_kw}) ({site_filter})"
+    else:
+        enhanced_query = f"({query}) ({category_kw})"
+    
+    # Add negative keywords to filter out low-quality sites
+    negative_keywords = [
+        "-site:quora.com", "-site:reddit.com", "-site:youtube.com",
+        "-site:facebook.com", "-site:twitter.com", "-site:instagram.com",
+        "-site:linkedin.com", "-site:pinterest.com", "-site:tumblr.com",
+        "-site:wikipedia.org", "-site:answers.com", "-site:yahoo.com",
+        "-site:ask.com", "-site:stackoverflow.com", "-site:medium.com"
+    ]
+    
+    final_query = f"{enhanced_query} {' '.join(negative_keywords)}"
+    
+    params = {
+        "q": final_query,
+        "num": num_results * 3,  # Request more results to account for filtering
+        "api_key": SERPAPI_API_KEY,
+        "gl": "us",  # Geographic location
+        "hl": "en",  # Language
+        "safe": "active",  # Safe search
+        "sort": "relevance"  # Sort by relevance
+    }
+    
     response = requests.get(url, params=params)
     if response.status_code == 200:
         data = response.json()
         results = []
+        
         for item in data.get("organic_results", []):
+            link = item.get("link", "")
+            
+            # Skip low-quality sites
+            low_quality_domains = [
+                "quora.com", "reddit.com", "youtube.com", "facebook.com",
+                "twitter.com", "instagram.com", "linkedin.com", "pinterest.com",
+                "tumblr.com", "wikipedia.org", "answers.com", "yahoo.com",
+                "ask.com", "stackoverflow.com", "medium.com", "blogspot.com",
+                "wordpress.com", "weebly.com", "squarespace.com"
+            ]
+            
+            if any(domain in link.lower() for domain in low_quality_domains):
+                continue
+            
+            # Skip if title or description is too short
+            title = item.get("title", "")
+            description = item.get("snippet", "")
+            
+            if len(title) < 10 or len(description) < 20:
+                continue
+            
+            # Skip if title contains unwanted keywords
+            unwanted_keywords = ["quora", "reddit", "youtube", "facebook", "twitter"]
+            if any(keyword in title.lower() for keyword in unwanted_keywords):
+                continue
+            
+            # Extract domain for metadata
+            domain = ""
+            try:
+                domain = link.split("/")[2] if len(link.split("/")) > 2 else ""
+            except:
+                domain = ""
+            
             results.append({
-                "title": item.get("title") or "",
-                "description": item.get("snippet", "") or "",
-                "source_url": item.get("link") or "",
+                "title": title,
+                "description": description,
+                "source_url": link,
                 "image_url": item.get("thumbnail") or (item.get("image", {}) or {}).get("src", "") or "",
                 "type": "web",
-                "category": "web",
+                "category": category,
                 "creator": "",
                 "release_date": "",
                 "metadata": {
@@ -136,8 +248,15 @@ def search_google(query: str, num_results: int = 10) -> List[Dict]:
                     "tags": ", ".join((item.get("rich_snippet", {}) or {}).get("top", {}).get("tags", []) or []) or "",
                     "rating": str(item.get("rating") or ""),
                     "mood": item.get("mood") or "",
+                    "domain": domain,
+                    "quality_score": "high" if domain in sites else "medium"
                 }
             })
+            
+            # Stop if we have enough high-quality results
+            if len(results) >= num_results:
+                break
+                
         return results
     else:
         print(f"[SerpAPI] Error: {response.status_code}")
@@ -239,17 +358,17 @@ def retrieve_top_candidates(category: str, user_embedding: List[float], user_pro
     elif category == "movies":
         results = search_tmdb(query, num_results=20)
     elif category == "musicals":
-        results = search_google(query, num_results=20)
+        results = search_google(query, num_results=20, category="musicals")
     elif category == "music":
         results = search_spotify(query, num_results=20)
     elif category == "art":
-        results = search_google(query, num_results=20)
+        results = search_google(query, num_results=20, category="art")
     elif category == "poetry":
-        results = search_google(query, num_results=20)
+        results = search_google(query, num_results=20, category="poetry")
     elif category == "podcasts":
-        results = search_google(query, num_results=20)
+        results = search_google(query, num_results=20, category="podcasts")
     else:
-        results = search_google(query, num_results=10)
+        results = search_google(query, num_results=10, category="general")
     # Deduplicate results by title + source_url
     seen = set()
     unique_results = []
