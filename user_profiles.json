@@ -1,17 +1,16 @@
 {
-  "b6d09b9f-3f69-47b7-bada-233f16665ad5": {
-    "uuid": "b6d09b9f-3f69-47b7-bada-233f16665ad5",
+    "uuid": "ff51fc1d-97bf-415b-aeea-22ceb5bceef8",
     "past_favorite_work": [
       "donnie darko"
     ],
-    "favorite_taste_genre_description": "love and peace",
-    "current_obsession": [],
-    "current_state_of_mind": "",
-    "future_aspirations": "",
-    "taste_genre": "love and peace",
-    "state_of_mind": "",
+    "taste_genre": "horror and romance",
+    "current_obsession": [
+      "labubu"
+    ],
+    "state_of_mind": "pretty happy!",
+    "future_aspirations": "astronaut",
     "complete": false,
-    "created_at": "",
-    "updated_at": "2025-06-27T23:45:12.535477Z"
-  }
-}
+    "created_at": "2025-06-27T23:27:07.025648Z",
+    "updated_at": "2025-06-27T23:27:38.255736Z"
+   }
+   

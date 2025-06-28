@@ -231,14 +231,14 @@ def main():
     
     # Test individual search functions
     test_results["openlibrary"] = test_search_openlibrary()
-    # test_results["google"] = test_search_google()
-    # test_results["tmdb"] = test_search_tmdb()
-    # test_results["spotify"] = test_search_spotify()
+    test_results["google"] = test_search_google()
+    test_results["tmdb"] = test_search_tmdb()
+    test_results["spotify"] = test_search_spotify()
     
     # Test utility functions
-    # test_results["build_query"] = test_build_query()
-    # test_results["load_profile"] = test_load_user_profile()
-    # test_results["retrieve_candidates"] = test_retrieve_top_candidates()
+    test_results["build_query"] = test_build_query()
+    test_results["load_profile"] = test_load_user_profile()
+    test_results["retrieve_candidates"] = test_retrieve_top_candidates()
     
     # Summary
     print("\n" + "="*60)
