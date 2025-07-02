@@ -196,40 +196,57 @@ export default function Chat() {
   return (
     <>
       <Toaster position="top-center" />
-      <div className="flex flex-col w-full max-w-2xl h-[70vh] bg-gray-800 rounded-lg shadow-lg">
-        <div className="flex-1 p-4 overflow-y-auto">
+      <div className="arteme-card flex flex-col w-full max-w-2xl h-[70vh] relative">
+        <div className="arteme-accent-bar absolute top-0 left-0 right-0"></div>
+        
+        {/* Chat header */}
+        <div className="p-6 pb-2 text-center border-b border-midnight-black/10">
+          <h3 className="font-bold text-lg arteme-title">
+            Creative Chat
+          </h3>
+        </div>
+        
+        <div className="flex-1 p-6 overflow-y-auto">
           {messages.map((msg, index) => (
-            <div key={index} className={`flex mb-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`px-4 py-2 rounded-lg max-w-prose ${msg.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'}`}>
+            <div key={index} className={`flex mb-6 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`${msg.role === 'user' ? 'arteme-speech-bubble-user' : 'arteme-speech-bubble-assistant'}`}>
                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
               </div>
             </div>
           ))}
            {isLoading && messages[messages.length - 1]?.role === 'assistant' && (
-             <div className="flex justify-start mb-4">
-                <div className="px-4 py-2 rounded-lg bg-gray-700">
-                    <div className="flex items-center justify-center">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s] mx-1"></div>
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+             <div className="flex justify-start mb-6">
+                <div className="arteme-speech-bubble-assistant">
+                    <div className="arteme-loading-dots">
+                        <div className="arteme-loading-dot"></div>
+                        <div className="arteme-loading-dot"></div>
+                        <div className="arteme-loading-dot"></div>
                     </div>
                 </div>
             </div>
            )}
           <div ref={messagesEndRef} />
         </div>
-        <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-700 flex items-center">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={isLoading ? "Waiting for response..." : "Type your message..."}
-            className="w-full px-4 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            disabled={isLoading}
-          />
-          <button type="submit" disabled={isLoading} className="ml-2 p-2 rounded-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
-            <FiSend className="text-white" />
-          </button>
+        
+        <form onSubmit={handleSendMessage} className="p-6 pt-2 border-t border-midnight-black/10">
+          <div className="flex items-center gap-4">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={isLoading ? "Creating magic..." : "What's your creative mood?"}
+              className="arteme-input flex-1 disabled:opacity-50"
+              disabled={isLoading}
+            />
+            <button 
+              type="submit" 
+              disabled={isLoading} 
+              className="arteme-button arteme-button-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FiSend className="text-lg" />
+              <span>Send</span>
+            </button>
+          </div>
         </form>
       </div>
     </>

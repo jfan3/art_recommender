@@ -101,28 +101,105 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
     setCurrent((prev) => prev + 1);
   };
 
-  if (waiting) return <div>Waiting for recommendations from Hunter Agent...</div>;
-  if (loading) return <div>Loading candidates...</div>;
-  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
-  if (trainingComplete) return <div>Training complete! You have swiped right on 30 items. 🎉</div>;
-  if (current >= candidates.length) return <div>No more candidates! 🎉</div>;
+  if (waiting) return (
+    <div className="arteme-card text-center p-8">
+      <div className="arteme-accent-bar w-24 mx-auto mb-6"></div>
+      <h2 className="arteme-title text-3xl mb-4">Discovering Art</h2>
+      <p className="text-lg mb-6 text-midnight-black/70">
+        Finding the perfect recommendations for you
+      </p>
+      <div className="arteme-loading-dots justify-center">
+        <div className="arteme-loading-dot"></div>
+        <div className="arteme-loading-dot"></div>
+        <div className="arteme-loading-dot"></div>
+      </div>
+    </div>
+  );
+  
+  if (loading) return (
+    <div className="arteme-card text-center p-8">
+      <div className="arteme-accent-bar w-24 mx-auto mb-6"></div>
+      <h2 className="arteme-title text-3xl mb-4">Loading Collection</h2>
+      <div className="arteme-loading-dots justify-center">
+        <div className="arteme-loading-dot"></div>
+        <div className="arteme-loading-dot"></div>
+        <div className="arteme-loading-dot"></div>
+      </div>
+    </div>
+  );
+  
+  if (error) return (
+    <div className="arteme-card text-center p-8">
+      <div className="arteme-accent-bar w-24 mx-auto mb-6"></div>
+      <h2 className="arteme-title text-3xl mb-4 text-cherry-red">Error</h2>
+      <p className="text-lg text-cherry-red">{error}</p>
+    </div>
+  );
+  
+  if (trainingComplete) return (
+    <div className="arteme-card text-center p-8">
+      <div className="arteme-accent-bar w-32 mx-auto mb-6"></div>
+      <h2 className="arteme-title text-4xl mb-4">Empire Complete!</h2>
+      <div className="arteme-header inline-block">
+        You've mastered your art taste!
+      </div>
+    </div>
+  );
+  
+  if (current >= candidates.length) return (
+    <div className="arteme-card text-center p-8">
+      <div className="arteme-accent-bar w-32 mx-auto mb-6"></div>
+      <h2 className="arteme-title text-4xl mb-4">All Done!</h2>
+      <p className="text-xl">You've explored all recommendations</p>
+    </div>
+  );
 
   const item = candidates[current];
 
   return (
-    <div style={{ maxWidth: 400, margin: '0 auto', textAlign: 'center' }}>
-      <div style={{ border: '1px solid #ccc', borderRadius: 12, padding: 24, marginBottom: 24 }}>
+    <div className="flex flex-col items-center max-w-lg mx-auto">
+      <div className="arteme-tarot-card p-8 mb-8 text-center relative w-full max-w-md">
         {item.image_url && (
-          <img src={item.image_url} alt={item.item_name || item.title} style={{ width: '100%', borderRadius: 8, marginBottom: 16 }} />
+          <img 
+            src={item.image_url} 
+            alt={item.item_name || item.title} 
+            className="w-full mb-6 rounded-xl"
+            style={{
+              aspectRatio: '4/3',
+              objectFit: 'cover'
+            }}
+          />
         )}
-        <h2>{item.item_name || item.title}</h2>
+        
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold arteme-title mb-2">
+            {item.item_name || item.title}
+          </h2>
+          <div className="arteme-accent-bar w-16 mx-auto"></div>
+        </div>
       </div>
-      <div>
-        <button onClick={() => handleSwipe('swipe_left')} style={{ marginRight: 24, padding: '8px 24px', background: '#eee', borderRadius: 8, border: 'none' }}>Swipe Left</button>
-        <button onClick={() => handleSwipe('swipe_right')} style={{ padding: '8px 24px', background: '#4caf50', color: 'white', borderRadius: 8, border: 'none' }}>Swipe Right</button>
+      
+      <div className="flex gap-6 mb-8">
+        <button 
+          onClick={() => handleSwipe('swipe_left')} 
+          className="arteme-button arteme-button-secondary"
+        >
+          Skip
+        </button>
+        <button 
+          onClick={() => handleSwipe('swipe_right')} 
+          className="arteme-button arteme-button-primary"
+        >
+          Love It!
+        </button>
       </div>
-      <div style={{ marginTop: 16, color: '#888' }}>
-        {current + 1} / {candidates.length}
+      
+      <div className="text-center">
+        <div className="arteme-card p-4 inline-block">
+          <span className="font-bold text-lg text-midnight-black">
+            {current + 1} / {candidates.length}
+          </span>
+        </div>
       </div>
     </div>
   );
