@@ -39,6 +39,15 @@ body {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.arteme-card-organic {
+  background: var(--color-primary-white);
+  border: 6px solid var(--color-primary-black);
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  position: relative;
+  box-shadow: 12px 12px 0px var(--color-primary-black);
+  transition: all 0.3s ease;
+}
+
 .arteme-card:hover {
   transform: translateY(-2px);
   box-shadow: 10px 10px 0px var(--color-primary-black);
@@ -235,3 +244,148 @@ body {
   );
   border-radius: 2px;
 }
+
+/* Enhanced Character Animations - Refined for Elegance */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-12px) rotate(1deg); }
+  66% { transform: translateY(-16px) rotate(-1deg); }
+}
+
+@keyframes dance {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.05) rotate(-3deg); }
+  50% { transform: scale(1.02) rotate(0deg); }
+  75% { transform: scale(1.05) rotate(3deg); }
+}
+
+@keyframes glow {
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 8px rgba(230, 0, 38, 0.4)); }
+  50% { filter: brightness(1.2) drop-shadow(0 0 25px rgba(230, 0, 38, 0.8)); }
+}
+
+@keyframes morph {
+  0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+  50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; }
+}
+
+@keyframes bounce-character {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-15px) scale(1.02); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(2deg); }
+  75% { transform: rotate(-2deg); }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@keyframes excited-jump {
+  0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+  25% { transform: translateY(-20px) scale(1.05) rotate(-2deg); }
+  50% { transform: translateY(-25px) scale(1.08) rotate(0deg); }
+  75% { transform: translateY(-15px) scale(1.03) rotate(2deg); }
+}
+
+@keyframes sway {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-8px) rotate(-1deg); }
+  75% { transform: translateX(8px) rotate(1deg); }
+}
+
+@keyframes funky-walk {
+  0%, 100% { transform: translateX(0) rotate(0deg) scaleX(1); }
+  25% { transform: translateX(-15px) rotate(-2deg) scaleX(0.98); }
+  50% { transform: translateX(-30px) rotate(0deg) scaleX(1); }
+  75% { transform: translateX(-15px) rotate(2deg) scaleX(0.98); }
+}
+
+@keyframes funky-slide {
+  0% { transform: translateX(0) rotate(0deg); }
+  50% { transform: translateX(20px) rotate(5deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes character-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+
+@keyframes funky-spin {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(90deg) scale(1.05); }
+  50% { transform: rotate(180deg) scale(1); }
+  75% { transform: rotate(270deg) scale(1.05); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-dance {
+  animation: dance 1.5s ease-in-out;
+}
+
+.animate-glow {
+  animation: glow 2.5s ease-in-out infinite;
+}
+
+.animate-morph {
+  animation: morph 4s ease-in-out infinite;
+}
+
+.animate-bounce-character {
+  animation: bounce-character 2s ease-in-out infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 1s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+.animate-excited-jump {
+  animation: excited-jump 1s ease-out;
+}
+
+.animate-sway {
+  animation: sway 3s ease-in-out infinite;
+}
+
+.animate-funky-walk {
+  animation: funky-walk 2s ease-in-out;
+}
+
+.animate-funky-slide {
+  animation: funky-slide 1.5s ease-in-out;
+}
+
+.animate-character-bob {
+  animation: character-bob 2.5s ease-in-out infinite;
+}
+
+.animate-funky-spin {
+  animation: funky-spin 2s ease-in-out;
+}
+
+/* Egle-inspired organic shapes */
+.organic-shape {
+  clip-path: polygon(20% 0%, 0% 20%, 30% 50%, 0% 80%, 20% 100%, 50% 70%, 80% 100%, 100% 80%, 70% 50%, 100% 20%, 80% 0%, 50% 30%);
+}
+
+.wave-shape {
+  clip-path: polygon(0% 20%, 60% 20%, 60% 0%, 100% 50%, 60% 100%, 60% 80%, 0% 80%);
+}
+
+.star-shape {
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+

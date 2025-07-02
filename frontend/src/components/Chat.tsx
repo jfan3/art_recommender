@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { FiSend } from 'react-icons/fi';
 import { Toaster, toast } from 'react-hot-toast';
 import SwipeFlow from './SwipeFlow';
+import FunkyCharacter from './FunkyCharacter';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -20,6 +21,7 @@ export default function Chat() {
   const [userUuid, setUserUuid] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [profilingComplete, setProfilingComplete] = useState(false);
+  const [characterActive, setCharacterActive] = useState(false);
 
   useEffect(() => {
     // Always start fresh: clear any previous session/profile
@@ -186,6 +188,18 @@ export default function Chat() {
     return () => clearInterval(interval);
   }, [userUuid, profilingComplete]);
 
+  // Handle character interaction
+  const handleCharacterInteraction = (characterMessage: string) => {
+    const characterBotMessage: Message = { role: 'assistant', content: characterMessage };
+    setMessages(prev => [...prev, characterBotMessage]);
+    setCharacterActive(true);
+    
+    // Auto-scroll to new message
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
   if (profilingComplete && userUuid) {
     return <SwipeFlow userUuid={userUuid} />;
   }
@@ -196,13 +210,22 @@ export default function Chat() {
   return (
     <>
       <Toaster position="top-center" />
-      <div className="arteme-card flex flex-col w-full max-w-2xl h-[70vh] relative">
-        <div className="arteme-accent-bar absolute top-0 left-0 right-0"></div>
+      <div className="flex gap-12 w-full max-w-6xl mx-auto px-12">
+        {/* Character Panel */}
+        <div className="flex-shrink-0">
+          <FunkyCharacter 
+            onInteraction={handleCharacterInteraction}
+            isActive={characterActive}
+          />
+        </div>
+        
+        {/* Chat Panel */}
+        <div className="arteme-card flex flex-col w-full max-w-lg h-[70vh] relative mr-8">
         
         {/* Chat header */}
         <div className="p-6 pb-2 text-center border-b border-midnight-black/10">
           <h3 className="font-bold text-lg arteme-title">
-            Creative Chat
+            Chat with Your Art Buddy
           </h3>
         </div>
         
@@ -210,25 +233,24 @@ export default function Chat() {
           {messages.map((msg, index) => (
             <div key={index} className={`flex mb-6 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`${msg.role === 'user' ? 'arteme-speech-bubble-user' : 'arteme-speech-bubble-assistant'}`}>
-                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                {msg.content ? (
+                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                ) : (
+                  msg.role === 'assistant' && isLoading && (
+                    <div className="arteme-loading-dots">
+                      <div className="arteme-loading-dot"></div>
+                      <div className="arteme-loading-dot"></div>
+                      <div className="arteme-loading-dot"></div>
+                    </div>
+                  )
+                )}
               </div>
             </div>
           ))}
-           {isLoading && messages[messages.length - 1]?.role === 'assistant' && (
-             <div className="flex justify-start mb-6">
-                <div className="arteme-speech-bubble-assistant">
-                    <div className="arteme-loading-dots">
-                        <div className="arteme-loading-dot"></div>
-                        <div className="arteme-loading-dot"></div>
-                        <div className="arteme-loading-dot"></div>
-                    </div>
-                </div>
-            </div>
-           )}
           <div ref={messagesEndRef} />
         </div>
         
-        <form onSubmit={handleSendMessage} className="p-6 pt-2 border-t border-midnight-black/10">
+        <form onSubmit={handleSendMessage} className="p-6 pt-4 border-t border-midnight-black/10">
           <div className="flex items-center gap-4">
             <input
               type="text"
@@ -248,6 +270,7 @@ export default function Chat() {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </>
   );
