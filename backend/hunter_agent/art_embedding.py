@@ -2,7 +2,7 @@
 import openai
 import os
 from typing import List, Dict
-from backend.db.supabase_client import upsert_item_embedding, get_item_embedding
+from db.supabase_client import upsert_item_embedding, get_item_embedding
 import hashlib
 
 openai.api_key = os.getenv("OPENAI_API_KEY")

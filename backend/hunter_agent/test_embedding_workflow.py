@@ -11,7 +11,7 @@ from pathlib import Path
 # Add parent directories to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from backend.db.supabase_client import (
+from db.supabase_client import (
     upsert_user_profile, get_user_profile, upsert_user_item, 
     get_user_embedding, get_item_embedding
 )

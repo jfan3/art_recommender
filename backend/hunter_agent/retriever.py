@@ -6,7 +6,7 @@ import base64
 from dotenv import load_dotenv  # pip install python-dotenv
 from typing import List, Dict
 from datetime import datetime
-from backend.db.supabase_client import get_user_profile
+from db.supabase_client import get_user_profile
 
 # Load environment variables from .env in the root folder
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'))

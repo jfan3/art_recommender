@@ -2,7 +2,7 @@
 import numpy as np
 from typing import List, Dict
 from sklearn.metrics.pairwise import cosine_similarity
-from backend.db.supabase_client import (
+from db.supabase_client import (
     get_user_embedding, upsert_user_embedding, get_user_items, 
     get_items_with_embeddings
 )

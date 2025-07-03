@@ -3,8 +3,8 @@ import json
 import openai
 import os
 from dotenv import load_dotenv
-from backend.hunter_agent.retriever import load_user_profile
-from backend.db.supabase_client import upsert_user_embedding, get_user_embedding
+from retriever import load_user_profile
+from db.supabase_client import upsert_user_embedding, get_user_embedding
 import numpy as np
 
 # Load environment variables from .env in the root folder
