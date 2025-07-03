@@ -22,8 +22,13 @@ export default function Chat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [profilingComplete, setProfilingComplete] = useState(false);
   const [characterActive, setCharacterActive] = useState(false);
+  const initializationRef = useRef(false);
 
   useEffect(() => {
+    // Check if already initialized to prevent double execution
+    if (initializationRef.current) return;
+    initializationRef.current = true;
+    
     // Always start fresh: clear any previous session/profile
     localStorage.removeItem('userUuid');
     localStorage.removeItem('sessionId');
@@ -43,8 +48,6 @@ export default function Chat() {
         localStorage.setItem('sessionId', newSessionId);
         toast.success('New profile created!');
         // Send initial message to get the conversation started
-        const initialBotMessage: Message = { role: 'assistant', content: '' };
-        setMessages([initialBotMessage]);
         setIsLoading(true);
         const payload = {
             session_id: newSessionId,
@@ -76,9 +79,16 @@ export default function Chat() {
                         const data = JSON.parse(dataStr);
                         if (data.type === 'content') {
                             setMessages(prev => {
+                                if (prev.length === 0) {
+                                    return [{ role: 'assistant', content: data.content }];
+                                }
                                 const lastMessage = prev[prev.length - 1];
-                                const updatedLastMessage = { ...lastMessage, content: lastMessage.content + data.content };
-                                return [...prev.slice(0, -1), updatedLastMessage];
+                                if (lastMessage.role === 'assistant') {
+                                    const updatedLastMessage = { ...lastMessage, content: lastMessage.content + data.content };
+                                    return [...prev.slice(0, -1), updatedLastMessage];
+                                } else {
+                                    return [...prev, { role: 'assistant', content: data.content }];
+                                }
                             });
                         } else if (data.type === 'complete') {
                             toast.success("Profiling complete!");
@@ -210,7 +220,7 @@ export default function Chat() {
   return (
     <>
       <Toaster position="top-center" />
-      <div className="flex gap-12 w-full max-w-6xl mx-auto px-12">
+      <div className="flex gap-8 w-full max-w-5xl mx-auto px-8">
         {/* Character Panel */}
         <div className="flex-shrink-0">
           <FunkyCharacter 
@@ -220,7 +230,7 @@ export default function Chat() {
         </div>
         
         {/* Chat Panel */}
-        <div className="arteme-card flex flex-col w-full max-w-lg h-[70vh] relative mr-8">
+        <div className="arteme-card flex flex-col w-full max-w-lg h-[70vh] relative">
         
         {/* Chat header */}
         <div className="p-6 pb-2 text-center border-b border-midnight-black/10">

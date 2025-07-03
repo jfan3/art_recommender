@@ -97,7 +97,7 @@ const FunkyCharacter: React.FC<FunkyCharacterProps> = ({
     <div className="relative flex flex-col items-center">
       {/* Character Container with PNG Image */}
       <div 
-        className={`relative cursor-pointer transition-all duration-500 hover:scale-110 ${animations[currentMood as keyof typeof animations]} ${isActive ? 'ring-4 ring-yellow-400 ring-opacity-60' : ''}`}
+        className={`relative cursor-pointer transition-all duration-500 hover:scale-110 ${animations[currentMood as keyof typeof animations]}`}
         onClick={handleCharacterClick}
         style={{
           width: '200px',
@@ -106,10 +106,10 @@ const FunkyCharacter: React.FC<FunkyCharacterProps> = ({
         }}
       >
         
-        {/* PNG Character Image - 标准图片加载方式 */}
+        {/* PNG Character Image */}
         <img 
-          src="/assets/new-character.png" 
-          alt="ARTEME Funky Character"
+          src="/assets/character.png" 
+          alt="ARTEME Character"
           className="w-full h-full object-contain relative z-10"
           style={{
             filter: currentMood === 'excited' 
