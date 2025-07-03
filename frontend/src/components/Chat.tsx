@@ -220,7 +220,7 @@ export default function Chat() {
   return (
     <>
       <Toaster position="top-center" />
-      <div className="flex flex-row gap-8 w-full max-w-7xl mx-auto px-8 h-full">
+      <div className="flex flex-row gap-1 w-full max-w-4xl mx-auto px-8 h-full">
         {/* Character Panel - 1/3 width */}
         <div className="flex flex-col justify-center items-center w-1/3">
           <FunkyCharacter 
@@ -230,16 +230,22 @@ export default function Chat() {
         </div>
         
         {/* Chat Panel - 2/3 width */}
-        <div className="arteme-card flex flex-col w-2/3 max-w-2xl h-[70vh] relative">
+        <div className="arteme-card flex flex-col w-2/3 max-w-md h-[60vh] relative overflow-hidden"
+             style={{
+               marginTop: '20px !important',
+               marginRight: '50px !important',
+               background: 'linear-gradient(135deg, #e0f2fe 0%, #f3e5f5 50%, #fff8e1 100%) !important',
+               transform: 'translateY(0px) translateX(-10px)'
+             }}>
         
         {/* Chat header */}
         <div className="px-2 py-3 text-center border-b border-midnight-black/10">
           <h3 className="font-bold text-base arteme-title">
-            Chat with Your Art Buddy
+Chat with Arteme
           </h3>
         </div>
         
-        <div className="flex-1 px-2 py-4 overflow-y-auto">
+        <div className="flex-1 px-4 py-4 overflow-y-auto">
           {messages.map((msg, index) => (
             <div key={index} className={`flex mb-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`${msg.role === 'user' ? 'arteme-speech-bubble-user' : 'arteme-speech-bubble-assistant'}`}>
@@ -260,7 +266,7 @@ export default function Chat() {
           <div ref={messagesEndRef} />
         </div>
         
-        <form onSubmit={handleSendMessage} className="p-4 pt-3 border-t border-midnight-black/10">
+        <form onSubmit={handleSendMessage} className="px-4 py-3 border-t border-midnight-black/10">
           <div className="flex items-center gap-3">
             <input
               type="text"

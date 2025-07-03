@@ -562,3 +562,41 @@ body {
   }
 }
 
+/* Fun running animation across the page */
+@keyframes run-across-page {
+  0% { 
+    transform: translateX(-100vw) scaleX(1) rotate(0deg); 
+    opacity: 0.8;
+  }
+  15% { 
+    transform: translateX(-50vw) scaleX(1.1) rotate(-2deg); 
+    opacity: 1;
+  }
+  30% { 
+    transform: translateX(0vw) scaleX(1) rotate(0deg); 
+    opacity: 1;
+  }
+  45% { 
+    transform: translateX(50vw) scaleX(1.1) rotate(2deg); 
+    opacity: 1;
+  }
+  60% { 
+    transform: translateX(100vw) scaleX(1) rotate(0deg); 
+    opacity: 1;
+  }
+  75% { 
+    transform: translateX(150vw) scaleX(1.1) rotate(-2deg); 
+    opacity: 0.8;
+  }
+  100% { 
+    transform: translateX(200vw) scaleX(1) rotate(0deg); 
+    opacity: 0.5;
+  }
+}
+
+.animate-run-across-page {
+  animation: run-across-page 4s ease-in-out;
+  position: relative;
+  z-index: 1000;
+}
+

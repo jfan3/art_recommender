@@ -101,8 +101,8 @@ const FunkyCharacter: React.FC<FunkyCharacterProps> = ({
         onClick={handleCharacterClick}
         style={{
           filter: isActive ? 'brightness(1.1) contrast(1.1) drop-shadow(0 0 25px rgba(255, 202, 43, 0.6))' : 'brightness(1)',
-          width: '180px',
-          height: '225px'
+          width: '400px',
+          height: '500px'
         }}
       >
         
