@@ -4,6 +4,7 @@ import openai
 import os
 from dotenv import load_dotenv
 from backend.hunter_agent.retriever import load_user_profile
+from backend.db.supabase_client import upsert_user_embedding, get_user_embedding
 import numpy as np
 
 # Load environment variables from .env in the root folder
@@ -65,11 +66,22 @@ def extract_profile_text_from_dict(profile: dict) -> str:
             text_parts.append(str(value))
     return "; ".join(text_parts)
 
-def generate_user_embedding(user_uuid_or_profile):
+def generate_user_embedding(user_uuid_or_profile, store_in_db: bool = True):
+    """Generate user embedding and optionally store in database."""
     if isinstance(user_uuid_or_profile, dict):
         profile = user_uuid_or_profile
+        user_uuid = profile.get("uuid")
     else:
-        profile = load_user_profile(user_uuid_or_profile)
+        user_uuid = user_uuid_or_profile
+        profile = load_user_profile(user_uuid)
+    
+    # Check if embedding already exists
+    if store_in_db and user_uuid:
+        existing_embedding = get_user_embedding(user_uuid)
+        if existing_embedding:
+            print(f"Using existing user embedding for {user_uuid}")
+            return existing_embedding["embedding"]
+    
     profile_text = extract_profile_text_from_dict(profile)
     
     response = openai.embeddings.create(
@@ -78,6 +90,12 @@ def generate_user_embedding(user_uuid_or_profile):
     )
     
     embedding = response.data[0].embedding
+    
+    # Store in database if requested
+    if store_in_db and user_uuid:
+        upsert_user_embedding(user_uuid, embedding, version=1)
+        print(f"Stored new user embedding for {user_uuid}")
+    
     return embedding
 
 # For demonstration, return a dummy embedding (replace with real model call)

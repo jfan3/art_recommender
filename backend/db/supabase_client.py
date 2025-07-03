@@ -47,4 +47,60 @@ def get_user_items(uuid: str) -> List[Dict]:
 
 def update_user_item_status(uuid: str, item_id: str, status: str) -> Dict:
     resp = supabase.table("user_item").update({"status": status}).eq("uuid", uuid).eq("item_id", item_id).execute()
-    return resp.data 
+    return resp.data
+
+# --- USER EMBEDDINGS ---
+def upsert_user_embedding(uuid: str, embedding: List[float], version: int = 1) -> Dict:
+    """Store or update user embedding in database."""
+    embedding_data = {
+        "uuid": uuid,
+        "embedding": embedding,
+        "version": version,
+        "updated_at": "now()"
+    }
+    resp = supabase.table("user_embedding").upsert(embedding_data).execute()
+    return resp.data
+
+def get_user_embedding(uuid: str) -> Optional[Dict]:
+    """Retrieve the latest user embedding."""
+    resp = supabase.table("user_embedding").select("*").eq("uuid", uuid).order("version", desc=True).limit(1).execute()
+    return resp.data[0] if resp.data else None
+
+# --- ITEM EMBEDDINGS ---
+def upsert_item_embedding(item_id: str, embedding: List[float]) -> Dict:
+    """Store or update item embedding in database."""
+    embedding_data = {
+        "item_id": item_id,
+        "embedding": embedding,
+        "updated_at": "now()"
+    }
+    resp = supabase.table("item_embedding").upsert(embedding_data).execute()
+    return resp.data
+
+def get_item_embedding(item_id: str) -> Optional[Dict]:
+    """Retrieve item embedding."""
+    resp = supabase.table("item_embedding").select("*").eq("item_id", item_id).single().execute()
+    return resp.data if resp.data else None
+
+def get_items_with_embeddings(item_ids: List[str]) -> List[Dict]:
+    """Retrieve items with their embeddings."""
+    if not item_ids:
+        return []
+    
+    # Get items
+    items_resp = supabase.table("item").select("*").in_("item_id", item_ids).execute()
+    items = {item["item_id"]: item for item in items_resp.data} if items_resp.data else {}
+    
+    # Get embeddings
+    embeddings_resp = supabase.table("item_embedding").select("*").in_("item_id", item_ids).execute()
+    embeddings = {emb["item_id"]: emb["embedding"] for emb in embeddings_resp.data} if embeddings_resp.data else {}
+    
+    # Combine items with embeddings
+    results = []
+    for item_id in item_ids:
+        if item_id in items and item_id in embeddings:
+            item = items[item_id].copy()
+            item["embedding"] = embeddings[item_id]
+            results.append(item)
+    
+    return results 
