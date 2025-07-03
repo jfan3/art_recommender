@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { toast } from 'react-hot-toast';
+import ThreeMonthPlan from './ThreeMonthPlan';
 
 const HUNTER_API_URL = process.env.NEXT_PUBLIC_HUNTER_API_URL || 'http://localhost:8090';
 
@@ -24,6 +25,7 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
   const [error, setError] = useState<string | null>(null);
   const [waiting, setWaiting] = useState(true);
   const [trainingComplete, setTrainingComplete] = useState(false);
+  const [swipesComplete, setSwipesComplete] = useState(false);
   
   // Swipe state
   const [isDragging, setIsDragging] = useState(false);
@@ -226,6 +228,11 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
       if (data.training_complete) {
         setTrainingComplete(true);
         toast.success('Training complete! You have swiped right on 30 items.');
+        return;
+      }
+      if (data.swipes_complete && data.plan_generated) {
+        toast.success(`Preference learning complete! Generated ${data.plan_items} personalized recommendations for your 3-month art journey.`);
+        setSwipesComplete(true);
         return;
       }
     } catch (err) {
@@ -447,6 +454,10 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
       <p className="text-lg text-cherry-red">{error}</p>
     </div>
   );
+  
+  if (swipesComplete) {
+    return <ThreeMonthPlan userUuid={userUuid} />;
+  }
   
   if (trainingComplete) return (
     <div className="arteme-card text-center p-8">
