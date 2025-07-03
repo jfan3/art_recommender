@@ -166,7 +166,8 @@ export default function Chat() {
                             });
                         } else if (data.type === 'complete') {
                             toast.success("Profiling complete!");
-                            setIsLoading(true);
+                            setProfilingComplete(true);
+                            setIsLoading(false);
                         }
                     } catch (e) {
                         console.error('Failed to parse stream data:', e);
@@ -189,10 +190,16 @@ export default function Chat() {
       fetch(`${API_BASE_URL}/profiles/${userUuid}`)
         .then(res => res.json())
         .then(profile => {
+          console.log('Profile status:', profile);
           if (profile.complete) {
+            console.log('Profile is complete, transitioning to SwipeFlow');
             setProfilingComplete(true);
+            toast.success("Profile completed!");
             clearInterval(interval);
           }
+        })
+        .catch(err => {
+          console.error('Error checking profile:', err);
         });
     }, 1500);
     return () => clearInterval(interval);
