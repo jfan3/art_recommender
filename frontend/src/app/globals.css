@@ -243,6 +243,17 @@ body {
     var(--color-accent-peach) 100%
   );
   border-radius: 2px;
+  background-size: 200% 100%;
+  animation: rainbow-flow 3s ease-in-out infinite;
+}
+
+@keyframes rainbow-flow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 /* Enhanced Character Animations - Refined for Elegance */
@@ -499,6 +510,14 @@ section {
   background: linear-gradient(135deg, var(--color-primary-yellow) 0%, var(--color-accent-peach) 100%);
 }
 
+/* Chat page responsive design */
+@media (max-width: 1024px) {
+  .arteme-card {
+    margin: 0 auto;
+    max-width: 90vw;
+  }
+}
+
 /* Responsive design for home page */
 @media (max-width: 768px) {
   .arteme-title {
@@ -512,6 +531,34 @@ section {
   
   .floating-decorative {
     display: none;
+  }
+  
+  /* Chat specific mobile styles */
+  .arteme-card {
+    height: 50vh !important;
+    margin: 0 auto;
+    max-width: 95vw;
+  }
+  
+  /* Character responsive sizing */
+  .character-container {
+    width: 120px !important;
+    height: 150px !important;
+  }
+}
+
+/* Prevent horizontal overflow */
+body {
+  overflow-x: hidden;
+}
+
+/* Better spacing for mobile */
+@media (max-width: 640px) {
+  .arteme-card {
+    height: 45vh !important;
+    max-width: 100vw;
+    margin: 0;
+    border-radius: 12px;
   }
 }
 

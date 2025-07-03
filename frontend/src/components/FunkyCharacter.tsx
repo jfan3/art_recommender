@@ -97,12 +97,12 @@ const FunkyCharacter: React.FC<FunkyCharacterProps> = ({
     <div className="relative flex flex-col items-center">
       {/* Character Container with PNG Image */}
       <div 
-        className={`relative cursor-pointer transition-all duration-500 hover:scale-110 ${animations[currentMood as keyof typeof animations]}`}
+        className={`relative cursor-pointer transition-all duration-500 hover:scale-110 w-4 h-5 md:w-5 md:h-6 lg:w-6 lg:h-8 ${animations[currentMood as keyof typeof animations]}`}
         onClick={handleCharacterClick}
         style={{
-          width: '200px',
-          height: '250px',
           filter: isActive ? 'brightness(1.1) contrast(1.1) drop-shadow(0 0 25px rgba(255, 202, 43, 0.6))' : 'brightness(1)',
+          width: '180px',
+          height: '225px'
         }}
       >
         
@@ -137,10 +137,7 @@ const FunkyCharacter: React.FC<FunkyCharacterProps> = ({
       </div>
 
       {/* Character Info */}
-      <div className="mt-6 text-center">
-        <div className="arteme-header text-base mb-3 inline-block">
-          YOUR ART BUDDY
-        </div>
+      <div className="mt-4 text-center">
         <div className="text-sm max-w-64" style={{ color: 'var(--color-primary-white)' }}>
           Click me to start chatting!
         </div>

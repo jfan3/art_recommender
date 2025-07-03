@@ -220,28 +220,28 @@ export default function Chat() {
   return (
     <>
       <Toaster position="top-center" />
-      <div className="flex gap-8 w-full max-w-5xl mx-auto px-8">
-        {/* Character Panel */}
-        <div className="flex-shrink-0">
+      <div className="flex flex-row gap-8 w-full max-w-7xl mx-auto px-8 h-full">
+        {/* Character Panel - 1/3 width */}
+        <div className="flex flex-col justify-center items-center w-1/3">
           <FunkyCharacter 
             onInteraction={handleCharacterInteraction}
             isActive={characterActive}
           />
         </div>
         
-        {/* Chat Panel */}
-        <div className="arteme-card flex flex-col w-full max-w-lg h-[70vh] relative">
+        {/* Chat Panel - 2/3 width */}
+        <div className="arteme-card flex flex-col w-2/3 max-w-2xl h-[70vh] relative">
         
         {/* Chat header */}
-        <div className="p-6 pb-2 text-center border-b border-midnight-black/10">
-          <h3 className="font-bold text-lg arteme-title">
+        <div className="px-2 py-3 text-center border-b border-midnight-black/10">
+          <h3 className="font-bold text-base arteme-title">
             Chat with Your Art Buddy
           </h3>
         </div>
         
-        <div className="flex-1 p-6 overflow-y-auto">
+        <div className="flex-1 px-2 py-4 overflow-y-auto">
           {messages.map((msg, index) => (
-            <div key={index} className={`flex mb-6 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div key={index} className={`flex mb-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`${msg.role === 'user' ? 'arteme-speech-bubble-user' : 'arteme-speech-bubble-assistant'}`}>
                 {msg.content ? (
                   <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
@@ -260,22 +260,22 @@ export default function Chat() {
           <div ref={messagesEndRef} />
         </div>
         
-        <form onSubmit={handleSendMessage} className="p-6 pt-4 border-t border-midnight-black/10">
-          <div className="flex items-center gap-4">
+        <form onSubmit={handleSendMessage} className="p-4 pt-3 border-t border-midnight-black/10">
+          <div className="flex items-center gap-3">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={isLoading ? "Creating magic..." : "What's your creative mood?"}
-              className="arteme-input flex-1 disabled:opacity-50"
+              className="arteme-input flex-1 disabled:opacity-50 text-sm"
               disabled={isLoading}
             />
             <button 
               type="submit" 
               disabled={isLoading} 
-              className="arteme-button arteme-button-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="arteme-button arteme-button-primary flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed text-sm px-3 py-2"
             >
-              <FiSend className="text-lg" />
+              <FiSend className="text-base" />
               <span>Send</span>
             </button>
           </div>
