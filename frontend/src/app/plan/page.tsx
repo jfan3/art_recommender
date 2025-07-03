@@ -1,6 +1,6 @@
 'use client';
 
-import ThreeMonthPlan from '@/components/ThreeMonthPlan';
+import ThreeMonthPlan from '@/components/three-month-plan';
 
 export default function PlanPage() {
   // Use a test UUID - in real app, this would come from authentication

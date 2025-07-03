@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { toast } from 'react-hot-toast';
-import ThreeMonthPlan from './ThreeMonthPlan';
+import ThreeMonthPlan from './three-month-plan';
 
 const HUNTER_API_URL = process.env.NEXT_PUBLIC_HUNTER_API_URL || 'http://localhost:8090';
 
