@@ -102,29 +102,168 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
   };
 
   if (waiting) return (
-    <div className="arteme-card text-center p-8">
-      <div className="arteme-accent-bar w-24 mx-auto mb-6"></div>
-      <h2 className="arteme-title text-3xl mb-4">Discovering Art</h2>
-      <p className="text-lg mb-6 text-midnight-black/70">
-        Finding the perfect recommendations for you
+    <div className="text-center" style={{ maxWidth: '600px', margin: '0 auto', paddingTop: '10px', paddingBottom: '24px' }}>
+      <h2 className="arteme-title text-4xl mb-4" style={{ color: 'var(--color-primary-white)' }}>Discovering Art</h2>
+      <p className="text-xl" style={{ color: 'var(--color-primary-white)', marginBottom: '100px' }}>
+        Finding the personalized recommendations for you
       </p>
-      <div className="arteme-loading-dots justify-center">
-        <div className="arteme-loading-dot"></div>
-        <div className="arteme-loading-dot"></div>
-        <div className="arteme-loading-dot"></div>
+      
+      {/* 3D Cube Animation */}
+      <div className="cube-container mb-8" style={{ 
+        perspective: '1200px', 
+        display: 'flex', 
+        justifyContent: 'center',
+        height: '180px'
+      }}>
+        <div className="cube" style={{
+          width: '120px',
+          height: '120px',
+          position: 'relative',
+          transformStyle: 'preserve-3d',
+          animation: 'rotateCube 3s infinite linear'
+        }}>
+          <div className="cube-face cube-front" style={{
+            position: 'absolute',
+            width: '120px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #E60026, #FF6B6B)',
+            border: '3px solid #000',
+            transform: 'rotateY(0deg) translateZ(60px)'
+          }}></div>
+          <div className="cube-face cube-back" style={{
+            position: 'absolute',
+            width: '120px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #FFCA2B, #FFE066)',
+            border: '3px solid #000',
+            transform: 'rotateY(180deg) translateZ(60px)'
+          }}></div>
+          <div className="cube-face cube-right" style={{
+            position: 'absolute',
+            width: '120px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #90D4F2, #B3E5FC)',
+            border: '3px solid #000',
+            transform: 'rotateY(90deg) translateZ(60px)'
+          }}></div>
+          <div className="cube-face cube-left" style={{
+            position: 'absolute',
+            width: '120px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #D3A4FF, #E1BEE7)',
+            border: '3px solid #000',
+            transform: 'rotateY(-90deg) translateZ(60px)'
+          }}></div>
+          <div className="cube-face cube-top" style={{
+            position: 'absolute',
+            width: '120px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #FFB6C1, #FFCCCB)',
+            border: '3px solid #000',
+            transform: 'rotateX(90deg) translateZ(60px)'
+          }}></div>
+          <div className="cube-face cube-bottom" style={{
+            position: 'absolute',
+            width: '120px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #FFA07A, #FFB07A)',
+            border: '3px solid #000',
+            transform: 'rotateX(-90deg) translateZ(60px)'
+          }}></div>
+        </div>
       </div>
+      
+      <style jsx>{`
+        @keyframes rotateCube {
+          0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+          33% { transform: rotateX(120deg) rotateY(120deg) rotateZ(0deg); }
+          66% { transform: rotateX(240deg) rotateY(240deg) rotateZ(120deg); }
+          100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+        }
+      `}</style>
     </div>
   );
   
   if (loading) return (
-    <div className="arteme-card text-center p-8">
-      <div className="arteme-accent-bar w-24 mx-auto mb-6"></div>
-      <h2 className="arteme-title text-3xl mb-4">Loading Collection</h2>
-      <div className="arteme-loading-dots justify-center">
-        <div className="arteme-loading-dot"></div>
-        <div className="arteme-loading-dot"></div>
-        <div className="arteme-loading-dot"></div>
+    <div className="text-center" style={{ maxWidth: '600px', margin: '0 auto', paddingTop: '10px', paddingBottom: '24px' }}>
+      <h2 className="arteme-title text-4xl mb-4" style={{ color: 'var(--color-primary-white)' }}>Loading Collection</h2>
+      <p className="text-xl" style={{ color: 'var(--color-primary-white)', marginBottom: '100px' }}>
+        Preparing your art discoveries
+      </p>
+      
+      {/* 3D Cube Animation */}
+      <div className="cube-container mb-8" style={{ 
+        perspective: '1200px', 
+        display: 'flex', 
+        justifyContent: 'center',
+        height: '180px'
+      }}>
+        <div className="cube" style={{
+          width: '120px',
+          height: '120px',
+          position: 'relative',
+          transformStyle: 'preserve-3d',
+          animation: 'rotateCube 3s infinite linear'
+        }}>
+          <div className="cube-face cube-front" style={{
+            position: 'absolute',
+            width: '120px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #E60026, #FF6B6B)',
+            border: '3px solid #000',
+            transform: 'rotateY(0deg) translateZ(60px)'
+          }}></div>
+          <div className="cube-face cube-back" style={{
+            position: 'absolute',
+            width: '120px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #FFCA2B, #FFE066)',
+            border: '3px solid #000',
+            transform: 'rotateY(180deg) translateZ(60px)'
+          }}></div>
+          <div className="cube-face cube-right" style={{
+            position: 'absolute',
+            width: '120px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #90D4F2, #B3E5FC)',
+            border: '3px solid #000',
+            transform: 'rotateY(90deg) translateZ(60px)'
+          }}></div>
+          <div className="cube-face cube-left" style={{
+            position: 'absolute',
+            width: '120px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #D3A4FF, #E1BEE7)',
+            border: '3px solid #000',
+            transform: 'rotateY(-90deg) translateZ(60px)'
+          }}></div>
+          <div className="cube-face cube-top" style={{
+            position: 'absolute',
+            width: '120px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #FFB6C1, #FFCCCB)',
+            border: '3px solid #000',
+            transform: 'rotateX(90deg) translateZ(60px)'
+          }}></div>
+          <div className="cube-face cube-bottom" style={{
+            position: 'absolute',
+            width: '120px',
+            height: '120px',
+            background: 'linear-gradient(135deg, #FFA07A, #FFB07A)',
+            border: '3px solid #000',
+            transform: 'rotateX(-90deg) translateZ(60px)'
+          }}></div>
+        </div>
       </div>
+      
+      <style jsx>{`
+        @keyframes rotateCube {
+          0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+          33% { transform: rotateX(120deg) rotateY(120deg) rotateZ(0deg); }
+          66% { transform: rotateX(240deg) rotateY(240deg) rotateZ(120deg); }
+          100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+        }
+      `}</style>
     </div>
   );
   
