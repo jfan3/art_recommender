@@ -360,12 +360,36 @@ def get_plan(user_uuid: str):
     # Check if we have a generated plan for this user
     if user_uuid in user_plans:
         plan = user_plans[user_uuid]
+        total_items = sum(len(items) for items in plan.values())
+        total_weeks = len(plan)
+        
+        # Calculate time based on content type
+        total_time_hours = 0
+        for week_items in plan.values():
+            for item in week_items:
+                item_type = item.get("type", "art").lower()
+                # Estimate time based on content type
+                if item_type in ["art", "poetry"]:
+                    total_time_hours += 1.0  # 1 hour for visual art/poetry
+                elif item_type in ["books"]:
+                    total_time_hours += 8.0  # 8 hours for books
+                elif item_type in ["movies", "musicals"]:
+                    total_time_hours += 2.5  # 2.5 hours for movies
+                elif item_type in ["music", "podcasts"]:
+                    total_time_hours += 1.5  # 1.5 hours for music/podcasts
+                else:
+                    total_time_hours += 2.0  # Default 2 hours
+        
+        avg_hours_per_week = round(total_time_hours / max(total_weeks, 1), 1)
+        
         print(f"Returning generated plan for user {user_uuid}")
         return {
             "success": True,
             "weekly_plan": plan,
-            "total_weeks": len(plan),
-            "total_items": sum(len(items) for items in plan.values()),
+            "total_weeks": total_weeks,
+            "total_items": total_items,
+            "total_time_hours": int(total_time_hours),
+            "avg_hours_per_week": avg_hours_per_week,
             "user_preferences_applied": True,
             "plan_generated": True
         }
