@@ -29,9 +29,21 @@ export default function Chat() {
     if (initializationRef.current) return;
     initializationRef.current = true;
     
-    // Always start fresh: clear any previous session/profile
+    // Check if we have an existing completed profile
+    const existingProfileComplete = localStorage.getItem('profilingComplete');
+    const existingUserUuid = localStorage.getItem('userUuid');
+    
+    if (existingProfileComplete === 'true' && existingUserUuid) {
+      // Restore completed state
+      setUserUuid(existingUserUuid);
+      setProfilingComplete(true);
+      return;
+    }
+    
+    // Otherwise start fresh: clear any previous session/profile
     localStorage.removeItem('userUuid');
     localStorage.removeItem('sessionId');
+    localStorage.removeItem('profilingComplete');
 
     // Immediately create a new profile and start chat
     const startConversation = async () => {
@@ -93,6 +105,7 @@ export default function Chat() {
                         } else if (data.type === 'complete') {
                             toast.success("Profiling complete!");
                             setProfilingComplete(true);
+                            localStorage.setItem('profilingComplete', 'true');
                             setIsLoading(false);
                         }
                     } catch (e) {
@@ -167,6 +180,7 @@ export default function Chat() {
                         } else if (data.type === 'complete') {
                             toast.success("Profiling complete!");
                             setProfilingComplete(true);
+                            localStorage.setItem('profilingComplete', 'true');
                             setIsLoading(false);
                         }
                     } catch (e) {
@@ -194,6 +208,7 @@ export default function Chat() {
           if (profile.complete) {
             console.log('Profile is complete, transitioning to SwipeFlow');
             setProfilingComplete(true);
+            localStorage.setItem('profilingComplete', 'true');
             toast.success("Profile completed!");
             clearInterval(interval);
           }
@@ -218,7 +233,11 @@ export default function Chat() {
   };
 
   if (profilingComplete && userUuid) {
-    return <SwipeFlow userUuid={userUuid} />;
+    return (
+      <div className="relative">
+        <SwipeFlow userUuid={userUuid} />
+      </div>
+    );
   }
   if (!userUuid) {
     return <div>Loading...</div>;
@@ -236,13 +255,13 @@ export default function Chat() {
           />
         </div>
         
-        {/* Chat Panel - 2/3 width */}
-        <div className="flex flex-col w-2/3 max-w-md h-[60vh] relative overflow-hidden"
+        {/* Chat Panel - smaller size */}
+        <div className="flex flex-col w-1/2 max-w-sm h-[45vh] relative overflow-hidden"
              style={{
                marginTop: '20px !important',
-               marginRight: '60px !important',
+               marginRight: '20px !important',
                background: 'linear-gradient(135deg, #fdf2f8 0%, #fefbf3 50%, #f0fdf4 100%) !important',
-               transform: 'translateY(30px) translateX(-50px)',
+               transform: 'translateY(20px) translateX(-30px)',
                border: '4px solid var(--color-primary-black)',
                borderRadius: '20px',
                boxShadow: '8px 8px 0px var(--color-primary-black)'

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import ThreeMonthPlan from './three-month-plan';
 
-const HUNTER_API_URL = process.env.NEXT_PUBLIC_HUNTER_API_URL || 'http://localhost:8090';
+const HUNTER_API_URL = process.env.NEXT_PUBLIC_HUNTER_API_URL || 'http://localhost:8000';
 
 interface Item {
   item_id: string;
@@ -25,7 +25,10 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
   const [error, setError] = useState<string | null>(null);
   const [waiting, setWaiting] = useState(true);
   const [trainingComplete, setTrainingComplete] = useState(false);
-  const [swipesComplete, setSwipesComplete] = useState(false);
+  const [swipesComplete, setSwipesComplete] = useState(() => {
+    // Check if swipes were already completed
+    return localStorage.getItem('swipesComplete') === 'true';
+  });
   
   // Swipe state
   const [isDragging, setIsDragging] = useState(false);
@@ -36,14 +39,9 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
 
   // Poll for generation status
   useEffect(() => {
-    // For test users, skip waiting
-    if (userUuid === 'test-uuid-123') {
-      setWaiting(false);
-      return;
-    }
+    // NO TEST USER SHORTCUTS - all users follow real workflow
     
     let pollTimeout: NodeJS.Timeout;
-    let cancelled = false;
     const pollStatus = async () => {
       try {
         const res = await fetch(`${HUNTER_API_URL}/api/generation_status/${userUuid}`);
@@ -61,7 +59,6 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
     };
     pollStatus();
     return () => {
-      cancelled = true;
       if (pollTimeout) clearTimeout(pollTimeout);
     };
   }, [userUuid]);
@@ -75,28 +72,16 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
       try {
         const res = await fetch(`${HUNTER_API_URL}/api/candidates/${userUuid}`);
         if (!res.ok) {
-          // For testing purposes, add some mock data when API fails
-          if (userUuid === 'test-uuid-123') {
-            const mockData = [
-              {
-                item_id: 'test1',
-                item_name: 'Test Artwork 1',
-                image_url: 'https://picsum.photos/400/500',
-                category: 'Painting'
-              },
-              {
-                item_id: 'test2', 
-                item_name: 'Test Artwork 2',
-                image_url: 'https://picsum.photos/400/501',
-                category: 'Sculpture'
-              }
-            ];
-            setCandidates(mockData);
-            setCurrent(0);
-            setLoading(false);
-            return;
+          // Handle specific error codes from consolidated API
+          if (res.status === 503) {
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.detail || 'Backend services unavailable. Please ensure Supabase connection is active.');
           }
-          throw new Error('Failed to fetch candidates');
+          
+          // NO MOCK DATA - only real candidates
+          
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.detail || `Failed to fetch candidates (${res.status})`);
         }
         const data = await res.json();
         if (data.training_complete) {
@@ -106,27 +91,8 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
         setCandidates(data.candidates || []);
         setCurrent(0);
       } catch (err: any) {
-        // For testing, set mock data even on error
-        if (userUuid === 'test-uuid-123') {
-          const mockData = [
-            {
-              item_id: 'test1',
-              item_name: 'Test Artwork 1', 
-              image_url: 'https://picsum.photos/400/500',
-              category: 'Painting'
-            },
-            {
-              item_id: 'test2',
-              item_name: 'Test Artwork 2',
-              image_url: 'https://picsum.photos/400/501', 
-              category: 'Sculpture'
-            }
-          ];
-          setCandidates(mockData);
-          setCurrent(0);
-        } else {
-          setError(err.message || 'Error fetching candidates');
-        }
+        // NO MOCK DATA - show error for all cases
+        setError(err.message || 'Error fetching real candidates. Please ensure your profile is complete and try again.');
       } finally {
         setLoading(false);
       }
@@ -214,6 +180,7 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
   const handleSwipe = async (direction: 'swipe_left' | 'swipe_right') => {
     if (!candidates[current]) return;
     const item = candidates[current];
+    console.log(`Swiping ${direction} on item ${current + 1}/${candidates.length}`);
     try {
       const response = await fetch(`${HUNTER_API_URL}/api/swipe`, {
         method: 'POST',
@@ -224,20 +191,40 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
           status: direction,
         }),
       });
+      
+      if (!response.ok) {
+        // Handle specific error codes from consolidated API
+        if (response.status === 503) {
+          const errorData = await response.json().catch(() => ({}));
+          toast.error(errorData.detail || 'Backend services unavailable. Please try again later.');
+          return;
+        }
+        const errorData = await response.json().catch(() => ({}));
+        toast.error(errorData.detail || `Error processing swipe (${response.status})`);
+        return;
+      }
+      
       const data = await response.json();
+      console.log('Swipe response:', data);
+      
       if (data.training_complete) {
         setTrainingComplete(true);
         toast.success('Training complete! You have swiped right on 30 items.');
         return;
       }
-      if (data.swipes_complete && data.plan_generated) {
-        toast.success(`Preference learning complete! Generated ${data.plan_items} personalized recommendations for your 3-month art journey.`);
+      if (data.swipes_complete) {
+        console.log('Setting swipesComplete to true');
+        toast.success(`Preference learning complete! Generating your personalized 3-month art journey...`);
         setSwipesComplete(true);
+        localStorage.setItem('swipesComplete', 'true');
         return;
       }
-    } catch (err) {
-      // Optionally handle error
+    } catch (err: any) {
+      console.error('Error swiping:', err);
+      toast.error(err.message || 'Error processing swipe. Please try again.');
+      return;
     }
+    // Only increment if we haven't completed swipes
     setCurrent((prev) => prev + 1);
   };
 
@@ -455,6 +442,7 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
     </div>
   );
   
+  // Check swipesComplete first - this takes priority over other states
   if (swipesComplete) {
     return <ThreeMonthPlan userUuid={userUuid} />;
   }
@@ -469,7 +457,8 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
     </div>
   );
   
-  if (current >= candidates.length) return (
+  // Only show "All Done" if we haven't completed swipes yet
+  if (current >= candidates.length && !swipesComplete) return (
     <div className="arteme-card text-center p-8">
       <div className="arteme-accent-bar w-32 mx-auto mb-6"></div>
       <h2 className="arteme-title text-4xl mb-4">All Done!</h2>
