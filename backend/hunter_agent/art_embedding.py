@@ -40,7 +40,7 @@ def make_embedding_text(item: dict) -> str:
 def batch_generate_embeddings(candidates: List[Dict], store_in_db: bool = True) -> List[Dict]:
     """
     Converts candidate items into embedding-enriched data using all available fields.
-    Optionally stores embeddings in database for persistence.
+    No longer stores embeddings in database; always returns in-memory enriched candidates.
     """
     enriched_candidates = []
     for item in candidates:
@@ -48,31 +48,14 @@ def batch_generate_embeddings(candidates: List[Dict], store_in_db: bool = True) 
         source_url = item.get("source_url", "")
         if not source_url:
             continue
-            
         item_id = generate_item_id(source_url)
-        
-        # Check if embedding already exists in database
-        existing_embedding = get_item_embedding(item_id) if store_in_db else None
-        
-        if existing_embedding:
-            # Use existing embedding
-            embedding = existing_embedding["embedding"]
-            print(f"Using existing embedding for item {item_id}")
-        else:
-            # Generate new embedding
-            text = make_embedding_text(item)
-            if not text:
-                continue
-            embedding = generate_text_embedding(text)
-            
-            # Store in database if requested
-            if store_in_db:
-                upsert_item_embedding(item_id, embedding)
-                print(f"Stored new embedding for item {item_id}")
-        
+        # Always generate new embedding in-memory
+        text = make_embedding_text(item)
+        if not text:
+            continue
+        embedding = generate_text_embedding(text)
         enriched_item = item.copy()
         enriched_item["embedding"] = embedding
         enriched_item["item_id"] = item_id  # Ensure item_id is included
         enriched_candidates.append(enriched_item)
-    
     return enriched_candidates 
