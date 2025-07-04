@@ -11,7 +11,7 @@ import traceback
 import hashlib
 import importlib.util
 from dotenv import load_dotenv
-from reranker import get_personalized_candidates
+from reranker import get_personalized_candidates, update_user_embedding
 from db.supabase_client import get_user_embedding, get_items_with_embeddings
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
@@ -41,7 +41,6 @@ try:
     from .retriever import load_user_profile, retrieve_top_candidates
     from .embedding import generate_user_embedding
     from .art_embedding import batch_generate_embeddings
-    from .reranker import update_user_embedding_from_swipes, get_personalized_candidates
     RETRIEVER_AVAILABLE = True
     print("✅ Successfully loaded retriever functions")
 except ImportError:
@@ -50,7 +49,6 @@ except ImportError:
         from retriever import load_user_profile, retrieve_top_candidates
         from embedding import generate_user_embedding
         from art_embedding import batch_generate_embeddings
-        from reranker import update_user_embedding_from_swipes, get_personalized_candidates
         RETRIEVER_AVAILABLE = True
         print("✅ Successfully loaded retriever functions")
     except ImportError as e:
@@ -448,47 +446,76 @@ def swipe(req: SwipeRequest):
         # After exactly 5 total swipes, update embedding and trigger plan generation
         if total_swipes == SWIPE_COMPLETION_THRESHOLD:
             print(f"🎉 User {req.user_uuid} completed {SWIPE_COMPLETION_THRESHOLD} swipes - updating embedding and generating plan")
-            
             plan_items = 0
-            if RETRIEVER_AVAILABLE:
-                try:
-                    # Update user embedding based on swipe feedback
-                    update_user_embedding_from_swipes(req.user_uuid)
-                    print(f"✅ Updated user embedding for {req.user_uuid}")
-                    
-                    # Get personalized candidates for plan generation
-                    personalized_candidates = get_personalized_candidates(req.user_uuid, limit=50)
-                    print(f"✅ Generated {len(personalized_candidates)} personalized candidates")
-                    
-                    # Trigger plan generation
-                    plan_result = generate_three_month_plan(req.user_uuid, personalized_candidates)
-                    plan_items = plan_result.get("plan_items", 0)
-                    
-                except Exception as e:
-                    print(f"❌ Error in retriever workflow: {e}")
-                    # Still generate a plan with available data
-                    plan_result = generate_three_month_plan(req.user_uuid, [])
-                    plan_items = plan_result.get("plan_items", 0)
-            else:
-                # Generate plan without retriever
+            plan_result = {"success": False, "plan_items": 0}
+            try:
+                # 1. 获取 user_profile
+                user_profile = get_user_profile(req.user_uuid)
+                # 2. 获取 swipe 记录
+                user_items = get_user_items(req.user_uuid)
+                liked_items = [ui for ui in user_items if ui["status"] == "swipe_right"]
+                disliked_items = [ui for ui in user_items if ui["status"] == "swipe_left"]
+                # 3. 用 profile + swipe 生成 embedding
+                from embedding import generate_user_embedding
+                # 先用 profile 生成初始 embedding
+                user_embedding = generate_user_embedding(user_profile, store_in_db=False)
+                # 获取 candidates embedding
+                candidates = user_candidates.get(req.user_uuid, [])
+                from art_embedding import batch_generate_embeddings
+                enriched_candidates = [c for c in candidates if c.get("embedding") is not None]
+                if len(enriched_candidates) < len(candidates):
+                    enriched_candidates = batch_generate_embeddings(candidates, store_in_db=False)
+                    user_candidates[req.user_uuid] = enriched_candidates  # update cache
+                # 取 liked/disliked item 的 embedding
+                item_id_to_emb = {c["item_id"]: c["embedding"] for c in enriched_candidates if c.get("embedding")}
+                feedback = []
+                feedback_embeddings = []
+                for ui in liked_items:
+                    if ui["item_id"] in item_id_to_emb:
+                        feedback.append(1)
+                        feedback_embeddings.append(item_id_to_emb[ui["item_id"]])
+                for ui in disliked_items:
+                    if ui["item_id"] in item_id_to_emb:
+                        feedback.append(0)
+                        feedback_embeddings.append(item_id_to_emb[ui["item_id"]])
+                # 用 feedback 更新 embedding
+                if feedback and feedback_embeddings:
+                    user_embedding = update_user_embedding(user_embedding, feedback, feedback_embeddings)
+                # 4. 用 user embedding 对 candidates 重新排序
+                item_embeddings = [item["embedding"] for item in enriched_candidates]
+                similarities = cosine_similarity([user_embedding], item_embeddings)[0]
+                for i, item in enumerate(enriched_candidates):
+                    item["score"] = float(similarities[i])
+                sorted_candidates = sorted(enriched_candidates, key=lambda x: x["score"], reverse=True)
+                # 5. 取前50个，传给 plan_agent
+                top_candidates = sorted_candidates[:50]
+                plan_result = generate_three_month_plan(req.user_uuid, top_candidates)
+                plan_items = plan_result.get("plan_items", 0)
+                print(f"✅ Generated plan with {plan_items} items for {req.user_uuid}")
+            except Exception as e:
+                print(f"❌ Error in in-memory retriever workflow: {e}")
+                import traceback
+                print(traceback.format_exc())
                 plan_result = generate_three_month_plan(req.user_uuid, [])
                 plan_items = plan_result.get("plan_items", 0)
-            
             return {
-                "success": True, 
+                "success": True,
                 "training_complete": False,
                 "swipes_complete": True,
                 "plan_generated": plan_result.get("success", False),
                 "plan_items": plan_items
             }
-            
         # Update embedding after every additional 5 swipes for continuous learning
-        elif total_swipes > SWIPE_COMPLETION_THRESHOLD and total_swipes % 5 == 0 and RETRIEVER_AVAILABLE:
+        elif total_swipes > SWIPE_COMPLETION_THRESHOLD and total_swipes % 5 == 0:
             try:
-                print(f"🔄 Updating user embedding for {req.user_uuid} after {total_swipes} swipes")
-                update_user_embedding_from_swipes(req.user_uuid)
+                print(f"🔄 Updating user embedding for {req.user_uuid} after {total_swipes} swipes (in-memory)")
+                # 只做 in-memory embedding update，无需数据库
+                user_profile = get_user_profile(req.user_uuid)
+                from embedding import generate_user_embedding
+                user_embedding = generate_user_embedding(user_profile, store_in_db=False)
+                # 可选：重新排序 user_candidates
             except Exception as e:
-                print(f"❌ Error updating embedding: {e}")
+                print(f"❌ Error updating embedding (in-memory): {e}")
         
         # Check if we've reached the right swipe limit (training complete)
         if req.status == "swipe_right" and right_swipes >= RIGHT_SWIPE_LIMIT:
@@ -539,12 +566,10 @@ def get_generation_status(user_uuid: str):
                         if RETRIEVER_AVAILABLE:
                             user_embedding = generate_user_embedding(user_uuid, store_in_db=False)
                             all_candidates = []
-                            domains = ["art", "books", "movies", "music", "poetry", "podcasts", "musicals"]
-                            
-                            for domain in domains:
+                            for domain in CONTENT_DOMAINS:
                                 try:
                                     domain_candidates = retrieve_top_candidates(domain, user_embedding, user_profile)
-                                    all_candidates.extend(domain_candidates[:10])  # Take top 10 from each domain
+                                    all_candidates.extend(domain_candidates[:10])  # 每个领域取前10
                                     print(f"✅ Retrieved {len(domain_candidates)} {domain} candidates")
                                 except Exception as e:
                                     print(f"❌ Error retrieving {domain} candidates: {e}")
@@ -595,7 +620,14 @@ def generate_candidates(user_uuid: str, request: Request):
         user_embedding = generate_user_embedding(user_profile, store_in_db=False)
         print(f"✅ Generated user embedding in-memory for {user_uuid}")
         # 3. Use retriever to get candidates
-        all_candidates = retrieve_top_candidates(user_embedding, user_profile)
+        all_candidates = []
+        for domain in CONTENT_DOMAINS:
+            try:
+                domain_candidates = retrieve_top_candidates(domain, user_embedding, user_profile)
+                all_candidates.extend(domain_candidates[:10])  # 每个领域取前10
+                print(f"✅ Retrieved {len(domain_candidates)} {domain} candidates")
+            except Exception as e:
+                print(f"❌ Error retrieving {domain} candidates: {e}")
         print(f"✅ Retrieved {len(all_candidates)} candidates")
         # 4. Upsert all candidates to item and user_item tables
         for candidate in all_candidates:

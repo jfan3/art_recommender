@@ -193,14 +193,26 @@ Rules:
                         tool_result = self._handle_save_profile(user_uuid, args)
                         # Check if profile is complete
                         if tool_result.get("complete", False):
-                            yield f"data: {{\"type\":\"complete\",\"user_uuid\":\"{user_uuid}\"}}\n\n"
+                            # Send completion message first
+                            completion_message = "Perfect! I have everything I need to understand your artistic taste. I'm now generating personalized recommendations for you based on your profile. This will take a moment..."
+                            yield f"data: {{\"type\":\"content\",\"content\":\"{completion_message}\"}}\n\n"
+                            
                             # --- Trigger hunter agent here ---
                             try:
-                                hunter_url = os.getenv("HUNTER_AGENT_API_URL", "http://localhost:8090")
-                                resp = requests.post(f"{hunter_url}/api/generate_candidates/{user_uuid}")
-                                print(f"[INFO] Triggered Hunter Agent for UUID {user_uuid}. Status: {resp.status_code}, Response: {resp.text}")
+                                hunter_url = os.getenv("HUNTER_AGENT_API_URL", "http://localhost:8000")
+                                resp = requests.post(f"{hunter_url}/api/generate_candidates/{user_uuid}", timeout=30)
+                                if resp.status_code == 200:
+                                    print(f"✅ Successfully triggered Hunter Agent for UUID {user_uuid}")
+                                    yield f"data: {{\"type\":\"content\",\"content\":\"\\n\\nYour recommendations are ready! Redirecting you to start exploring...\"}}\n\n"
+                                else:
+                                    print(f"⚠️ Hunter Agent responded with status {resp.status_code}: {resp.text}")
+                                    yield f"data: {{\"type\":\"content\",\"content\":\"\\n\\nThere was an issue generating recommendations, but let's continue with what we have.\"}}\n\n"
                             except Exception as e:
-                                print(f"[WARN] Could not trigger hunter agent candidate generation: {e}")
+                                print(f"❌ Could not trigger hunter agent candidate generation: {e}")
+                                yield f"data: {{\"type\":\"content\",\"content\":\"\\n\\nThere was a connection issue, but let's continue.\"}}\n\n"
+                            
+                            # Finally send completion event
+                            yield f"data: {{\"type\":\"complete\",\"user_uuid\":\"{user_uuid}\"}}\n\n"
                             return
                 except json.JSONDecodeError as e:
                     print(f"ERROR: Failed to parse tool call arguments: {e}")

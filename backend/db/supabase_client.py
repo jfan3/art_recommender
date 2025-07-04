@@ -45,8 +45,39 @@ def get_user_items(uuid: str) -> List[Dict]:
     resp = supabase.table("user_item").select("*").eq("uuid", uuid).execute()
     return resp.data if resp.data else []
 
-def update_user_item_status(uuid: str, item_id: str, status: str) -> Dict:
-    resp = supabase.table("user_item").update({"status": status}).eq("uuid", uuid).eq("item_id", item_id).execute()
+def update_user_item_status(uuid: str, item_id: str, status: str) -> bool:
+    try:
+        # First try to update existing record
+        resp = supabase.table("user_item").update({"status": status}).eq("uuid", uuid).eq("item_id", item_id).execute()
+        
+        # If no rows were updated, insert new record
+        if not resp.data:
+            user_item_data = {
+                "uuid": uuid,
+                "item_id": item_id,
+                "status": status
+            }
+            resp = supabase.table("user_item").insert(user_item_data).execute()
+        
+        return True  # Return True if successful
+    except Exception as e:
+        print(f"❌ Error updating user_item status: {e}")
+        return False
+
+# --- USER PLAN ---
+def upsert_user_plan(plan_data: Dict[str, Any]) -> Dict:
+    """Store or update a user's weekly plan in Supabase."""
+    resp = supabase.table("user_plan").upsert(plan_data).execute()
+    return resp.data
+
+def get_user_plan(uuid: str) -> Optional[Dict]:
+    """Retrieve a user's plan from Supabase."""
+    resp = supabase.table("user_plan").select("*").eq("uuid", uuid).single().execute()
+    return resp.data if resp.data else None
+
+def delete_user_plan(uuid: str) -> Dict:
+    """Delete a user's plan from Supabase."""
+    resp = supabase.table("user_plan").delete().eq("uuid", uuid).execute()
     return resp.data
 
 # --- USER EMBEDDINGS ---

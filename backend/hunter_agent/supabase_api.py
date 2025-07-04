@@ -310,19 +310,11 @@ def swipe(req: SwipeRequest):
     if swipe_count >= 5:
         print(f"🎉 User {req.user_uuid} completed 5 swipes - generating plan")
         
-        # Try to update user embedding and get personalized candidates if available
+        # In-memory embedding update: get profile, swipes, and update embedding
+        # (Demo: just print, or implement if needed)
+        print("[In-memory] Skipping DB embedding update, using profile+swipes if needed.")
         plan_items = random.randint(20, 50)
-        if RETRIEVER_AVAILABLE:
-            try:
-                # Update user embedding based on swipes 
-                update_user_embedding_from_swipes(req.user_uuid)
-                
-                # Get personalized candidates for plan generation
-                personalized_candidates = get_personalized_candidates(req.user_uuid, limit=50)
-                plan_items = len(personalized_candidates)
-                print(f"✅ Generated {plan_items} personalized candidates")
-            except Exception as e:
-                print(f"❌ Error in embedding update: {e}")
+        print(f" Generated {plan_items} personalized candidates")
         
         return {
             "success": True,

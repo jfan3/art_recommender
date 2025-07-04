@@ -35,13 +35,6 @@ def rerank_candidates(user_embedding: List[float], candidates: List[Dict], feedb
     
     return sorted(candidates, key=lambda x: x['score'], reverse=True)
 
-def update_user_embedding_from_swipes(user_uuid: str) -> List[float]:
-    """
-    Update user embedding based on swipe history from database.
-    Returns the updated embedding.
-    """
-    raise NotImplementedError("update_user_embedding_from_swipes is not supported in in-memory embedding mode.")
-
 def get_personalized_candidates(user_uuid: str, limit: int = 10) -> List[Dict]:
     """
     Get personalized candidate recommendations based on current user embedding.
