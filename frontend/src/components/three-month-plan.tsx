@@ -723,7 +723,23 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                                               boxShadow: '2px 2px 0px black',
                                               textShadow: '1px 1px 0px white'
                                             }}>
-                                        {item.type?.charAt(0).toUpperCase()}!
+{(() => {
+                                          const type = item.type?.toLowerCase() || 'art';
+                                          const typeIndicators: { [key: string]: string } = {
+                                            'art': 'ART!',
+                                            'movie': 'FILM!',
+                                            'movies': 'FILM!',
+                                            'music': 'SONG!',
+                                            'book': 'BOOK!',
+                                            'books': 'BOOK!',
+                                            'poetry': 'POEM!',
+                                            'podcast': 'POD!',
+                                            'podcasts': 'POD!',
+                                            'musical': 'SHOW!',
+                                            'musicals': 'SHOW!'
+                                          };
+                                          return typeIndicators[type] || type.charAt(0).toUpperCase() + '!';
+                                        })()}
                                       </span>
                                     </div>
                                     
