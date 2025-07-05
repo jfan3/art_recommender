@@ -111,10 +111,17 @@ def adjust_plan_for_preferences(base_plan: dict, duration: int, intensity: str) 
     # Filter plan to only include the specified duration
     filtered_plan = {}
     for i in range(1, max_weeks + 1):
-        week_key = f"week_{i}"
-        if week_key in base_plan:
-            week_items = base_plan[week_key]
-            
+        # Try both formats: existing plan files use "Week 1", new plans use "week_1"
+        week_key_old = f"Week {i}"
+        week_key_new = f"week_{i}"
+        
+        week_items = None
+        if week_key_old in base_plan:
+            week_items = base_plan[week_key_old]
+        elif week_key_new in base_plan:
+            week_items = base_plan[week_key_new]
+        
+        if week_items:
             # Adjust items per week based on intensity (use fixed counts for consistency)
             intensity_target_items = {
                 "chill": 2,
@@ -135,7 +142,8 @@ def adjust_plan_for_preferences(base_plan: dict, duration: int, intensity: str) 
                 # No items available
                 adjusted_items = []
             
-            filtered_plan[week_key] = adjusted_items
+            # Always store with frontend-expected format
+            filtered_plan[week_key_new] = adjusted_items
     
     return filtered_plan
 
@@ -249,7 +257,33 @@ def generate_mock_plan(user_uuid: str, candidates: list, duration_months: int = 
     print(f"Generating mock {duration_months}-month plan for user {user_uuid} (intensity: {intensity})")
     
     if not candidates:
-        candidates = []
+        # Load mock data as fallback when no candidates available
+        mock_data_path = os.path.join(os.path.dirname(__file__), "..", "..", "mock_data", "items.json")
+        try:
+            with open(mock_data_path, 'r', encoding='utf-8') as f:
+                mock_items = json.load(f)
+                candidates = mock_items[:20]  # Use first 20 items
+                print(f"✅ Loaded {len(candidates)} mock items as fallback")
+        except Exception as e:
+            print(f"❌ Could not load mock data: {e}")
+            # Create minimal fallback items
+            candidates = [
+                {"item_name": "Abstract Expressionism Exhibition", "category": "art", "creator": "Various Artists", "description": "Explore modern abstract art"},
+                {"item_name": "The Great Gatsby", "category": "book", "creator": "F. Scott Fitzgerald", "description": "Classic American literature"},
+                {"item_name": "Citizen Kane", "category": "movie", "creator": "Orson Welles", "description": "Cinematic masterpiece"},
+                {"item_name": "Kind of Blue", "category": "music", "creator": "Miles Davis", "description": "Jazz album"},
+                {"item_name": "The Wasteland", "category": "poetry", "creator": "T.S. Eliot", "description": "Modernist poem"}
+            ]
+    
+    # Final safety check to ensure we have candidates
+    if not candidates or len(candidates) == 0:
+        print("❌ No candidates available even after fallbacks")
+        return {
+            "weekly_plan": {},
+            "plan_items": 0,
+            "total_time_hours": 0,
+            "weeks": duration_months * 4
+        }
     
     # Calculate items per week based on intensity (fixed numbers for consistent totals)
     intensity_items = {
