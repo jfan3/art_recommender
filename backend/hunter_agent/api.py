@@ -134,10 +134,30 @@ def adjust_plan_for_preferences(base_plan: dict, duration: int, intensity: str) 
                 # Take exactly the target number
                 adjusted_items = week_items[:target_count]
             elif len(week_items) > 0:
-                # Pad with repeats to reach target count
+                # Pad with repeats to reach target count, but avoid immediate duplicates
                 adjusted_items = week_items[:]
+                available_items = week_items[:]
                 while len(adjusted_items) < target_count:
-                    adjusted_items.append(random.choice(week_items))
+                    # If we've used all items, reset the pool
+                    if not available_items:
+                        available_items = week_items[:]
+                    
+                    # Choose randomly but try to avoid the last added item
+                    if len(available_items) > 1 and len(adjusted_items) > 0:
+                        last_title = adjusted_items[-1].get("title", "")
+                        filtered_items = [item for item in available_items if item.get("title", "") != last_title]
+                        if filtered_items:
+                            chosen_item = random.choice(filtered_items)
+                        else:
+                            chosen_item = random.choice(available_items)
+                    else:
+                        chosen_item = random.choice(available_items)
+                    
+                    # Add unique identifier to distinguish duplicates
+                    duplicate_item = chosen_item.copy()
+                    duplicate_item["id"] = f"{chosen_item.get('id', '')}_{len(adjusted_items)}"
+                    adjusted_items.append(duplicate_item)
+                    available_items.remove(chosen_item)
             else:
                 # No items available
                 adjusted_items = []
@@ -296,22 +316,47 @@ def generate_mock_plan(user_uuid: str, candidates: list, duration_months: int = 
     num_weeks = duration_months * 4
     weeks = {}
     
+    # Create a shuffled and extended list to minimize repeats
+    total_items_needed = num_weeks * items_per_week
+    extended_candidates = []
+    
+    # If we need more items than available, create multiple shuffled copies
+    cycles_needed = max(1, (total_items_needed // len(candidates)) + 1)
+    for _ in range(cycles_needed):
+        shuffled_candidates = candidates.copy()
+        random.shuffle(shuffled_candidates)
+        extended_candidates.extend(shuffled_candidates)
+    
+    # Distribute items across weeks to minimize duplicates
+    item_index = 0
     for week in range(1, num_weeks + 1):
         week_items = []
-        num_items = items_per_week
+        used_titles_this_week = set()
         
-        # Ensure we always get exactly num_items by repeating candidates if needed
-        for i in range(num_items):
-            item = candidates[i % len(candidates)]  # Cycle through candidates
-            week_items.append({
-                "title": item.get("item_name", item.get("title", "Unknown")),
-                "type": item.get("category", "art").lower(),
-                "description": item.get("description", ""),
-                "image_url": item.get("image_url", ""),
-                "category": item.get("category", "Art"),
-                "creator": item.get("creator", "Unknown Artist"),
-                "score": item.get("score", random.uniform(0.7, 0.95))
-            })
+        for i in range(items_per_week):
+            attempts = 0
+            while attempts < len(candidates):
+                item = extended_candidates[item_index % len(extended_candidates)]
+                item_title = item.get("item_name", item.get("title", "Unknown"))
+                
+                # Try to avoid duplicates within the same week
+                if item_title not in used_titles_this_week or attempts >= len(candidates) - 1:
+                    week_items.append({
+                        "id": f"{item.get('item_id', '')}_{week}_{i}",  # Add unique identifier
+                        "title": item_title,
+                        "type": item.get("category", "art").lower(),
+                        "description": item.get("description", ""),
+                        "image_url": item.get("image_url", ""),
+                        "category": item.get("category", "Art"),
+                        "creator": item.get("creator", "Unknown Artist"),
+                        "score": item.get("score", random.uniform(0.7, 0.95))
+                    })
+                    used_titles_this_week.add(item_title)
+                    item_index += 1
+                    break
+                
+                item_index += 1
+                attempts += 1
         
         weeks[f"week_{week}"] = week_items
     

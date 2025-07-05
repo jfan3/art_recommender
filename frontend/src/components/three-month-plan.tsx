@@ -649,17 +649,17 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                             <div className="space-y-2">
                               {items.slice(0, 4).map((item, index) => {
                                 const typeColors: { [key: string]: string } = {
-                                  'art': 'bg-purple-50 text-purple-700 border-purple-200',
-                                  'movies': 'bg-blue-50 text-blue-700 border-blue-200',
-                                  'movie': 'bg-blue-50 text-blue-700 border-blue-200',
-                                  'books': 'bg-green-50 text-green-700 border-green-200',
-                                  'book': 'bg-green-50 text-green-700 border-green-200',
-                                  'music': 'bg-yellow-50 text-yellow-700 border-yellow-200',
-                                  'poetry': 'bg-pink-50 text-pink-700 border-pink-200',
-                                  'podcasts': 'bg-indigo-50 text-indigo-700 border-indigo-200',
-                                  'podcast': 'bg-indigo-50 text-indigo-700 border-indigo-200',
-                                  'musicals': 'bg-red-50 text-red-700 border-red-200',
-                                  'musical': 'bg-red-50 text-red-700 border-red-200'
+                                  'art': 'bg-purple-100 text-purple-800 border-purple-300',
+                                  'movies': 'bg-blue-100 text-blue-800 border-blue-300',
+                                  'movie': 'bg-blue-100 text-blue-800 border-blue-300',
+                                  'books': 'bg-emerald-100 text-emerald-800 border-emerald-300',
+                                  'book': 'bg-emerald-100 text-emerald-800 border-emerald-300',
+                                  'music': 'bg-amber-100 text-amber-800 border-amber-300',
+                                  'poetry': 'bg-rose-100 text-rose-800 border-rose-300',
+                                  'podcasts': 'bg-violet-100 text-violet-800 border-violet-300',
+                                  'podcast': 'bg-violet-100 text-violet-800 border-violet-300',
+                                  'musicals': 'bg-orange-100 text-orange-800 border-orange-300',
+                                  'musical': 'bg-orange-100 text-orange-800 border-orange-300'
                                 };
                                 
                                 const typeColor = typeColors[item.type?.toLowerCase()] || 'bg-gray-50 text-gray-700 border-gray-200';
@@ -667,15 +667,18 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                                 // Calculate estimated time for this item
                                 const itemType = item.type?.toLowerCase() || 'art';
                                 let estimatedHours = 2.0; // Default
-                                if (itemType.includes('art') || itemType.includes('poetry')) {
+                                
+                                if (itemType === 'art' || itemType === 'poetry') {
                                   estimatedHours = 1.0;
-                                } else if (itemType.includes('book')) {
+                                } else if (itemType === 'book' || itemType === 'books') {
                                   estimatedHours = 8.0;
-                                } else if (itemType.includes('movie') || itemType.includes('musical')) {
+                                } else if (itemType === 'movie' || itemType === 'movies' || itemType === 'musical' || itemType === 'musicals') {
                                   estimatedHours = 2.5;
-                                } else if (itemType.includes('music') || itemType.includes('podcast')) {
+                                } else if (itemType === 'music' || itemType === 'podcast' || itemType === 'podcasts') {
                                   estimatedHours = 1.5;
                                 }
+                                
+                                console.log(`Item: ${item.title}, Type: ${itemType}, Hours: ${estimatedHours}`);
                                 
                                 return (
                                   <div key={item.id || `${globalWeek}-${index}`} 
@@ -683,14 +686,15 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                                        style={{ 
                                          minHeight: '85px',
                                          boxShadow: '4px 4px 0px var(--color-primary-black)',
-                                         background: `linear-gradient(135deg, ${typeColor.includes('purple') ? '#f3e8ff, #e9d5ff' : 
-                                                                              typeColor.includes('blue') ? '#dbeafe, #bfdbfe' :
-                                                                              typeColor.includes('green') ? '#dcfce7, #bbf7d0' :
-                                                                              typeColor.includes('yellow') ? '#fefce8, #fef3c7' :
-                                                                              typeColor.includes('pink') ? '#fdf2f8, #fce7f3' :
-                                                                              typeColor.includes('red') ? '#fef2f2, #fecaca' :
-                                                                              typeColor.includes('indigo') ? '#eef2ff, #e0e7ff' :
-                                                                              '#f9fafb, #f3f4f6'})`
+                                         background: `linear-gradient(135deg, ${
+                                           typeColor.includes('purple') ? '#f3e8ff, #e9d5ff' : 
+                                           typeColor.includes('blue') ? '#dbeafe, #bfdbfe' :
+                                           typeColor.includes('emerald') ? '#d1fae5, #a7f3d0' :
+                                           typeColor.includes('amber') ? '#fef3c7, #fde68a' :
+                                           typeColor.includes('rose') ? '#fdf2f8, #fce7f3' :
+                                           typeColor.includes('orange') ? '#fed7aa, #fdba74' :
+                                           typeColor.includes('violet') ? '#ede9fe, #ddd6fe' :
+                                           '#f9fafb, #f3f4f6'})`
                                        }}>
                                     {/* Comic-style halftone pattern overlay */}
                                     <div className="absolute inset-0 opacity-10 pointer-events-none"
