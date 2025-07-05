@@ -841,17 +841,55 @@ def get_user_plan(user_uuid: str, duration: int = 3, intensity: str = "medium"):
                 user_items = get_user_items(user_uuid)
                 liked_items = [item for item in user_items if item.get("status") == "swipe_right"]
                 
-                # Generate mock plan based on actual user data with custom parameters
-                mock_plan_result = generate_mock_plan(user_uuid, [], duration_months=duration, intensity=intensity)
+                # Generate real plan using actual recommendation system
+                print(f"🔍 Retrieving real candidates for user {user_uuid}")
+                
+                # Get real personalized candidates from the recommendation system
+                try:
+                    if RETRIEVER_AVAILABLE and len(liked_items) > 0:
+                        # Use retriever to get personalized candidates based on user's swipe history
+                        real_candidates = retrieve_top_candidates(user_uuid, num_candidates=100)
+                        print(f"✅ Retrieved {len(real_candidates)} personalized candidates")
+                    else:
+                        # Use reranker to get general candidates 
+                        real_candidates = get_personalized_candidates(user_uuid, num_candidates=100)
+                        print(f"✅ Retrieved {len(real_candidates)} general candidates")
+                    
+                    if len(real_candidates) >= 20:  # Ensure we have enough variety
+                        plan_result = generate_mock_plan(user_uuid, real_candidates, duration_months=duration, intensity=intensity)
+                        print(f"✅ Generated plan with {len(real_candidates)} real items")
+                    else:
+                        print(f"⚠️  Only {len(real_candidates)} real candidates, supplementing with database items")
+                        # Get additional items from database
+                        if SUPABASE_AVAILABLE:
+                            db_items = get_items_with_embeddings(limit=100)
+                            real_candidates.extend(db_items)
+                        plan_result = generate_mock_plan(user_uuid, real_candidates, duration_months=duration, intensity=intensity)
+                        
+                except Exception as retrieval_error:
+                    print(f"❌ Error retrieving real candidates: {retrieval_error}")
+                    # Fallback to database items
+                    if SUPABASE_AVAILABLE:
+                        try:
+                            db_items = get_items_with_embeddings(limit=100)
+                            plan_result = generate_mock_plan(user_uuid, db_items, duration_months=duration, intensity=intensity)
+                            print(f"✅ Generated plan with {len(db_items)} database items")
+                        except Exception as db_error:
+                            print(f"❌ Error getting database items: {db_error}")
+                            # Last resort: use enhanced mock data
+                            plan_result = generate_mock_plan(user_uuid, [], duration_months=duration, intensity=intensity)
+                    else:
+                        # Last resort: use enhanced mock data
+                        plan_result = generate_mock_plan(user_uuid, [], duration_months=duration, intensity=intensity)
                 
                 return {
                     "plan_exists": True,
-                    "weekly_plan": mock_plan_result["weekly_plan"],
+                    "weekly_plan": plan_result["weekly_plan"],
                     "statistics": {
-                        "total_items": mock_plan_result["plan_items"],
-                        "total_time_hours": mock_plan_result["total_time_hours"],
-                        "weeks": mock_plan_result["weeks"],
-                        "avg_hours_per_week": round(mock_plan_result["total_time_hours"] / mock_plan_result["weeks"], 1)
+                        "total_items": plan_result["plan_items"],
+                        "total_time_hours": plan_result["total_time_hours"],
+                        "weeks": plan_result["weeks"],
+                        "avg_hours_per_week": round(plan_result["total_time_hours"] / plan_result["weeks"], 1)
                     },
                     "plan_type": "generated_from_data",
                     "user_preferences_applied": len(liked_items) > 0,
@@ -862,18 +900,33 @@ def get_user_plan(user_uuid: str, duration: int = 3, intensity: str = "medium"):
             except Exception as e:
                 print(f"❌ Error generating plan from user data: {e}")
         
-        # Last resort: generate a basic plan even without Supabase
-        print(f"📋 Generating basic plan for {user_uuid} (duration: {duration}, intensity: {intensity})")
-        mock_plan_result = generate_mock_plan(user_uuid, [], duration_months=duration, intensity=intensity)
+        # Last resort: try to get some real data even without user context
+        print(f"📋 Generating basic plan with available data for {user_uuid} (duration: {duration}, intensity: {intensity})")
+        try:
+            # Try to get any available items from database
+            if SUPABASE_AVAILABLE:
+                db_items = get_items_with_embeddings(limit=100)
+                if len(db_items) > 10:
+                    basic_plan_result = generate_mock_plan(user_uuid, db_items, duration_months=duration, intensity=intensity)
+                    print(f"✅ Generated basic plan with {len(db_items)} database items")
+                else:
+                    basic_plan_result = generate_mock_plan(user_uuid, [], duration_months=duration, intensity=intensity)
+                    print("⚠️  Limited database items, using enhanced fallback")
+            else:
+                basic_plan_result = generate_mock_plan(user_uuid, [], duration_months=duration, intensity=intensity)
+                print("⚠️  No database available, using enhanced fallback")
+        except Exception as e:
+            print(f"❌ Error getting database items for basic plan: {e}")
+            basic_plan_result = generate_mock_plan(user_uuid, [], duration_months=duration, intensity=intensity)
         
         return {
             "plan_exists": True,
-            "weekly_plan": mock_plan_result["weekly_plan"],
+            "weekly_plan": basic_plan_result["weekly_plan"],
             "statistics": {
-                "total_items": mock_plan_result["plan_items"],
-                "total_time_hours": mock_plan_result["total_time_hours"],
-                "weeks": mock_plan_result["weeks"],
-                "avg_hours_per_week": round(mock_plan_result["total_time_hours"] / mock_plan_result["weeks"], 1)
+                "total_items": basic_plan_result["plan_items"],
+                "total_time_hours": basic_plan_result["total_time_hours"],
+                "weeks": basic_plan_result["weeks"],
+                "avg_hours_per_week": round(basic_plan_result["total_time_hours"] / basic_plan_result["weeks"], 1)
             },
             "plan_type": "basic_generated",
             "user_preferences_applied": False,
