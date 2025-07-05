@@ -649,17 +649,17 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                             <div className="space-y-2">
                               {items.slice(0, 4).map((item, index) => {
                                 const typeColors: { [key: string]: string } = {
-                                  'art': 'bg-purple-100 text-purple-800 border-purple-300',
-                                  'movies': 'bg-blue-100 text-blue-800 border-blue-300',
-                                  'movie': 'bg-blue-100 text-blue-800 border-blue-300',
-                                  'books': 'bg-emerald-100 text-emerald-800 border-emerald-300',
-                                  'book': 'bg-emerald-100 text-emerald-800 border-emerald-300',
-                                  'music': 'bg-amber-100 text-amber-800 border-amber-300',
-                                  'poetry': 'bg-rose-100 text-rose-800 border-rose-300',
-                                  'podcasts': 'bg-violet-100 text-violet-800 border-violet-300',
-                                  'podcast': 'bg-violet-100 text-violet-800 border-violet-300',
-                                  'musicals': 'bg-orange-100 text-orange-800 border-orange-300',
-                                  'musical': 'bg-orange-100 text-orange-800 border-orange-300'
+                                  'art': 'bg-purple-200 text-purple-900 border-purple-400',
+                                  'movies': 'bg-blue-200 text-blue-900 border-blue-400',
+                                  'movie': 'bg-blue-200 text-blue-900 border-blue-400',
+                                  'books': 'bg-emerald-200 text-emerald-900 border-emerald-400',
+                                  'book': 'bg-emerald-200 text-emerald-900 border-emerald-400',
+                                  'music': 'bg-amber-200 text-amber-900 border-amber-400',
+                                  'poetry': 'bg-rose-200 text-rose-900 border-rose-400',
+                                  'podcasts': 'bg-violet-200 text-violet-900 border-violet-400',
+                                  'podcast': 'bg-violet-200 text-violet-900 border-violet-400',
+                                  'musicals': 'bg-orange-200 text-orange-900 border-orange-400',
+                                  'musical': 'bg-orange-200 text-orange-900 border-orange-400'
                                 };
                                 
                                 const typeColor = typeColors[item.type?.toLowerCase()] || 'bg-gray-50 text-gray-700 border-gray-200';
@@ -687,14 +687,14 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                                          minHeight: '85px',
                                          boxShadow: '4px 4px 0px var(--color-primary-black)',
                                          background: `linear-gradient(135deg, ${
-                                           typeColor.includes('purple') ? '#f3e8ff, #e9d5ff' : 
-                                           typeColor.includes('blue') ? '#dbeafe, #bfdbfe' :
-                                           typeColor.includes('emerald') ? '#d1fae5, #a7f3d0' :
-                                           typeColor.includes('amber') ? '#fef3c7, #fde68a' :
-                                           typeColor.includes('rose') ? '#fdf2f8, #fce7f3' :
-                                           typeColor.includes('orange') ? '#fed7aa, #fdba74' :
-                                           typeColor.includes('violet') ? '#ede9fe, #ddd6fe' :
-                                           '#f9fafb, #f3f4f6'})`
+                                           typeColor.includes('purple') ? '#e9d5ff, #d8b4fe' : 
+                                           typeColor.includes('blue') ? '#bfdbfe, #93c5fd' :
+                                           typeColor.includes('emerald') ? '#a7f3d0, #6ee7b7' :
+                                           typeColor.includes('amber') ? '#fde68a, #fcd34d' :
+                                           typeColor.includes('rose') ? '#fce7f3, #fbcfe8' :
+                                           typeColor.includes('orange') ? '#fdba74, #fb923c' :
+                                           typeColor.includes('violet') ? '#ddd6fe, #c4b5fd' :
+                                           '#f3f4f6, #e5e7eb'})`
                                        }}>
                                     {/* Comic-style halftone pattern overlay */}
                                     <div className="absolute inset-0 opacity-10 pointer-events-none"
