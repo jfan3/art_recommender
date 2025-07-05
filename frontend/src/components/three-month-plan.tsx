@@ -647,7 +647,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                             </div>
                           ) : (
                             <div className="space-y-2">
-                              {items.slice(0, 4).map((item, index) => {
+                              {items.map((item, index) => {
                                 // Monet-inspired impressionistic color palette
                                 const typeColors: { [key: string]: string } = {
                                   'art': 'bg-purple-50 text-purple-700 border-purple-200',
@@ -774,18 +774,6 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                                   </div>
                                 );
                               })}
-                              
-                              {items.length > 4 && (
-                                <div className="text-center">
-                                  <span className="text-xs font-black text-white bg-purple-500 px-3 py-2 rounded-full border-2 border-black transform hover:scale-110 transition-all duration-300 animate-bounce"
-                                        style={{ 
-                                          boxShadow: '3px 3px 0px black',
-                                          textShadow: '1px 1px 0px black'
-                                        }}>
-                                    💥 +{items.length - 4} MORE! 💥
-                                  </span>
-                                </div>
-                              )}
                             </div>
                           )}
                         </div>
