@@ -39,17 +39,17 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
   const [error, setError] = useState<string | null>(null);
   const [viewDuration, setViewDuration] = useState<1 | 2 | 3>(3); // Duration to display
   const [viewIntensity, setViewIntensity] = useState<'chill' | 'medium' | 'intense'>('medium'); // Intensity level
+  const [showRetryButton, setShowRetryButton] = useState(false);
 
-  useEffect(() => {
-    const fetchPlan = async () => {
+  const fetchPlan = async () => {
       try {
         console.log(`Fetching plan for ${userUuid} with duration=${viewDuration}, intensity=${viewIntensity}`);
-        const response = await fetch(`${HUNTER_API_URL}/api/plan/${userUuid}?duration=${viewDuration}&intensity=${viewIntensity}`);
+        const response = await fetch(`${HUNTER_API_URL}/api/user_plan/${userUuid}?duration=${viewDuration}&intensity=${viewIntensity}`);
         const data = await response.json();
         
         console.log('Plan API response:', data);
         
-        if (data.success && data.weekly_plan && Object.keys(data.weekly_plan).length > 0) {
+        if (data.plan_exists && data.weekly_plan && Object.keys(data.weekly_plan).length > 0) {
           console.log('Weekly plan data:', data.weekly_plan);
           setWeeklyPlan(data.weekly_plan);
           setStatistics({
@@ -58,50 +58,37 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
             weeks: data.total_weeks || 0,
             avg_hours_per_week: data.avg_hours_per_week || 0
           });
+        } else if (data.plan_exists && (!data.weekly_plan || Object.keys(data.weekly_plan).length === 0)) {
+          console.log('Plan exists but weekly_plan is empty, plan is still being generated');
+          setError('Your personalized plan is being generated. This may take a moment...');
+          
+          // Just wait and retry - the backend should be generating the plan already
+          setTimeout(() => {
+            fetchPlan();
+          }, 5000);
+          
+          // Show retry button after 15 seconds if still stuck
+          setTimeout(() => {
+            setShowRetryButton(true);
+          }, 15000);
         } else {
-          console.log('No plan exists:', data.message);
-          // Check if user has completed swiping and try to generate plan
-          try {
-            console.log('Checking if we can generate a plan for user:', userUuid);
-            const swipeResponse = await fetch(`${HUNTER_API_URL}/api/swipe`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                user_uuid: userUuid,
-                item_id: 'check_status',
-                status: 'check_status'
-              })
-            });
-            
-            if (swipeResponse.ok) {
-              const swipeData = await swipeResponse.json();
-              console.log('Swipe status response:', swipeData);
-              
-              if (swipeData.swipes_complete) {
-                console.log('User has completed swiping, plan should exist. Refreshing...');
-                setTimeout(() => {
-                  window.location.reload();
-                }, 2000);
-                setError('Plan is being generated. Please wait...');
-              } else {
-                setError('Please complete your preference learning by swiping on more items.');
-              }
-            } else {
-              setError(data.message || 'No plan available. Please complete your preference learning first.');
-            }
-          } catch (genErr) {
-            console.error('Error checking status:', genErr);
-            setError(data.message || 'No plan available. Please complete your preference learning first.');
-          }
+          console.log('No plan exists:', data.message || 'Plan not found');
+          setError('Plan not ready. Please complete your profile and swipe on art recommendations first.');
+          setShowRetryButton(true);
         }
       } catch (err) {
         console.error('Error fetching plan:', err);
-        setError('Failed to load your plan');
+        if (err instanceof TypeError && err.message.includes('fetch')) {
+          setError('Unable to connect to the server. Please check if the backend is running and try again.');
+        } else {
+          setError('Failed to load your plan. Please try again.');
+        }
       } finally {
         setLoading(false);
       }
     };
 
+  useEffect(() => {
     fetchPlan();
   }, [userUuid, viewDuration, viewIntensity]);
 
@@ -199,13 +186,85 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-primary-red)' }}>
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Loading Your {viewDuration}-Month Art Journey...</h2>
-          <div className="arteme-loading-dots">
-            <div className="arteme-loading-dot"></div>
-            <div className="arteme-loading-dot"></div>
-            <div className="arteme-loading-dot"></div>
+        <div className="text-center" style={{ maxWidth: '600px', margin: '0 auto', paddingTop: '10px', paddingBottom: '24px' }}>
+          <h2 className="arteme-title text-4xl mb-4" style={{ color: 'var(--color-primary-white)' }}>Loading Journey</h2>
+          <p className="text-xl" style={{ color: 'var(--color-primary-white)', marginBottom: '100px' }}>
+            Preparing your personalized {viewDuration}-month art adventure
+          </p>
+          
+          {/* 3D Cube Animation */}
+          <div className="cube-container mb-8" style={{ 
+            perspective: '1200px', 
+            display: 'flex', 
+            justifyContent: 'center',
+            height: '180px'
+          }}>
+            <div className="cube" style={{
+              width: '120px',
+              height: '120px',
+              position: 'relative',
+              transformStyle: 'preserve-3d',
+              animation: 'rotateCube 3s infinite linear'
+            }}>
+              <div className="cube-face cube-front" style={{
+                position: 'absolute',
+                width: '120px',
+                height: '120px',
+                background: 'linear-gradient(135deg, #E60026, #FF6B6B)',
+                border: '3px solid #000',
+                transform: 'rotateY(0deg) translateZ(60px)'
+              }}></div>
+              <div className="cube-face cube-back" style={{
+                position: 'absolute',
+                width: '120px',
+                height: '120px',
+                background: 'linear-gradient(135deg, #FFCA2B, #FFE066)',
+                border: '3px solid #000',
+                transform: 'rotateY(180deg) translateZ(60px)'
+              }}></div>
+              <div className="cube-face cube-right" style={{
+                position: 'absolute',
+                width: '120px',
+                height: '120px',
+                background: 'linear-gradient(135deg, #90D4F2, #B3E5FC)',
+                border: '3px solid #000',
+                transform: 'rotateY(90deg) translateZ(60px)'
+              }}></div>
+              <div className="cube-face cube-left" style={{
+                position: 'absolute',
+                width: '120px',
+                height: '120px',
+                background: 'linear-gradient(135deg, #D3A4FF, #E1BEE7)',
+                border: '3px solid #000',
+                transform: 'rotateY(-90deg) translateZ(60px)'
+              }}></div>
+              <div className="cube-face cube-top" style={{
+                position: 'absolute',
+                width: '120px',
+                height: '120px',
+                background: 'linear-gradient(135deg, #FFB6C1, #FFCCCB)',
+                border: '3px solid #000',
+                transform: 'rotateX(90deg) translateZ(60px)'
+              }}></div>
+              <div className="cube-face cube-bottom" style={{
+                position: 'absolute',
+                width: '120px',
+                height: '120px',
+                background: 'linear-gradient(135deg, #FFA07A, #FFB07A)',
+                border: '3px solid #000',
+                transform: 'rotateX(-90deg) translateZ(60px)'
+              }}></div>
+            </div>
           </div>
+          
+          <style jsx>{`
+            @keyframes rotateCube {
+              0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+              33% { transform: rotateX(120deg) rotateY(120deg) rotateZ(0deg); }
+              66% { transform: rotateX(240deg) rotateY(240deg) rotateZ(120deg); }
+              100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+            }
+          `}</style>
         </div>
       </div>
     );
@@ -214,15 +273,118 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-primary-red)' }}>
-        <div className="arteme-card text-center p-8">
-          <h2 className="arteme-title text-2xl mb-4">Plan Not Ready</h2>
-          <p className="text-lg mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="arteme-button bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg"
-          >
-            Refresh
-          </button>
+        <div className="text-center" style={{ maxWidth: '600px', margin: '0 auto', paddingTop: '10px', paddingBottom: '24px' }}>
+          <h2 className="arteme-title text-4xl mb-4" style={{ color: 'var(--color-primary-white)' }}>
+            {error.includes('being generated') ? 'Crafting Your Journey' : 'Plan Not Ready'}
+          </h2>
+          <p className="text-xl" style={{ color: 'var(--color-primary-white)', marginBottom: '100px' }}>
+            {error.includes('being generated') ? 'Creating your personalized art adventure' : error}
+          </p>
+          
+          {error.includes('being generated') && (
+            <>
+              {/* 3D Cube Animation */}
+              <div className="cube-container mb-8" style={{ 
+                perspective: '1200px', 
+                display: 'flex', 
+                justifyContent: 'center',
+                height: '180px'
+              }}>
+                <div className="cube" style={{
+                  width: '120px',
+                  height: '120px',
+                  position: 'relative',
+                  transformStyle: 'preserve-3d',
+                  animation: 'rotateCube 3s infinite linear'
+                }}>
+                  <div className="cube-face cube-front" style={{
+                    position: 'absolute',
+                    width: '120px',
+                    height: '120px',
+                    background: 'linear-gradient(135deg, #E60026, #FF6B6B)',
+                    border: '3px solid #000',
+                    transform: 'rotateY(0deg) translateZ(60px)'
+                  }}></div>
+                  <div className="cube-face cube-back" style={{
+                    position: 'absolute',
+                    width: '120px',
+                    height: '120px',
+                    background: 'linear-gradient(135deg, #FFCA2B, #FFE066)',
+                    border: '3px solid #000',
+                    transform: 'rotateY(180deg) translateZ(60px)'
+                  }}></div>
+                  <div className="cube-face cube-right" style={{
+                    position: 'absolute',
+                    width: '120px',
+                    height: '120px',
+                    background: 'linear-gradient(135deg, #90D4F2, #B3E5FC)',
+                    border: '3px solid #000',
+                    transform: 'rotateY(90deg) translateZ(60px)'
+                  }}></div>
+                  <div className="cube-face cube-left" style={{
+                    position: 'absolute',
+                    width: '120px',
+                    height: '120px',
+                    background: 'linear-gradient(135deg, #D3A4FF, #E1BEE7)',
+                    border: '3px solid #000',
+                    transform: 'rotateY(-90deg) translateZ(60px)'
+                  }}></div>
+                  <div className="cube-face cube-top" style={{
+                    position: 'absolute',
+                    width: '120px',
+                    height: '120px',
+                    background: 'linear-gradient(135deg, #FFB6C1, #FFCCCB)',
+                    border: '3px solid #000',
+                    transform: 'rotateX(90deg) translateZ(60px)'
+                  }}></div>
+                  <div className="cube-face cube-bottom" style={{
+                    position: 'absolute',
+                    width: '120px',
+                    height: '120px',
+                    background: 'linear-gradient(135deg, #FFA07A, #FFB07A)',
+                    border: '3px solid #000',
+                    transform: 'rotateX(-90deg) translateZ(60px)'
+                  }}></div>
+                </div>
+              </div>
+              
+              <style jsx>{`
+                @keyframes rotateCube {
+                  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+                  33% { transform: rotateX(120deg) rotateY(120deg) rotateZ(0deg); }
+                  66% { transform: rotateX(240deg) rotateY(240deg) rotateZ(120deg); }
+                  100% { transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg); }
+                }
+              `}</style>
+            </>
+          )}
+          
+          {(showRetryButton && error.includes('being generated')) && (
+            <button 
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                setShowRetryButton(false);
+                fetchPlan();
+              }}
+              className="arteme-button bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-bold"
+            >
+              Try Again
+            </button>
+          )}
+          
+          {!error.includes('being generated') && (
+            <button 
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                fetchPlan();
+              }}
+              className="arteme-button bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-bold"
+            >
+              Try Again
+            </button>
+          )}
         </div>
       </div>
     );
@@ -286,7 +448,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       </div>
 
       {/* Plan Controls */}
-      <div className="max-w-5xl mx-auto mb-8 px-4 mx-8">
+      <div className="max-w-5xl mx-auto mb-12 px-4 mx-8">
         <div className="bg-white rounded-2xl shadow-xl p-6">
           {/* Section Header */}
           <div className="text-center mb-6">
@@ -322,7 +484,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                     style={{
                       boxShadow: viewDuration === duration 
                         ? '4px 4px 0px var(--color-primary-black)' 
-                        : '3px 3px 0px var(--color-purple-600)'
+                        : '3px 3px 0px var(--color-purple-600)',
+                      minWidth: '120px'
                     }}
                   >
                     {duration} Month{duration > 1 ? 's' : ''}
@@ -354,7 +517,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                   style={{
                     boxShadow: viewIntensity === 'chill' 
                       ? '4px 4px 0px var(--color-primary-black)' 
-                      : '3px 3px 0px #10b981'
+                      : '3px 3px 0px #10b981',
+                    minWidth: '120px'
                   }}
                 >
                   Relaxed
@@ -371,7 +535,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                   style={{
                     boxShadow: viewIntensity === 'medium' 
                       ? '4px 4px 0px var(--color-primary-black)' 
-                      : '3px 3px 0px #3b82f6'
+                      : '3px 3px 0px #3b82f6',
+                    minWidth: '120px'
                   }}
                 >
                   Balanced
@@ -388,7 +553,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                   style={{
                     boxShadow: viewIntensity === 'intense' 
                       ? '4px 4px 0px var(--color-primary-black)' 
-                      : '3px 3px 0px #ef4444'
+                      : '3px 3px 0px #ef4444',
+                    minWidth: '120px'
                   }}
                 >
                   Immersive
@@ -425,8 +591,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       </div>
 
       {/* Weekly Plan - Horizontal Layout */}
-      <div className="w-full px-8 lg:px-16 mx-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="w-full px-12 lg:px-24">
+        <div className="max-w-5xl mx-auto">
           <div className="space-y-12">
             {getMonthHeaders().map((month) => (
               <div key={month} className="arteme-card p-6 lg:p-8">
@@ -460,7 +626,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                     const items = displayPlan?.[weekKey] || [];
                     
                     return (
-                      <div key={weekKey} className="bg-white border-2 border-gray-300 rounded-lg hover:shadow-lg transition-all flex flex-col" style={{ minHeight: '280px' }}>
+                      <div key={weekKey} className="bg-white border-2 border-gray-300 rounded-lg hover:shadow-lg transition-all flex flex-col" style={{ minHeight: '360px' }}>
                         {/* Week Header */}
                         <div className="p-2 border-b border-gray-200 flex-shrink-0">
                           <div className="text-center">
@@ -480,7 +646,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                               <p className="text-xs">No items scheduled</p>
                             </div>
                           ) : (
-                            <div className="space-y-1.5">
+                            <div className="space-y-2">
                               {items.slice(0, 4).map((item, index) => {
                                 const typeColors: { [key: string]: string } = {
                                   'art': 'bg-purple-50 text-purple-700 border-purple-200',
@@ -512,35 +678,90 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                                 }
                                 
                                 return (
-                                  <div key={item.id || `${globalWeek}-${index}`} className={`p-1.5 rounded border ${typeColor} hover:shadow-sm transition-shadow`}>
-                                    <div className="flex items-start justify-between mb-0.5">
-                                      <h5 className="font-medium text-xs leading-tight flex-1 pr-1" title={item.title}>
-                                        {item.title.length > 14 ? `${item.title.substring(0, 14)}...` : item.title}
+                                  <div key={item.id || `${globalWeek}-${index}`} 
+                                       className={`p-3 rounded-xl border-3 ${typeColor} hover:scale-105 hover:rotate-1 transition-all duration-300 transform hover:shadow-2xl overflow-hidden relative`} 
+                                       style={{ 
+                                         minHeight: '85px',
+                                         boxShadow: '4px 4px 0px var(--color-primary-black)',
+                                         background: `linear-gradient(135deg, ${typeColor.includes('purple') ? '#f3e8ff, #e9d5ff' : 
+                                                                              typeColor.includes('blue') ? '#dbeafe, #bfdbfe' :
+                                                                              typeColor.includes('green') ? '#dcfce7, #bbf7d0' :
+                                                                              typeColor.includes('yellow') ? '#fefce8, #fef3c7' :
+                                                                              typeColor.includes('pink') ? '#fdf2f8, #fce7f3' :
+                                                                              typeColor.includes('red') ? '#fef2f2, #fecaca' :
+                                                                              typeColor.includes('indigo') ? '#eef2ff, #e0e7ff' :
+                                                                              '#f9fafb, #f3f4f6'})`
+                                       }}>
+                                    {/* Comic-style halftone pattern overlay */}
+                                    <div className="absolute inset-0 opacity-10 pointer-events-none"
+                                         style={{
+                                           backgroundImage: 'radial-gradient(circle, black 1px, transparent 1px)',
+                                           backgroundSize: '8px 8px'
+                                         }}>
+                                    </div>
+                                    
+                                    <div className="flex items-start justify-between mb-2 relative z-10">
+                                      <h5 className="font-black text-sm leading-tight flex-1 pr-2 text-black uppercase tracking-wide" 
+                                          style={{ 
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 2,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden',
+                                            fontFamily: 'Impact, "Arial Black", sans-serif',
+                                            textShadow: '2px 2px 0px white, -1px -1px 0px white, 1px -1px 0px white, -1px 1px 0px white'
+                                          }}
+                                          title={item.title}>
+                                        {item.title}
                                       </h5>
-                                      <span className="text-xs opacity-75 flex-shrink-0 font-semibold">
-                                        {item.type?.charAt(0).toUpperCase()}
+                                      <span className="text-xs flex-shrink-0 font-black bg-yellow-300 px-2 py-1 rounded-full border-2 border-black transform rotate-12 hover:rotate-0 transition-transform duration-200"
+                                            style={{ 
+                                              boxShadow: '2px 2px 0px black',
+                                              textShadow: '1px 1px 0px white'
+                                            }}>
+                                        {item.type?.charAt(0).toUpperCase()}!
                                       </span>
                                     </div>
                                     
                                     {item.creator && (
-                                      <p className="text-xs opacity-75 truncate mb-0.5" title={item.creator}>
-                                        {item.creator.length > 11 ? `${item.creator.substring(0, 11)}...` : item.creator}
+                                      <p className="text-xs font-bold mb-2 text-black uppercase tracking-wider relative z-10" 
+                                         style={{ 
+                                           display: '-webkit-box',
+                                           WebkitLineClamp: 1,
+                                           WebkitBoxOrient: 'vertical',
+                                           overflow: 'hidden',
+                                           fontFamily: 'Impact, "Arial Black", sans-serif',
+                                           textShadow: '1px 1px 0px white'
+                                         }}
+                                         title={item.creator}>
+                                        BY: {item.creator}
                                       </p>
                                     )}
                                     
-                                    <div className="flex justify-start items-center text-xs">
-                                      <span className="bg-gray-100 px-1 py-0.5 rounded text-gray-600 text-xs">
-                                        {estimatedHours}h
+                                    <div className="flex justify-start items-center mt-auto relative z-10">
+                                      <span className="bg-red-400 px-3 py-1 rounded-full text-white text-xs font-black border-2 border-black transform hover:scale-110 transition-transform duration-200"
+                                            style={{ 
+                                              boxShadow: '3px 3px 0px black',
+                                              textShadow: '1px 1px 0px black',
+                                              background: 'linear-gradient(45deg, #f87171, #ef4444)'
+                                            }}>
+                                        {estimatedHours}H
                                       </span>
                                     </div>
+                                    
+                                    {/* Comic-style speech bubble effect */}
+                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full border-2 border-black animate-pulse"></div>
                                   </div>
                                 );
                               })}
                               
                               {items.length > 4 && (
                                 <div className="text-center">
-                                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                                    +{items.length - 4} more
+                                  <span className="text-xs font-black text-white bg-purple-500 px-3 py-2 rounded-full border-2 border-black transform hover:scale-110 transition-all duration-300 animate-bounce"
+                                        style={{ 
+                                          boxShadow: '3px 3px 0px black',
+                                          textShadow: '1px 1px 0px black'
+                                        }}>
+                                    💥 +{items.length - 4} MORE! 💥
                                   </span>
                                 </div>
                               )}
@@ -565,12 +786,23 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
             Your personalized art journey has been carefully curated based on your preferences.<br />
             Each week offers a balanced mix of different art forms to enrich your cultural experience.
           </p>
-          <button 
-            onClick={() => toast.success('Your art journey begins now!')}
-            className="arteme-button bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-bold"
-          >
-            Begin Journey
-          </button>
+          <div className="flex gap-4 justify-center">
+            <button 
+              onClick={() => toast.success('Your art journey begins now!')}
+              className="arteme-button bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-bold"
+            >
+              Begin Journey
+            </button>
+            <button 
+              onClick={() => {
+                localStorage.clear();
+                window.location.href = '/chat?reset=true';
+              }}
+              className="arteme-button bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-bold"
+            >
+              Start Over
+            </button>
+          </div>
         </div>
       </div>
     </div>
