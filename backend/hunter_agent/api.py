@@ -331,62 +331,54 @@ def generate_mock_plan(user_uuid: str, candidates: list, duration_months: int = 
     num_weeks = duration_months * 4
     weeks = {}
     
-    # Implement global duplicate tracking to minimize repetitions across all weeks
-    total_items_needed = num_weeks * items_per_week
-    global_used_items = []  # Track all items used across all weeks
-    weeks = {}
+    # Show only what we have - no duplicates, fewer weeks if needed
+    available_items = candidates.copy()
+    random.shuffle(available_items)  # Randomize order
     
-    for week in range(1, num_weeks + 1):
+    weeks = {}
+    global_used_titles = set()  # Track globally used items - no repeats allowed
+    
+    items_distributed = 0
+    week_num = 1
+    
+    # Continue until we run out of unique items or reach max weeks
+    while week_num <= num_weeks and items_distributed < len(available_items):
         week_items = []
-        week_used_titles = set()
+        week_target = min(items_per_week, len(available_items) - items_distributed)
         
-        # For each item slot in this week
-        for slot in range(items_per_week):
-            best_item = None
-            min_global_usage = float('inf')
-            
-            # Find the item that has been used least globally and not used this week
-            for candidate in candidates:
-                item_title = candidate.get("item_name", candidate.get("title", "Unknown"))
+        # Fill this week with unique items
+        for slot in range(week_target):
+            if items_distributed >= len(available_items):
+                break
                 
-                # Skip if already used this week
-                if item_title in week_used_titles:
-                    continue
-                
-                # Count how many times this item has been used globally
-                global_usage_count = sum(1 for used_item in global_used_items if used_item == item_title)
-                
-                # Prefer items with lower global usage
-                if global_usage_count < min_global_usage:
-                    min_global_usage = global_usage_count
-                    best_item = candidate
+            item = available_items[items_distributed]
+            item_title = item.get("item_name", item.get("title", "Unknown"))
             
-            # If we couldn't find an unused item, pick the least used one
-            if best_item is None:
-                # Find item with minimum global usage (even if used this week)
-                for candidate in candidates:
-                    item_title = candidate.get("item_name", candidate.get("title", "Unknown"))
-                    global_usage_count = sum(1 for used_item in global_used_items if used_item == item_title)
-                    if global_usage_count < min_global_usage:
-                        min_global_usage = global_usage_count
-                        best_item = candidate
-            
-            if best_item:
-                item_title = best_item.get("item_name", best_item.get("title", "Unknown"))
+            # Only add if we haven't used this item before globally
+            if item_title not in global_used_titles:
                 week_items.append({
-                    "id": f"{best_item.get('item_id', '')}_{week}_{slot}",
+                    "id": f"{item.get('item_id', '')}_{week_num}_{slot}",
                     "title": item_title,
-                    "type": best_item.get("category", "art").lower(),
-                    "description": best_item.get("description", ""),
-                    "image_url": best_item.get("image_url", ""),
-                    "category": best_item.get("category", "Art"),
-                    "creator": best_item.get("creator", "Unknown Artist"),
-                    "score": best_item.get("score", random.uniform(0.7, 0.95))
+                    "type": item.get("category", "art").lower(),
+                    "description": item.get("description", ""),
+                    "image_url": item.get("image_url", ""),
+                    "category": item.get("category", "Art"),
+                    "creator": item.get("creator", "Unknown Artist"),
+                    "score": item.get("score", random.uniform(0.7, 0.95))
                 })
-                week_used_titles.add(item_title)
-                global_used_items.append(item_title)
+                global_used_titles.add(item_title)
+            
+            items_distributed += 1
         
-        weeks[f"week_{week}"] = week_items
+        # Only create the week if it has items
+        if week_items:
+            weeks[f"week_{week_num}"] = week_items
+            week_num += 1
+        else:
+            break
+    
+    print(f"📊 Generated {len(weeks)} weeks with {len(global_used_titles)} unique items (no duplicates)")
+    print(f"📊 Available candidates: {len(candidates)}, Used: {len(global_used_titles)}")
     
     total_items = sum(len(items) for items in weeks.values())
     
