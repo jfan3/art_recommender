@@ -282,17 +282,32 @@ def generate_mock_plan(user_uuid: str, candidates: list, duration_months: int = 
         try:
             with open(mock_data_path, 'r', encoding='utf-8') as f:
                 mock_items = json.load(f)
-                candidates = mock_items[:20]  # Use first 20 items
+                candidates = mock_items  # Use ALL available items
                 print(f"✅ Loaded {len(candidates)} mock items as fallback")
         except Exception as e:
             print(f"❌ Could not load mock data: {e}")
-            # Create minimal fallback items
+            # Create diverse fallback items including art podcasts and varied content
             candidates = [
-                {"item_name": "Abstract Expressionism Exhibition", "category": "art", "creator": "Various Artists", "description": "Explore modern abstract art"},
+                {"item_name": "Abstract Expressionism Exhibition", "category": "art", "creator": "Various Artists", "description": "Explore modern abstract art movements"},
                 {"item_name": "The Great Gatsby", "category": "book", "creator": "F. Scott Fitzgerald", "description": "Classic American literature"},
                 {"item_name": "Citizen Kane", "category": "movie", "creator": "Orson Welles", "description": "Cinematic masterpiece"},
-                {"item_name": "Kind of Blue", "category": "music", "creator": "Miles Davis", "description": "Jazz album"},
-                {"item_name": "The Wasteland", "category": "poetry", "creator": "T.S. Eliot", "description": "Modernist poem"}
+                {"item_name": "Kind of Blue", "category": "music", "creator": "Miles Davis", "description": "Legendary jazz album"},
+                {"item_name": "The Wasteland", "category": "poetry", "creator": "T.S. Eliot", "description": "Modernist poetry masterpiece"},
+                {"item_name": "A Piece of Work", "category": "podcast", "creator": "WNYC Studios", "description": "Art podcast exploring masterpieces"},
+                {"item_name": "The Broad Experience", "category": "podcast", "creator": "Ashley Milne-Tyte", "description": "Art and culture podcast"},
+                {"item_name": "Frida", "category": "movie", "creator": "Julie Taymor", "description": "Biographical film about Frida Kahlo"},
+                {"item_name": "The Birth of Venus", "category": "art", "creator": "Sandro Botticelli", "description": "Renaissance masterpiece"},
+                {"item_name": "Howl", "category": "poetry", "creator": "Allen Ginsberg", "description": "Beat generation poetry"},
+                {"item_name": "Moonlight Sonata", "category": "music", "creator": "Ludwig van Beethoven", "description": "Classical piano composition"},
+                {"item_name": "Ways of Seeing", "category": "book", "creator": "John Berger", "description": "Art criticism and theory"},
+                {"item_name": "Hamilton", "category": "musical", "creator": "Lin-Manuel Miranda", "description": "Revolutionary Broadway musical"},
+                {"item_name": "Art Assignment", "category": "podcast", "creator": "PBS Digital", "description": "Contemporary art exploration podcast"},
+                {"item_name": "Guernica", "category": "art", "creator": "Pablo Picasso", "description": "Anti-war painting masterpiece"},
+                {"item_name": "The Picture of Dorian Gray", "category": "book", "creator": "Oscar Wilde", "description": "Gothic fiction exploring art and beauty"},
+                {"item_name": "Amadeus", "category": "movie", "creator": "Miloš Forman", "description": "Film about Mozart's life and music"},
+                {"item_name": "The Four Seasons", "category": "music", "creator": "Antonio Vivaldi", "description": "Baroque classical composition"},
+                {"item_name": "Leaves of Grass", "category": "poetry", "creator": "Walt Whitman", "description": "American poetry collection"},
+                {"item_name": "Modern Art Notes", "category": "podcast", "creator": "Tyler Green", "description": "Art world news and interviews"}
             ]
     
     # Final safety check to ensure we have candidates
@@ -316,47 +331,60 @@ def generate_mock_plan(user_uuid: str, candidates: list, duration_months: int = 
     num_weeks = duration_months * 4
     weeks = {}
     
-    # Create a shuffled and extended list to minimize repeats
+    # Implement global duplicate tracking to minimize repetitions across all weeks
     total_items_needed = num_weeks * items_per_week
-    extended_candidates = []
+    global_used_items = []  # Track all items used across all weeks
+    weeks = {}
     
-    # If we need more items than available, create multiple shuffled copies
-    cycles_needed = max(1, (total_items_needed // len(candidates)) + 1)
-    for _ in range(cycles_needed):
-        shuffled_candidates = candidates.copy()
-        random.shuffle(shuffled_candidates)
-        extended_candidates.extend(shuffled_candidates)
-    
-    # Distribute items across weeks to minimize duplicates
-    item_index = 0
     for week in range(1, num_weeks + 1):
         week_items = []
-        used_titles_this_week = set()
+        week_used_titles = set()
         
-        for i in range(items_per_week):
-            attempts = 0
-            while attempts < len(candidates):
-                item = extended_candidates[item_index % len(extended_candidates)]
-                item_title = item.get("item_name", item.get("title", "Unknown"))
+        # For each item slot in this week
+        for slot in range(items_per_week):
+            best_item = None
+            min_global_usage = float('inf')
+            
+            # Find the item that has been used least globally and not used this week
+            for candidate in candidates:
+                item_title = candidate.get("item_name", candidate.get("title", "Unknown"))
                 
-                # Try to avoid duplicates within the same week
-                if item_title not in used_titles_this_week or attempts >= len(candidates) - 1:
-                    week_items.append({
-                        "id": f"{item.get('item_id', '')}_{week}_{i}",  # Add unique identifier
-                        "title": item_title,
-                        "type": item.get("category", "art").lower(),
-                        "description": item.get("description", ""),
-                        "image_url": item.get("image_url", ""),
-                        "category": item.get("category", "Art"),
-                        "creator": item.get("creator", "Unknown Artist"),
-                        "score": item.get("score", random.uniform(0.7, 0.95))
-                    })
-                    used_titles_this_week.add(item_title)
-                    item_index += 1
-                    break
+                # Skip if already used this week
+                if item_title in week_used_titles:
+                    continue
                 
-                item_index += 1
-                attempts += 1
+                # Count how many times this item has been used globally
+                global_usage_count = sum(1 for used_item in global_used_items if used_item == item_title)
+                
+                # Prefer items with lower global usage
+                if global_usage_count < min_global_usage:
+                    min_global_usage = global_usage_count
+                    best_item = candidate
+            
+            # If we couldn't find an unused item, pick the least used one
+            if best_item is None:
+                # Find item with minimum global usage (even if used this week)
+                for candidate in candidates:
+                    item_title = candidate.get("item_name", candidate.get("title", "Unknown"))
+                    global_usage_count = sum(1 for used_item in global_used_items if used_item == item_title)
+                    if global_usage_count < min_global_usage:
+                        min_global_usage = global_usage_count
+                        best_item = candidate
+            
+            if best_item:
+                item_title = best_item.get("item_name", best_item.get("title", "Unknown"))
+                week_items.append({
+                    "id": f"{best_item.get('item_id', '')}_{week}_{slot}",
+                    "title": item_title,
+                    "type": best_item.get("category", "art").lower(),
+                    "description": best_item.get("description", ""),
+                    "image_url": best_item.get("image_url", ""),
+                    "category": best_item.get("category", "Art"),
+                    "creator": best_item.get("creator", "Unknown Artist"),
+                    "score": best_item.get("score", random.uniform(0.7, 0.95))
+                })
+                week_used_titles.add(item_title)
+                global_used_items.append(item_title)
         
         weeks[f"week_{week}"] = week_items
     

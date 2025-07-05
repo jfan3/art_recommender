@@ -648,19 +648,19 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                           ) : (
                             <div className="space-y-2">
                               {items.map((item, index) => {
-                                // Monet-inspired impressionistic color palette
+                                // Magic cube color palette - vibrant and saturated like a Rubik's cube
                                 const typeColors: { [key: string]: string } = {
-                                  'art': 'bg-purple-50 text-purple-700 border-purple-200',
-                                  'movies': 'bg-sky-50 text-sky-700 border-sky-200',
-                                  'movie': 'bg-sky-50 text-sky-700 border-sky-200',
-                                  'books': 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                  'book': 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                  'music': 'bg-yellow-50 text-yellow-700 border-yellow-200',
-                                  'poetry': 'bg-pink-50 text-pink-700 border-pink-200',
-                                  'podcasts': 'bg-indigo-50 text-indigo-700 border-indigo-200',
-                                  'podcast': 'bg-indigo-50 text-indigo-700 border-indigo-200',
-                                  'musicals': 'bg-orange-50 text-orange-700 border-orange-200',
-                                  'musical': 'bg-orange-50 text-orange-700 border-orange-200'
+                                  'art': 'bg-red-100 text-red-800 border-red-300',        // Magic cube red face
+                                  'movies': 'bg-blue-100 text-blue-800 border-blue-300',   // Magic cube blue face  
+                                  'movie': 'bg-blue-100 text-blue-800 border-blue-300',
+                                  'books': 'bg-green-100 text-green-800 border-green-300', // Magic cube green face
+                                  'book': 'bg-green-100 text-green-800 border-green-300',
+                                  'music': 'bg-yellow-100 text-yellow-800 border-yellow-300', // Magic cube yellow face
+                                  'poetry': 'bg-pink-100 text-pink-800 border-pink-300',    // Magic cube pink/magenta face
+                                  'podcasts': 'bg-orange-100 text-orange-800 border-orange-300', // Magic cube orange face
+                                  'podcast': 'bg-orange-100 text-orange-800 border-orange-300',
+                                  'musicals': 'bg-purple-100 text-purple-800 border-purple-300', // Magic cube purple face
+                                  'musical': 'bg-purple-100 text-purple-800 border-purple-300'
                                 };
                                 
                                 const typeColor = typeColors[item.type?.toLowerCase()] || 'bg-gray-50 text-gray-700 border-gray-200';
@@ -688,13 +688,13 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                                          minHeight: '85px',
                                          boxShadow: '4px 4px 0px var(--color-primary-black)',
                                          background: `linear-gradient(135deg, ${
-                                           typeColor.includes('purple') ? '#faf5ff, #f3e8ff' : 
-                                           typeColor.includes('sky') ? '#f0f9ff, #e0f2fe' :
-                                           typeColor.includes('emerald') ? '#ecfdf5, #d1fae5' :
-                                           typeColor.includes('yellow') ? '#fefce8, #fef3c7' :
-                                           typeColor.includes('pink') ? '#fdf2f8, #fce7f3' :
-                                           typeColor.includes('orange') ? '#fff7ed, #fed7aa' :
-                                           typeColor.includes('indigo') ? '#eef2ff, #e0e7ff' :
+                                           typeColor.includes('red') ? '#fef2f2, #fecaca' :      // Magic cube red gradient
+                                           typeColor.includes('blue') ? '#eff6ff, #dbeafe' :     // Magic cube blue gradient
+                                           typeColor.includes('green') ? '#f0fdf4, #dcfce7' :    // Magic cube green gradient  
+                                           typeColor.includes('yellow') ? '#fefce8, #fef3c7' :   // Magic cube yellow gradient
+                                           typeColor.includes('pink') ? '#fdf2f8, #fce7f3' :     // Magic cube pink gradient
+                                           typeColor.includes('orange') ? '#fff7ed, #fed7aa' :   // Magic cube orange gradient
+                                           typeColor.includes('purple') ? '#faf5ff, #f3e8ff' :  // Magic cube purple gradient
                                            '#f9fafb, #f3f4f6'})`
                                        }}>
                                     {/* Comic-style halftone pattern overlay */}
