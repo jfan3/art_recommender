@@ -40,6 +40,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
   const [viewDuration, setViewDuration] = useState<1 | 2 | 3>(3); // Duration to display
   const [viewIntensity, setViewIntensity] = useState<'chill' | 'medium' | 'intense'>('medium'); // Intensity level
   const [showRetryButton, setShowRetryButton] = useState(false);
+  const [currentPage, setCurrentPage] = useState<'loading' | 'controls' | 'schedule'>('loading');
 
   const fetchPlan = async () => {
       try {
@@ -58,6 +59,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
             weeks: data.total_weeks || 0,
             avg_hours_per_week: data.avg_hours_per_week || 0
           });
+          setCurrentPage('controls');
         } else if (data.plan_exists && (!data.weekly_plan || Object.keys(data.weekly_plan).length === 0)) {
           console.log('Plan exists but weekly_plan is empty, plan is still being generated');
           setError('Your personalized plan is being generated. This may take a moment...');
@@ -425,18 +427,28 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
     }
   };
 
-  if (!weeklyPlan && !statistics) {
+  if (loading || (!weeklyPlan && !statistics)) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--color-primary-red)' }}>
         <div className="arteme-card text-center p-8">
-          <h2 className="arteme-title text-2xl mb-4">No Plan Available</h2>
-          <p className="text-lg mb-6">Complete your preference learning to generate a personalized plan.</p>
-          <button 
-            onClick={handleGeneratePlan}
-            className="arteme-button bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-bold"
-          >
-            Generate My Plan
-          </button>
+          {loading ? (
+            <>
+              <h2 className="arteme-title text-2xl mb-4">Loading Your Journey...</h2>
+              <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-lg mb-6">Preparing your personalized art recommendations</p>
+            </>
+          ) : (
+            <>
+              <h2 className="arteme-title text-2xl mb-4">No Plan Available</h2>
+              <p className="text-lg mb-6">Complete your preference learning to generate a personalized plan.</p>
+              <button 
+                onClick={handleGeneratePlan}
+                className="arteme-button bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-bold"
+              >
+                Generate My Plan
+              </button>
+            </>
+          )}
         </div>
       </div>
     );
@@ -454,76 +466,92 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
           color: 'var(--color-primary-black)',
           border: '3px solid var(--color-primary-black)',
           boxShadow: '4px 4px 0px var(--color-primary-black)',
-          padding: '8px 16px'
+          padding: '12px 20px'
         }}>
-          Personalized Recommendations
+          <div className="grid grid-cols-4 gap-6 text-center">
+            <div>
+              <div className="text-lg font-bold arteme-title">{displayStatistics.total_items}</div>
+              <div className="text-xs">Items</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold arteme-title">{displayStatistics.weeks}</div>
+              <div className="text-xs">Weeks</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold arteme-title">{displayStatistics.total_time_hours}h</div>
+              <div className="text-xs">Total Time</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold arteme-title">{displayStatistics.avg_hours_per_week}h</div>
+              <div className="text-xs">Per Week</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Plan Controls */}
+      {currentPage === 'controls' && (
+        <>
+          {/* Controls and Plan Overview Page */}
       <div className="max-w-3xl mx-auto mb-16 px-4 lg:px-8" style={{ width: '90%' }}>
         <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
+          {/* Controls Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {/* Duration Selection */}
-            <div className="space-y-4">
-              <div className="text-center lg:text-left">
-                <h3 className="arteme-title text-lg mb-1" style={{ color: 'var(--color-primary-black)' }}>
-                  Journey Duration
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Choose how long you want your art journey to last
-                </p>
-              </div>
+            <div className="space-y-3">
+              <h3 className="arteme-title text-sm mb-1" style={{ color: 'var(--color-primary-black)' }}>
+                Journey Duration
+              </h3>
+              <p className="text-gray-600 text-xs mb-2">
+                Choose how long you want your art journey to last
+              </p>
               
-              <div className="flex lg:flex-col gap-2 lg:gap-3">
+              <div className="flex gap-2">
                 {[1, 2, 3].map((duration) => (
                   <button
                     key={duration}
                     type="button"
                     onClick={() => setViewDuration(duration as 1 | 2 | 3)}
-                    className={`arteme-button flex-1 lg:w-full py-3 px-4 font-bold text-base transition-all duration-300 transform hover:scale-105 ${
+                    className={`arteme-button flex-1 py-2 px-3 font-bold text-sm transition-all duration-300 transform hover:scale-105 ${
                       viewDuration === duration
-                        ? 'bg-purple-600 text-white border-3 border-black shadow-lg'
-                        : 'bg-white text-purple-600 border-3 border-purple-600 hover:bg-purple-50'
+                        ? 'bg-purple-600 text-white border-2 border-black shadow-lg'
+                        : 'bg-white text-purple-600 border-2 border-purple-600 hover:bg-purple-50'
                     }`}
                     style={{
                       boxShadow: viewDuration === duration 
-                        ? '4px 4px 0px var(--color-primary-black)' 
-                        : '3px 3px 0px var(--color-purple-600)',
-                      minWidth: '120px'
+                        ? '3px 3px 0px var(--color-primary-black)' 
+                        : '2px 2px 0px var(--color-purple-600)',
+                      minWidth: '60px'
                     }}
                   >
-                    {duration} Month{duration > 1 ? 's' : ''}
+                    {duration}M
                   </button>
                 ))}
               </div>
             </div>
             
             {/* Intensity Selection */}
-            <div className="space-y-4">
-              <div className="text-center lg:text-left">
-                <h3 className="arteme-title text-lg mb-1" style={{ color: 'var(--color-primary-black)' }}>
-                  Engagement Level
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Select your preferred intensity and time commitment
-                </p>
-              </div>
+            <div className="space-y-3">
+              <h3 className="arteme-title text-sm mb-1" style={{ color: 'var(--color-primary-black)' }}>
+                Engagement Level
+              </h3>
+              <p className="text-gray-600 text-xs mb-2">
+                Select your preferred intensity and time commitment
+              </p>
               
-              <div className="flex lg:flex-col gap-2 lg:gap-3">
+              <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setViewIntensity('chill')}
-                  className={`arteme-button flex-1 lg:w-full py-3 px-4 font-bold text-base transition-all duration-300 transform hover:scale-105 ${
+                  className={`arteme-button flex-1 py-2 px-2 font-bold text-xs transition-all duration-300 transform hover:scale-105 ${
                     viewIntensity === 'chill'
-                      ? 'bg-green-500 text-white border-3 border-black shadow-lg'
-                      : 'bg-white text-green-600 border-3 border-green-500 hover:bg-green-50'
+                      ? 'bg-green-500 text-white border-2 border-black shadow-lg'
+                      : 'bg-white text-green-600 border-2 border-green-500 hover:bg-green-50'
                   }`}
                   style={{
                     boxShadow: viewIntensity === 'chill' 
-                      ? '4px 4px 0px var(--color-primary-black)' 
-                      : '3px 3px 0px #10b981',
-                    minWidth: '120px'
+                      ? '3px 3px 0px var(--color-primary-black)' 
+                      : '2px 2px 0px #10b981',
+                    minWidth: '55px'
                   }}
                 >
                   Relaxed
@@ -532,16 +560,16 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                 <button
                   type="button"
                   onClick={() => setViewIntensity('medium')}
-                  className={`arteme-button flex-1 lg:w-full py-3 px-4 font-bold text-base transition-all duration-300 transform hover:scale-105 ${
+                  className={`arteme-button flex-1 py-2 px-2 font-bold text-xs transition-all duration-300 transform hover:scale-105 ${
                     viewIntensity === 'medium'
-                      ? 'bg-blue-500 text-white border-3 border-black shadow-lg'
-                      : 'bg-white text-blue-600 border-3 border-blue-500 hover:bg-blue-50'
+                      ? 'bg-blue-500 text-white border-2 border-black shadow-lg'
+                      : 'bg-white text-blue-600 border-2 border-blue-500 hover:bg-blue-50'
                   }`}
                   style={{
                     boxShadow: viewIntensity === 'medium' 
-                      ? '4px 4px 0px var(--color-primary-black)' 
-                      : '3px 3px 0px #3b82f6',
-                    minWidth: '120px'
+                      ? '3px 3px 0px var(--color-primary-black)' 
+                      : '2px 2px 0px #3b82f6',
+                    minWidth: '55px'
                   }}
                 >
                   Balanced
@@ -550,16 +578,16 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                 <button
                   type="button"
                   onClick={() => setViewIntensity('intense')}
-                  className={`arteme-button flex-1 lg:w-full py-3 px-4 font-bold text-base transition-all duration-300 transform hover:scale-105 ${
+                  className={`arteme-button flex-1 py-2 px-2 font-bold text-xs transition-all duration-300 transform hover:scale-105 ${
                     viewIntensity === 'intense'
-                      ? 'bg-red-500 text-white border-3 border-black shadow-lg'
-                      : 'bg-white text-red-600 border-3 border-red-500 hover:bg-red-50'
+                      ? 'bg-red-500 text-white border-2 border-black shadow-lg'
+                      : 'bg-white text-red-600 border-2 border-red-500 hover:bg-red-50'
                   }`}
                   style={{
                     boxShadow: viewIntensity === 'intense' 
-                      ? '4px 4px 0px var(--color-primary-black)' 
-                      : '3px 3px 0px #ef4444',
-                    minWidth: '120px'
+                      ? '3px 3px 0px var(--color-primary-black)' 
+                      : '2px 2px 0px #ef4444',
+                    minWidth: '55px'
                   }}
                 >
                   Immersive
@@ -570,26 +598,33 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
         </div>
       </div>
 
-      {/* Statistics */}
-      <div className="max-w-3xl mx-auto mb-20 px-4 lg:px-8" style={{ width: '90%' }}>
-        <h2 className="arteme-title text-lg mb-3 text-center" style={{ color: 'var(--color-primary-white)' }}>Plan Overview</h2>
-        <div className="grid grid-cols-4 gap-3 w-full">
-          <div className="text-center min-w-0">
-            <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center" style={{ color: 'var(--color-primary-white)' }}>{displayStatistics.total_items}</div>
-            <div className="text-xs" style={{ color: 'var(--color-primary-white)' }}>Items</div>
+          {/* Navigation Button */}
+          <div className="text-center mb-8 mt-20">
+            <button 
+              onClick={() => setCurrentPage('schedule')}
+              className="arteme-button bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-105"
+              style={{
+                boxShadow: '4px 4px 0px var(--color-primary-black)'
+              }}
+            >
+              View My Schedule →
+            </button>
           </div>
-          <div className="text-center min-w-0">
-            <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center" style={{ color: 'var(--color-primary-white)' }}>{displayStatistics.weeks}</div>
-            <div className="text-xs" style={{ color: 'var(--color-primary-white)' }}>Weeks</div>
-          </div>
-          <div className="text-center min-w-0">
-            <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center" style={{ color: 'var(--color-primary-white)' }}>{displayStatistics.total_time_hours}h</div>
-            <div className="text-xs" style={{ color: 'var(--color-primary-white)' }}>Total Time</div>
-          </div>
-          <div className="text-center min-w-0">
-            <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center" style={{ color: 'var(--color-primary-white)' }}>{displayStatistics.avg_hours_per_week}h</div>
-            <div className="text-xs" style={{ color: 'var(--color-primary-white)' }}>Per Week</div>
-          </div>
+        </>
+      )}
+
+      {currentPage === 'schedule' && (
+        <>
+          {/* Schedule Section Header */}
+      <div className="max-w-3xl mx-auto mb-8 px-4 lg:px-8" style={{ width: '90%' }}>
+        <div className="text-center">
+          <h2 className="arteme-title text-3xl mb-2" style={{ color: 'var(--color-primary-white)' }}>
+            Your Schedule
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mx-auto mb-4"></div>
+          <p className="text-sm" style={{ color: 'var(--color-primary-white)' }}>
+            Week-by-week breakdown of your {viewDuration}-month journey
+          </p>
         </div>
       </div>
 
@@ -755,7 +790,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                                     </div>
                                     
                                     {item.creator && (
-                                      <p className="text-xs font-bold mb-1 text-black uppercase tracking-wider relative z-10" 
+                                      <p className="text-xs font-bold mb-0 text-black uppercase tracking-wider relative z-10" 
                                          style={{ 
                                            display: '-webkit-box',
                                            WebkitLineClamp: 1,
@@ -797,6 +832,12 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
           </p>
           <div className="flex gap-4 justify-center">
             <button 
+              onClick={() => setCurrentPage('controls')}
+              className="arteme-button bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-full font-bold"
+            >
+              ← Back to Overview
+            </button>
+            <button 
               onClick={() => toast.success('Your art journey begins now!')}
               className="arteme-button bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-bold"
             >
@@ -814,6 +855,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };
