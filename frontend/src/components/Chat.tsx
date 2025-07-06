@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import { FiSend } from 'react-icons/fi';
 import { Toaster, toast } from 'react-hot-toast';
 import SwipeFlow from './SwipeFlow';
-import FunkyCharacter from './FunkyCharacter';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -21,7 +20,6 @@ export default function Chat() {
   const [userUuid, setUserUuid] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [profilingComplete, setProfilingComplete] = useState(false);
-  const [characterActive, setCharacterActive] = useState(false);
   const initializationRef = useRef(false);
 
   useEffect(() => {
@@ -29,11 +27,22 @@ export default function Chat() {
     if (initializationRef.current) return;
     initializationRef.current = true;
     
+    // Check for reset parameter in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const resetParam = urlParams.get('reset');
+    
+    if (resetParam === 'true') {
+      // Force reset all localStorage data
+      localStorage.clear();
+      // Clear URL parameter
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
     // Check if we have an existing completed profile
     const existingProfileComplete = localStorage.getItem('profilingComplete');
     const existingUserUuid = localStorage.getItem('userUuid');
     
-    if (existingProfileComplete === 'true' && existingUserUuid) {
+    if (existingProfileComplete === 'true' && existingUserUuid && resetParam !== 'true') {
       // Restore completed state
       setUserUuid(existingUserUuid);
       setProfilingComplete(true);
@@ -44,6 +53,7 @@ export default function Chat() {
     localStorage.removeItem('userUuid');
     localStorage.removeItem('sessionId');
     localStorage.removeItem('profilingComplete');
+    localStorage.removeItem('swipesComplete');
 
     // Immediately create a new profile and start chat
     const startConversation = async () => {
@@ -220,17 +230,6 @@ export default function Chat() {
     return () => clearInterval(interval);
   }, [userUuid, profilingComplete]);
 
-  // Handle character interaction
-  const handleCharacterInteraction = (characterMessage: string) => {
-    const characterBotMessage: Message = { role: 'assistant', content: characterMessage };
-    setMessages(prev => [...prev, characterBotMessage]);
-    setCharacterActive(true);
-    
-    // Auto-scroll to new message
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
 
   if (profilingComplete && userUuid) {
     return (
@@ -246,22 +245,11 @@ export default function Chat() {
   return (
     <>
       <Toaster position="top-center" />
-      <div className="flex flex-row gap-1 w-full max-w-4xl mx-auto px-4 h-full">
-        {/* Character Panel - 1/3 width */}
-        <div className="flex flex-col justify-center items-center w-1/3">
-          <FunkyCharacter 
-            onInteraction={handleCharacterInteraction}
-            isActive={characterActive}
-          />
-        </div>
-        
-        {/* Chat Panel - smaller size */}
-        <div className="flex flex-col w-1/2 max-w-sm h-[45vh] relative overflow-hidden"
+      <div className="flex justify-center items-center w-full max-w-4xl mx-auto h-full" style={{ paddingLeft: '50px', paddingRight: '50px' }}>
+        {/* Chat Panel - centered */}
+        <div className="flex flex-col w-full max-w-md h-[60vh] relative overflow-hidden"
              style={{
-               marginTop: '20px !important',
-               marginRight: '20px !important',
-               background: 'linear-gradient(135deg, #fdf2f8 0%, #fefbf3 50%, #f0fdf4 100%) !important',
-               transform: 'translateY(20px) translateX(-30px)',
+               background: 'linear-gradient(135deg, #fdf2f8 0%, #fefbf3 50%, #f0fdf4 100%)',
                border: '4px solid var(--color-primary-black)',
                borderRadius: '20px',
                boxShadow: '8px 8px 0px var(--color-primary-black)'
@@ -274,7 +262,7 @@ export default function Chat() {
                borderRadius: '20px 20px 0 0'
              }}>
           <h3 className="font-bold text-base arteme-title">
-Chat with Arteme
+Art Discovery Chat
           </h3>
         </div>
         
@@ -323,4 +311,4 @@ Chat with Arteme
       </div>
     </>
   );
-} 
+}

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import ThreeMonthPlan from './three-month-plan';
 
-const HUNTER_API_URL = process.env.NEXT_PUBLIC_HUNTER_API_URL || 'http://localhost:8000';
+const HUNTER_API_URL = process.env.NEXT_PUBLIC_HUNTER_API_URL || 'http://localhost:8090';
 
 interface Item {
   item_id: string;
@@ -27,8 +27,32 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
   const [trainingComplete, setTrainingComplete] = useState(false);
   const [swipesComplete, setSwipesComplete] = useState(() => {
     // Check if swipes were already completed
-    return localStorage.getItem('swipesComplete') === 'true';
+    const storedValue = localStorage.getItem('swipesComplete');
+    console.log('SwipeFlow: Initial swipesComplete from localStorage:', storedValue);
+    return storedValue === 'true';
   });
+  
+  // Debug function to reset state
+  const resetSwipeState = () => {
+    console.log('SwipeFlow: Resetting swipe state');
+    localStorage.removeItem('swipesComplete');
+    localStorage.removeItem('profilingComplete');
+    localStorage.removeItem('userUuid');
+    localStorage.removeItem('sessionId');
+    setSwipesComplete(false);
+    setCurrent(0);
+    setWaiting(true);
+    setTrainingComplete(false);
+    window.location.href = '/chat';
+  };
+  
+  // Expose reset function globally for debugging
+  React.useEffect(() => {
+    (window as any).resetSwipeState = resetSwipeState;
+    return () => {
+      delete (window as any).resetSwipeState;
+    };
+  }, []);
   
   // Swipe state
   const [isDragging, setIsDragging] = useState(false);
@@ -40,20 +64,29 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
   // Poll for generation status
   useEffect(() => {
     // NO TEST USER SHORTCUTS - all users follow real workflow
+    console.log('SwipeFlow: Starting generation status polling for user:', userUuid);
+    console.log('SwipeFlow: Initial states:', { waiting, loading, error, swipesComplete });
     
     let pollTimeout: NodeJS.Timeout;
     const pollStatus = async () => {
       try {
+        console.log('SwipeFlow: Checking generation status for user:', userUuid);
+        console.log('SwipeFlow: Using API URL:', HUNTER_API_URL);
         const res = await fetch(`${HUNTER_API_URL}/api/generation_status/${userUuid}`);
-        if (!res.ok) throw new Error('Failed to check generation status');
+        console.log('SwipeFlow: Generation status response status:', res.status);
+        if (!res.ok) throw new Error(`Failed to check generation status: ${res.status} ${res.statusText}`);
         const data = await res.json();
+        console.log('SwipeFlow: Generation status response:', data);
         if (data.status === 'complete') {
+          console.log('SwipeFlow: Generation complete, setting waiting to false');
           setWaiting(false);
         } else {
+          console.log('SwipeFlow: Generation still pending, continuing to poll');
           setWaiting(true);
           pollTimeout = setTimeout(pollStatus, POLL_INTERVAL);
         }
       } catch (err: any) {
+        console.error('SwipeFlow: Error checking generation status:', err);
         setError(err.message || 'Error checking generation status');
       }
     };
@@ -65,11 +98,16 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
 
   // Fetch candidates only when status is complete
   useEffect(() => {
-    if (waiting) return;
+    if (waiting) {
+      console.log('SwipeFlow: Still waiting for generation to complete');
+      return;
+    }
+    console.log('SwipeFlow: Generation complete, fetching candidates');
     const fetchCandidates = async () => {
       setLoading(true);
       setError(null);
       try {
+        console.log('SwipeFlow: Fetching candidates for user:', userUuid);
         const res = await fetch(`${HUNTER_API_URL}/api/candidates/${userUuid}`);
         if (!res.ok) {
           // Handle specific error codes from consolidated API
@@ -84,13 +122,17 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
           throw new Error(errorData.detail || `Failed to fetch candidates (${res.status})`);
         }
         const data = await res.json();
+        console.log('SwipeFlow: Candidates response:', data);
         if (data.training_complete) {
+          console.log('SwipeFlow: Training complete, setting trainingComplete to true');
           setTrainingComplete(true);
           return;
         }
+        console.log('SwipeFlow: Setting candidates:', data.candidates?.length || 0, 'items');
         setCandidates(data.candidates || []);
         setCurrent(0);
       } catch (err: any) {
+        console.error('SwipeFlow: Error fetching candidates:', err);
         // NO MOCK DATA - show error for all cases
         setError(err.message || 'Error fetching real candidates. Please ensure your profile is complete and try again.');
       } finally {
@@ -444,6 +486,7 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
   
   // Check swipesComplete first - this takes priority over other states
   if (swipesComplete) {
+    console.log('SwipeFlow: Showing ThreeMonthPlan because swipesComplete is true');
     return <ThreeMonthPlan userUuid={userUuid} />;
   }
   
@@ -458,13 +501,26 @@ const SwipeFlow: React.FC<SwipeFlowProps> = ({ userUuid }) => {
   );
   
   // Only show "All Done" if we haven't completed swipes yet
-  if (current >= candidates.length && !swipesComplete) return (
-    <div className="arteme-card text-center p-8">
-      <div className="arteme-accent-bar w-32 mx-auto mb-6"></div>
-      <h2 className="arteme-title text-4xl mb-4">All Done!</h2>
-      <p className="text-xl">You've explored all recommendations</p>
-    </div>
-  );
+  if (current >= candidates.length && !swipesComplete) {
+    console.log('SwipeFlow: Showing "All Done" because current >= candidates.length', {
+      current,
+      candidatesLength: candidates.length,
+      swipesComplete
+    });
+    return (
+      <div className="arteme-card text-center p-8">
+        <div className="arteme-accent-bar w-32 mx-auto mb-6"></div>
+        <h2 className="arteme-title text-4xl mb-4">All Done!</h2>
+        <p className="text-xl mb-6">You've explored all recommendations</p>
+        <button 
+          onClick={resetSwipeState}
+          className="arteme-button bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-bold"
+        >
+          Start Over
+        </button>
+      </div>
+    );
+  }
 
   const item = candidates[current];
 
