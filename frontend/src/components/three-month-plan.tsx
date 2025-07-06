@@ -606,10 +606,17 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       {/* Weekly Plan - Horizontal Layout - ALWAYS SAME WIDTH */}
       <div className="w-full px-4 lg:px-8">
         <div className="max-w-4xl mx-auto" style={{ width: '100%' }}>
-          <div className="space-y-12" style={{ width: '100%', minHeight: '1500px' }}>
-            {/* Render only selected duration months */}
-            {[1, 2, 3].filter(month => month <= viewDuration).map((month) => (
-              <div key={month} className="arteme-card p-6 lg:p-8" style={{ width: '100%', minHeight: '500px' }}>
+          <div className="space-y-12" style={{ width: '100%' }}>
+            {/* ALWAYS render all 3 months to maintain consistent container width */}
+            {[1, 2, 3].map((month) => (
+              <div 
+                key={month} 
+                className="arteme-card p-6 lg:p-8" 
+                style={{ 
+                  width: '100%', 
+                  minHeight: '500px',
+                  display: month <= viewDuration ? 'block' : 'none'
+                }}>
                 {/* Month Header */}
                 <div className="text-center mb-8">
                   <h3 className="arteme-title text-2xl lg:text-3xl mb-4" style={{ color: 'var(--color-primary-black)' }}>
