@@ -609,7 +609,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
           <div className="space-y-12 w-full">
             {/* Always render 3 months but hide content beyond selected duration */}
             {[1, 2, 3].map((month) => (
-              <div key={month} className={`arteme-card p-6 lg:p-8 w-full ${month > viewDuration ? 'hidden' : ''}`}
+              <div key={month} className={`arteme-card p-6 lg:p-8 w-full ${month > viewDuration ? 'hidden' : ''}`}>
                 {/* Month Header */}
                 <div className="text-center mb-8">
                   <h3 className="arteme-title text-2xl lg:text-3xl mb-4" style={{ color: 'var(--color-primary-black)' }}>
