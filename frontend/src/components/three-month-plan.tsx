@@ -572,25 +572,23 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
 
       {/* Statistics */}
       <div className="max-w-3xl mx-auto mb-6 px-4 lg:px-8" style={{ width: '90%' }}>
-        <div className="arteme-card p-4">
-          <h2 className="arteme-title text-lg mb-3">Plan Overview</h2>
-          <div className="grid grid-cols-4 gap-3 w-full">
-            <div className="text-center min-w-0">
-              <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center">{displayStatistics.total_items}</div>
-              <div className="text-xs">Items</div>
-            </div>
-            <div className="text-center min-w-0">
-              <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center">{displayStatistics.weeks}</div>
-              <div className="text-xs">Weeks</div>
-            </div>
-            <div className="text-center min-w-0">
-              <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center">{displayStatistics.total_time_hours}h</div>
-              <div className="text-xs">Total Time</div>
-            </div>
-            <div className="text-center min-w-0">
-              <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center">{displayStatistics.avg_hours_per_week}h</div>
-              <div className="text-xs">Per Week</div>
-            </div>
+        <h2 className="arteme-title text-lg mb-3 text-center" style={{ color: 'var(--color-primary-white)' }}>Plan Overview</h2>
+        <div className="grid grid-cols-4 gap-3 w-full">
+          <div className="text-center min-w-0">
+            <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center" style={{ color: 'var(--color-primary-white)' }}>{displayStatistics.total_items}</div>
+            <div className="text-xs" style={{ color: 'var(--color-primary-white)' }}>Items</div>
+          </div>
+          <div className="text-center min-w-0">
+            <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center" style={{ color: 'var(--color-primary-white)' }}>{displayStatistics.weeks}</div>
+            <div className="text-xs" style={{ color: 'var(--color-primary-white)' }}>Weeks</div>
+          </div>
+          <div className="text-center min-w-0">
+            <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center" style={{ color: 'var(--color-primary-white)' }}>{displayStatistics.total_time_hours}h</div>
+            <div className="text-xs" style={{ color: 'var(--color-primary-white)' }}>Total Time</div>
+          </div>
+          <div className="text-center min-w-0">
+            <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center" style={{ color: 'var(--color-primary-white)' }}>{displayStatistics.avg_hours_per_week}h</div>
+            <div className="text-xs" style={{ color: 'var(--color-primary-white)' }}>Per Week</div>
           </div>
         </div>
       </div>
