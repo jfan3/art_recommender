@@ -617,8 +617,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                   <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mx-auto"></div>
                 </div>
 
-                {/* Weekly Layout - ALWAYS 4 weeks - FIXED WIDTH */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4" style={{ width: '100%', minHeight: '400px' }}>
+                {/* Weekly Layout - 4x1 horizontal layout */}
+                <div className="grid grid-cols-4 gap-3 lg:gap-4" style={{ width: '100%', minHeight: '400px' }}>
                   {Array.from({length: 4}, (_, weekInMonth) => {
                     const globalWeek = (month - 1) * 4 + weekInMonth + 1;
                     const weekKey = `week_${globalWeek}`;
