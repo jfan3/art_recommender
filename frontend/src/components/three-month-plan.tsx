@@ -605,8 +605,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
 
       {/* Weekly Plan - Horizontal Layout - ALWAYS SAME WIDTH */}
       <div className="w-full px-4 lg:px-8">
-        <div className="max-w-4xl mx-auto" style={{ width: '100%', maxWidth: '1024px' }}>
-          <div className="space-y-12" style={{ width: '100%' }}>
+        <div className="max-w-4xl mx-auto" style={{ width: '100%' }}>
+          <div className="space-y-12" style={{ width: '100%', minHeight: '1500px' }}>
             {/* Render only selected duration months */}
             {[1, 2, 3].filter(month => month <= viewDuration).map((month) => (
               <div key={month} className="arteme-card p-6 lg:p-8" style={{ width: '100%', minHeight: '500px' }}>
