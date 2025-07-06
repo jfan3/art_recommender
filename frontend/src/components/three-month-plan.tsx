@@ -598,17 +598,15 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
         </div>
       </div>
 
-          {/* Navigation Button */}
-          <div className="text-center mb-8 mt-20">
-            <button 
+          {/* Navigation Text */}
+          <div className="text-center mb-8" style={{ marginTop: '35px' }}>
+            <span 
               onClick={() => setCurrentPage('schedule')}
-              className="arteme-button bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-bold transition-all duration-300 transform hover:scale-105"
-              style={{
-                boxShadow: '4px 4px 0px var(--color-primary-black)'
-              }}
+              className="cursor-pointer arteme-title text-lg hover:underline transition-all duration-300"
+              style={{ color: 'var(--color-primary-white)' }}
             >
               View My Schedule →
-            </button>
+            </span>
           </div>
         </>
       )}
