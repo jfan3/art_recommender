@@ -445,8 +445,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
   return (
     <div className="min-h-screen p-4 w-full overflow-x-hidden" style={{ background: 'var(--color-primary-red)' }}>
       {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl lg:text-5xl arteme-title mb-4" style={{ color: 'var(--color-primary-white)' }}>
+      <div className="text-center mb-8 w-full">
+        <h1 className="text-4xl lg:text-5xl arteme-title mb-4 min-h-[4rem] flex items-center justify-center" style={{ color: 'var(--color-primary-white)' }}>
           Your {viewDuration}-Month Art Journey
         </h1>
         <div className="arteme-header mb-4 text-sm lg:text-base inline-block" style={{ 
@@ -583,20 +583,20 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
         <div className="arteme-card p-4">
           <h2 className="arteme-title text-lg mb-3">Plan Overview</h2>
           <div className="grid grid-cols-4 gap-3 w-full">
-            <div className="text-center">
-              <div className="text-xl font-bold arteme-title">{displayStatistics.total_items}</div>
+            <div className="text-center min-w-0">
+              <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center">{displayStatistics.total_items}</div>
               <div className="text-xs">Items</div>
             </div>
-            <div className="text-center">
-              <div className="text-xl font-bold arteme-title">{displayStatistics.weeks}</div>
+            <div className="text-center min-w-0">
+              <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center">{displayStatistics.weeks}</div>
               <div className="text-xs">Weeks</div>
             </div>
-            <div className="text-center">
-              <div className="text-xl font-bold arteme-title">{displayStatistics.total_time_hours}h</div>
+            <div className="text-center min-w-0">
+              <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center">{displayStatistics.total_time_hours}h</div>
               <div className="text-xs">Total Time</div>
             </div>
-            <div className="text-center">
-              <div className="text-xl font-bold arteme-title">{displayStatistics.avg_hours_per_week}h</div>
+            <div className="text-center min-w-0">
+              <div className="text-xl font-bold arteme-title min-h-[2rem] flex items-center justify-center">{displayStatistics.avg_hours_per_week}h</div>
               <div className="text-xs">Per Week</div>
             </div>
           </div>
@@ -605,10 +605,11 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
 
       {/* Weekly Plan - Horizontal Layout */}
       <div className="w-full px-4 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="space-y-12">
-            {getMonthHeaders().map((month) => (
-              <div key={month} className="arteme-card p-6 lg:p-8">
+        <div className="max-w-4xl mx-auto w-full">
+          <div className="space-y-12 w-full">
+            {/* Always render 3 months but hide content beyond selected duration */}
+            {[1, 2, 3].map((month) => (
+              <div key={month} className={`arteme-card p-6 lg:p-8 w-full ${month > viewDuration ? 'hidden' : ''}`}
                 {/* Month Header */}
                 <div className="text-center mb-8">
                   <h3 className="arteme-title text-2xl lg:text-3xl mb-4" style={{ color: 'var(--color-primary-black)' }}>
@@ -617,16 +618,18 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                   <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mx-auto"></div>
                 </div>
 
-                {/* Weekly Layout - 4 weeks side by side horizontally */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 min-h-[400px]">
+                {/* Weekly Layout - Always 4 weeks side by side horizontally */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 min-h-[400px] w-full">
                   {Array.from({length: 4}, (_, weekInMonth) => {
                     const globalWeek = (month - 1) * 4 + weekInMonth + 1;
                     const maxWeeks = viewDuration * 4;
                     
-                    // Skip weeks beyond selected duration
-                    if (globalWeek > maxWeeks) {
+                    // Always render week cards, but show different content for weeks beyond duration
+                    const isBeyondDuration = globalWeek > maxWeeks;
+                    
+                    if (isBeyondDuration) {
                       return (
-                        <div key={`empty-${weekInMonth}`} className="bg-gray-100 border-2 border-gray-200 rounded-xl p-4 opacity-50 w-full" style={{ minHeight: '360px', maxHeight: '360px' }}>
+                        <div key={`empty-${weekInMonth}`} className="bg-gray-100 border-2 border-gray-200 rounded-xl p-4 opacity-30 w-full" style={{ minHeight: '360px', maxHeight: '360px' }}>
                           <div className="text-center text-gray-400">
                             <h4 className="font-bold text-sm mb-2">Week {globalWeek}</h4>
                             <p className="text-xs">Beyond selected duration</p>
