@@ -461,7 +461,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       </div>
 
       {/* Plan Controls */}
-      <div className="max-w-4xl mx-auto mb-16 px-4 lg:px-8">
+      <div className="max-w-3xl mx-auto mb-16 px-4 lg:px-8" style={{ width: '90%' }}>
         <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {/* Duration Selection */}
@@ -571,7 +571,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       </div>
 
       {/* Statistics */}
-      <div className="max-w-3xl mx-auto mb-6 px-4 lg:px-8">
+      <div className="max-w-3xl mx-auto mb-6 px-4 lg:px-8" style={{ width: '90%' }}>
         <div className="arteme-card p-4">
           <h2 className="arteme-title text-lg mb-3">Plan Overview</h2>
           <div className="grid grid-cols-4 gap-3 w-full">
@@ -792,7 +792,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
 
       {/* Footer */}
       <div className="text-center mt-12 mb-8 px-4 lg:px-8">
-        <div className="arteme-card p-6 max-w-xl mx-auto">
+        <div className="arteme-card p-6 max-w-3xl mx-auto" style={{ width: '90%' }}>
           <h3 className="arteme-title text-xl mb-3">Ready to Start Your {viewDuration}-Month Journey?</h3>
           <p className="text-gray-700 mb-4">
             Your personalized {viewDuration}-month art journey has been carefully curated based on your preferences.<br />
