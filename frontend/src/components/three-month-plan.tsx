@@ -443,7 +443,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
   }
 
   return (
-    <div className="min-h-screen p-4" style={{ background: 'var(--color-primary-red)' }}>
+    <div className="min-h-screen p-4 w-full overflow-x-hidden" style={{ background: 'var(--color-primary-red)' }}>
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl lg:text-5xl arteme-title mb-4" style={{ color: 'var(--color-primary-white)' }}>
@@ -582,7 +582,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       <div className="max-w-3xl mx-auto mb-6 px-4 lg:px-8">
         <div className="arteme-card p-4">
           <h2 className="arteme-title text-lg mb-3">Plan Overview</h2>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-4 gap-3 w-full">
             <div className="text-center">
               <div className="text-xl font-bold arteme-title">{displayStatistics.total_items}</div>
               <div className="text-xs">Items</div>
@@ -618,7 +618,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                 </div>
 
                 {/* Weekly Layout - 4 weeks side by side horizontally */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 min-h-[400px]">
                   {Array.from({length: 4}, (_, weekInMonth) => {
                     const globalWeek = (month - 1) * 4 + weekInMonth + 1;
                     const maxWeeks = viewDuration * 4;
@@ -626,7 +626,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                     // Skip weeks beyond selected duration
                     if (globalWeek > maxWeeks) {
                       return (
-                        <div key={`empty-${weekInMonth}`} className="bg-gray-100 border-2 border-gray-200 rounded-xl p-4 opacity-50">
+                        <div key={`empty-${weekInMonth}`} className="bg-gray-100 border-2 border-gray-200 rounded-xl p-4 opacity-50 w-full" style={{ minHeight: '360px', maxHeight: '360px' }}>
                           <div className="text-center text-gray-400">
                             <h4 className="font-bold text-sm mb-2">Week {globalWeek}</h4>
                             <p className="text-xs">Beyond selected duration</p>
@@ -639,7 +639,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                     const items = displayPlan?.[weekKey] || [];
                     
                     return (
-                      <div key={weekKey} className="bg-white border-2 border-gray-300 rounded-lg hover:shadow-lg transition-all flex flex-col" style={{ minHeight: '360px' }}>
+                      <div key={weekKey} className="bg-white border-2 border-gray-300 rounded-lg hover:shadow-lg transition-all flex flex-col w-full" style={{ minHeight: '360px', maxHeight: '360px' }}>
                         {/* Week Header */}
                         <div className="p-2 border-b border-gray-200 flex-shrink-0">
                           <div className="text-center">
