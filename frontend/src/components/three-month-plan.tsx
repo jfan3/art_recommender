@@ -708,46 +708,56 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                                          }}>
                                     </div>
                                     
-                                    <div className="flex items-start justify-between mb-2 relative z-10">
-                                      <h5 className="font-black text-sm leading-tight flex-1 pr-2 text-black uppercase tracking-wide" 
+                                    <div className="flex items-start justify-between mb-1 relative z-10">
+                                      <h5 className="font-black text-xs leading-tight flex-1 pr-1 text-black uppercase tracking-wide" 
                                           style={{ 
                                             display: '-webkit-box',
                                             WebkitLineClamp: 2,
                                             WebkitBoxOrient: 'vertical',
                                             overflow: 'hidden',
                                             fontFamily: 'Impact, "Arial Black", sans-serif',
-                                            textShadow: '2px 2px 0px white, -1px -1px 0px white, 1px -1px 0px white, -1px 1px 0px white'
+                                            textShadow: '1px 1px 0px white, -1px -1px 0px white, 1px -1px 0px white, -1px 1px 0px white'
                                           }}
                                           title={item.title}>
                                         {item.title}
                                       </h5>
-                                      <span className="text-xs flex-shrink-0 font-black bg-yellow-300 px-2 py-1 rounded-full border-2 border-black transform rotate-12 hover:rotate-0 transition-transform duration-200"
-                                            style={{ 
-                                              boxShadow: '2px 2px 0px black',
-                                              textShadow: '1px 1px 0px white'
-                                            }}>
+                                      <div className="flex flex-col gap-1 items-end">
+                                        <span className="text-xs flex-shrink-0 font-black bg-yellow-300 px-1.5 py-0.5 rounded-full border-2 border-black"
+                                              style={{ 
+                                                boxShadow: '2px 2px 0px black',
+                                                textShadow: '1px 1px 0px white'
+                                              }}>
 {(() => {
-                                          const type = item.type?.toLowerCase() || 'art';
-                                          const typeIndicators: { [key: string]: string } = {
-                                            'art': 'ART!',
-                                            'movie': 'FILM!',
-                                            'movies': 'FILM!',
-                                            'music': 'SONG!',
-                                            'book': 'BOOK!',
-                                            'books': 'BOOK!',
-                                            'poetry': 'POEM!',
-                                            'podcast': 'POD!',
-                                            'podcasts': 'POD!',
-                                            'musical': 'SHOW!',
-                                            'musicals': 'SHOW!'
-                                          };
-                                          return typeIndicators[type] || type.charAt(0).toUpperCase() + '!';
-                                        })()}
-                                      </span>
+                                            const type = item.type?.toLowerCase() || 'art';
+                                            const typeIndicators: { [key: string]: string } = {
+                                              'art': 'ART!',
+                                              'movie': 'FILM!',
+                                              'movies': 'FILM!',
+                                              'music': 'SONG!',
+                                              'book': 'BOOK!',
+                                              'books': 'BOOK!',
+                                              'poetry': 'POEM!',
+                                              'podcast': 'POD!',
+                                              'podcasts': 'POD!',
+                                              'musical': 'SHOW!',
+                                              'musicals': 'SHOW!'
+                                            };
+                                            return typeIndicators[type] || type.charAt(0).toUpperCase() + '!';
+                                          })()}
+                                        </span>
+                                        <span className="bg-red-400 px-1.5 py-0.5 rounded-full text-white text-xs font-black border-2 border-black"
+                                              style={{ 
+                                                boxShadow: '2px 2px 0px black',
+                                                textShadow: '1px 1px 0px black',
+                                                background: 'linear-gradient(45deg, #f87171, #ef4444)'
+                                              }}>
+                                          {estimatedHours}H
+                                        </span>
+                                      </div>
                                     </div>
                                     
                                     {item.creator && (
-                                      <p className="text-xs font-bold mb-2 text-black uppercase tracking-wider relative z-10" 
+                                      <p className="text-xs font-bold mb-1 text-black uppercase tracking-wider relative z-10" 
                                          style={{ 
                                            display: '-webkit-box',
                                            WebkitLineClamp: 1,
@@ -760,17 +770,6 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                                         BY: {item.creator}
                                       </p>
                                     )}
-                                    
-                                    <div className="flex justify-start items-center mt-auto relative z-10">
-                                      <span className="bg-red-400 px-3 py-1 rounded-full text-white text-xs font-black border-2 border-black transform hover:scale-110 transition-transform duration-200"
-                                            style={{ 
-                                              boxShadow: '3px 3px 0px black',
-                                              textShadow: '1px 1px 0px black',
-                                              background: 'linear-gradient(45deg, #f87171, #ef4444)'
-                                            }}>
-                                        {estimatedHours}H
-                                      </span>
-                                    </div>
                                     
                                     {/* Comic-style speech bubble effect */}
                                     <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full border-2 border-black animate-pulse"></div>
