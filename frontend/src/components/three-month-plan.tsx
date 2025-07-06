@@ -603,13 +603,13 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
         </div>
       </div>
 
-      {/* Weekly Plan - Horizontal Layout */}
+      {/* Weekly Plan - Horizontal Layout - ALWAYS SAME WIDTH */}
       <div className="w-full px-4 lg:px-8">
-        <div className="max-w-4xl mx-auto w-full">
-          <div className="space-y-12 w-full">
-            {/* Always render 3 months with consistent spacing */}
+        <div className="max-w-4xl mx-auto" style={{ width: '100%', maxWidth: '1024px' }}>
+          <div className="space-y-12" style={{ width: '100%' }}>
+            {/* ALWAYS render ALL 3 months - never hide any to maintain consistent width */}
             {[1, 2, 3].map((month) => (
-              <div key={month} className={`arteme-card p-6 lg:p-8 w-full ${month > viewDuration ? 'opacity-0 pointer-events-none' : ''}`} style={{ minHeight: '500px' }}>
+              <div key={month} className="arteme-card p-6 lg:p-8" style={{ width: '100%', minHeight: '500px', opacity: month > viewDuration ? 0.3 : 1 }}>
                 {/* Month Header */}
                 <div className="text-center mb-8">
                   <h3 className="arteme-title text-2xl lg:text-3xl mb-4" style={{ color: 'var(--color-primary-black)' }}>
@@ -618,8 +618,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                   <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mx-auto"></div>
                 </div>
 
-                {/* Weekly Layout - Always 4 weeks side by side horizontally */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 min-h-[400px] w-full">
+                {/* Weekly Layout - ALWAYS 4 weeks - FIXED WIDTH */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4" style={{ width: '100%', minHeight: '400px' }}>
                   {Array.from({length: 4}, (_, weekInMonth) => {
                     const globalWeek = (month - 1) * 4 + weekInMonth + 1;
                     const maxWeeks = viewDuration * 4;
@@ -627,22 +627,16 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                     // Always render week cards, but show different content for weeks beyond duration
                     const isBeyondDuration = globalWeek > maxWeeks;
                     
-                    if (isBeyondDuration) {
-                      return (
-                        <div key={`empty-${weekInMonth}`} className="bg-gray-100 border-2 border-gray-200 rounded-xl p-4 opacity-30 w-full" style={{ minHeight: '360px', maxHeight: '360px' }}>
-                          <div className="text-center text-gray-400">
-                            <h4 className="font-bold text-sm mb-2">Week {globalWeek}</h4>
-                            <p className="text-xs">Beyond selected duration</p>
-                          </div>
-                        </div>
-                      );
-                    }
-                    
                     const weekKey = `week_${globalWeek}`;
                     const items = displayPlan?.[weekKey] || [];
                     
                     return (
-                      <div key={weekKey} className="bg-white border-2 border-gray-300 rounded-lg hover:shadow-lg transition-all flex flex-col w-full" style={{ minHeight: '360px', maxHeight: '360px' }}>
+                      <div key={weekKey} className="bg-white border-2 border-gray-300 rounded-lg hover:shadow-lg transition-all flex flex-col" style={{ 
+                        width: '100%', 
+                        minHeight: '360px', 
+                        maxHeight: '360px',
+                        opacity: isBeyondDuration ? 0.3 : 1 
+                      }}>
                         {/* Week Header */}
                         <div className="p-2 border-b border-gray-200 flex-shrink-0">
                           <div className="text-center">
@@ -657,7 +651,11 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                         
                         {/* Week Content - Items stacked vertically */}
                         <div className="flex-1 p-2 overflow-y-auto">
-                          {items.length === 0 ? (
+                          {isBeyondDuration ? (
+                            <div className="text-center py-4 text-gray-400">
+                              <p className="text-xs">Beyond selected duration</p>
+                            </div>
+                          ) : items.length === 0 ? (
                             <div className="text-center py-4 text-gray-500">
                               <p className="text-xs">No items scheduled</p>
                             </div>
@@ -806,9 +804,9 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       {/* Footer */}
       <div className="text-center mt-12 mb-8 px-4 lg:px-8">
         <div className="arteme-card p-6 max-w-xl mx-auto">
-          <h3 className="arteme-title text-xl mb-3">Ready to Start Your Journey?</h3>
+          <h3 className="arteme-title text-xl mb-3">Ready to Start Your {viewDuration}-Month Journey?</h3>
           <p className="text-gray-700 mb-4">
-            Your personalized art journey has been carefully curated based on your preferences.<br />
+            Your personalized {viewDuration}-month art journey has been carefully curated based on your preferences.<br />
             Each week offers a balanced mix of different art forms to enrich your cultural experience.
           </p>
           <div className="flex gap-4 justify-center">
