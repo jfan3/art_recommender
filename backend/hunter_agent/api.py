@@ -105,67 +105,100 @@ def count_right_swipes(user_uuid: str) -> int:
     return sum(1 for swipe in swipes if swipe["status"] == "swipe_right")
 
 def adjust_plan_for_preferences(base_plan: dict, duration: int, intensity: str) -> dict:
-    """Adjust the base plan based on duration and intensity preferences."""
+    """Adjust the base plan based on duration and intensity preferences.
+    
+    NO DUPLICATES: Rather than creating duplicates, we'll use only unique items
+    and adjust the number of items per week based on available content.
+    """
     max_weeks = duration * 4  # 4 weeks per month
     
-    # Filter plan to only include the specified duration
+    # Collect all unique items across all weeks to ensure no duplicates
+    all_unique_items = []
+    seen_titles = set()
+    
+    for week_key in base_plan:
+        week_items = base_plan[week_key]
+        for item in week_items:
+            title = item.get("title", "")
+            # Only add if we haven't seen this title before
+            if title and title not in seen_titles:
+                all_unique_items.append(item)
+                seen_titles.add(title)
+    
+    # Define intensity targets but be flexible based on available items
+    intensity_target_items = {
+        "chill": 2,
+        "medium": 3, 
+        "intense": 4
+    }
+    base_target = intensity_target_items.get(intensity, 3)
+    
+    # Calculate realistic items per week based on available unique items
+    total_unique_items = len(all_unique_items)
+    if total_unique_items == 0:
+        return {}
+    
+    # Distribute items as evenly as possible across weeks
+    items_per_week = max(1, min(base_target, total_unique_items // max_weeks))
+    if total_unique_items < max_weeks:
+        # Very few items - some weeks might be empty
+        items_per_week = 1
+    
+    # Shuffle items to ensure good distribution
+    import random
+    random.shuffle(all_unique_items)
+    
+    # Distribute items across weeks
     filtered_plan = {}
+    item_index = 0
+    
     for i in range(1, max_weeks + 1):
-        # Try both formats: existing plan files use "Week 1", new plans use "week_1"
-        week_key_old = f"Week {i}"
         week_key_new = f"week_{i}"
+        week_items = []
         
-        week_items = None
-        if week_key_old in base_plan:
-            week_items = base_plan[week_key_old]
-        elif week_key_new in base_plan:
-            week_items = base_plan[week_key_new]
+        # Add items to this week up to the target, but don't exceed available items
+        items_to_add = min(items_per_week, len(all_unique_items) - item_index)
         
-        if week_items:
-            # Adjust items per week based on intensity (use fixed counts for consistency)
-            intensity_target_items = {
-                "chill": 2,
-                "medium": 4, 
-                "intense": 6
-            }
-            target_count = intensity_target_items.get(intensity, 4)
+        for j in range(items_to_add):
+            if item_index < len(all_unique_items):
+                week_items.append(all_unique_items[item_index])
+                item_index += 1
+        
+        filtered_plan[week_key_new] = week_items
+    
+    # If we have remaining items, distribute them round-robin style
+    if item_index < len(all_unique_items):
+        week_num = 1
+        while item_index < len(all_unique_items):
+            week_key = f"week_{week_num}"
+            if week_key in filtered_plan:
+                # Only add if this would still be reasonable
+                if len(filtered_plan[week_key]) < base_target + 2:  # Allow some flexibility
+                    filtered_plan[week_key].append(all_unique_items[item_index])
+                    item_index += 1
             
-            if len(week_items) >= target_count:
-                # Take exactly the target number
-                adjusted_items = week_items[:target_count]
-            elif len(week_items) > 0:
-                # Pad with repeats to reach target count, but avoid immediate duplicates
-                adjusted_items = week_items[:]
-                available_items = week_items[:]
-                while len(adjusted_items) < target_count:
-                    # If we've used all items, reset the pool
-                    if not available_items:
-                        available_items = week_items[:]
-                    
-                    # Choose randomly but try to avoid the last added item
-                    if len(available_items) > 1 and len(adjusted_items) > 0:
-                        last_title = adjusted_items[-1].get("title", "")
-                        filtered_items = [item for item in available_items if item.get("title", "") != last_title]
-                        if filtered_items:
-                            chosen_item = random.choice(filtered_items)
-                        else:
-                            chosen_item = random.choice(available_items)
-                    else:
-                        chosen_item = random.choice(available_items)
-                    
-                    # Add unique identifier to distinguish duplicates
-                    duplicate_item = chosen_item.copy()
-                    duplicate_item["id"] = f"{chosen_item.get('id', '')}_{len(adjusted_items)}"
-                    adjusted_items.append(duplicate_item)
-                    available_items.remove(chosen_item)
-            else:
-                # No items available
-                adjusted_items = []
-            
-            # Always store with frontend-expected format
-            filtered_plan[week_key_new] = adjusted_items
+            week_num += 1
+            if week_num > max_weeks:
+                week_num = 1
     
     return filtered_plan
+
+def deduplicate_plan(plan: dict) -> dict:
+    """Remove any duplicate items from a plan across all weeks."""
+    seen_titles = set()
+    deduplicated_plan = {}
+    
+    for week_key, week_items in plan.items():
+        deduplicated_week = []
+        for item in week_items:
+            title = item.get("title", "")
+            # Only add if we haven't seen this title before
+            if title and title not in seen_titles:
+                deduplicated_week.append(item)
+                seen_titles.add(title)
+        deduplicated_plan[week_key] = deduplicated_week
+    
+    return deduplicated_plan
 
 # Demo candidates function removed - only real candidates from hunter_agent retriever
 
@@ -215,6 +248,9 @@ def generate_three_month_plan(user_uuid: str, personalized_candidates: list, dur
         
         print(f"Generating {duration_months}-month plan for user {user_uuid} with {len(formatted_candidates)} candidates (intensity: {intensity})")
         weekly_plan = generate_smart_weekly_plan(formatted_candidates, num_weeks=num_weeks, effort_level=effort_level)
+        
+        # Apply deduplication to ensure no duplicate items across weeks
+        weekly_plan = deduplicate_plan(weekly_plan)
         
         # Save plan to user-specific file
         plan_filename = f"user_plan_{user_uuid}.json"
@@ -469,10 +505,38 @@ def get_candidates(user_uuid: str):
         return {"candidates": [], "training_complete": False, "error": "Retriever required"}
 
     try:
-        # 1. Ensure candidates are generated and cached
-        if user_uuid not in user_candidates or not user_candidates[user_uuid]:
-            return {"candidates": [], "training_complete": False, "error": "No candidates found. Please generate candidates first."}
-        candidates = user_candidates[user_uuid]
+        # 1. Get candidates from Supabase (not from cache)
+        if SUPABASE_AVAILABLE:
+            user_items = get_user_items(user_uuid)
+            candidate_items = [item for item in user_items if item.get("status") == "candidate"]
+            if not candidate_items:
+                return {"candidates": [], "training_complete": False, "error": "No candidates found. Please generate candidates first."}
+            
+            # Convert user_items to candidate format
+            candidates = []
+            for user_item in candidate_items:
+                try:
+                    item_data = get_item(user_item["item_id"])
+                    if item_data:
+                        candidates.append({
+                            "item_id": item_data["item_id"],
+                            "item_name": item_data["item_name"],
+                            "title": item_data["item_name"],
+                            "description": item_data["description"],
+                            "source_url": item_data["source_url"],
+                            "image_url": item_data["image_url"],
+                            "category": item_data["category"],
+                            "creator": item_data["creator"],
+                            "metadata": item_data.get("metadata", {})
+                        })
+                except Exception as e:
+                    print(f"Error loading item {user_item['item_id']}: {e}")
+                    continue
+        else:
+            # Fallback to cached candidates
+            if user_uuid not in user_candidates or not user_candidates[user_uuid]:
+                return {"candidates": [], "training_complete": False, "error": "No candidates found. Please generate candidates first."}
+            candidates = user_candidates[user_uuid]
 
         # 2. Get user profile and embedding
         user_profile = get_user_profile(user_uuid) if SUPABASE_AVAILABLE else None
@@ -640,11 +704,12 @@ def get_generation_status(user_uuid: str):
         generation_status[user_uuid] = "complete"
         return {"status": "complete"}
     
-    # Check if user already has candidates in database
+    # Check if user already has candidates in database AND they're not all swiped
     if SUPABASE_AVAILABLE:
         try:
             user_items = get_user_items(user_uuid)
-            if user_items and any(item["status"] == "candidate" for item in user_items):
+            candidate_items = [item for item in user_items if item.get("status") == "candidate"]
+            if candidate_items and len(candidate_items) > 0:
                 generation_status[user_uuid] = "complete"
                 return {"status": "complete"}
         except Exception as e:
@@ -753,7 +818,11 @@ def generate_candidates(user_uuid: str, request: Request):
         from art_embedding import batch_generate_embeddings
         item_embeddings = batch_generate_embeddings(all_candidates, store_in_db=False)
         print(f"✅ Generated {len(item_embeddings)} item embeddings in-memory")
-        # 6. Return success
+        
+        # 6. Cache candidates for immediate access
+        user_candidates[user_uuid] = all_candidates
+        
+        # 7. Return success
         return {"success": True, "num_candidates": len(all_candidates)}
     except Exception as e:
         print(f"❌ Error in full candidate generation workflow: {e}")

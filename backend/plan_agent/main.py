@@ -119,7 +119,7 @@ def generate_smart_weekly_plan(candidates: List[Dict], num_weeks: int = 12, effo
     target_items_per_week = max(1, total_items // num_weeks)
     
     for week in range(1, num_weeks + 1):
-        weekly_plan[f"Week {week}"] = []
+        weekly_plan[f"week_{week}"] = []
         weekly_type_counts[week] = {}
         current_week_time = 0
         
@@ -184,7 +184,7 @@ def generate_smart_weekly_plan(candidates: List[Dict], num_weeks: int = 12, effo
                 index, item = best_item
                 item_type = item.get('type', 'unknown').lower()
                 
-                weekly_plan[f"Week {week}"].append(item)
+                weekly_plan[f"week_{week}"].append(item)
                 assigned_items.append(item)
                 current_week_time += get_media_time_estimate(item_type)
                 items_added_this_week += 1
@@ -336,12 +336,24 @@ def manual_curation_loop(plan, effort_level="medium"):
             
     return all_items
 
-def save_final_plan(plan, filename="final_media_plan.json"):
-    """Save the final plan to a JSON file."""
+def save_final_plan(plan, user_uuid):
+    """Save the final plan to Supabase."""
+    if not user_uuid:
+        print("Error: User UUID is required to save plan")
+        return False
+        
     try:
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(plan, f, indent=2, ensure_ascii=False)
-        print(f"Final plan saved to {filename}")
+        from backend.db.supabase_client import upsert_user_plan
+        
+        plan_data = {
+            "uuid": user_uuid,
+            "plan": plan,
+            "created_at": "now()",
+            "updated_at": "now()"
+        }
+        
+        upsert_user_plan(plan_data)
+        print(f"Final plan saved to Supabase")
         return True
     except Exception as e:
         print(f"Error saving plan: {e}")
@@ -454,16 +466,19 @@ def show_mode_selection():
         except ValueError:
             print("Please enter a valid number")
 
-def run_interactive_mode():
+def run_interactive_mode(user_uuid, candidates):
     """Run the full interactive mode."""
+    if not user_uuid:
+        print("Error: User UUID is required")
+        return
+        
+    if not candidates:
+        print("No candidates provided. Cannot generate plan.")
+        return
+    
     print("\n" + "="*60)
     print(" " * 15 + "INTERACTIVE MODE")
     print("="*60)
-    
-    candidates = load_ranked_candidates("ranked_candidates_sample.json")
-    if not candidates:
-        print("No candidates loaded. Exiting.")
-        return
     
     print("Welcome to the Smart Media Plan Generator!")
     print("This tool will create a personalized media consumption plan based on your preferences.")
@@ -487,13 +502,12 @@ def run_interactive_mode():
     
     if confirmed:
         # Save the final plan
-        save_final_plan(final_plan)
+        save_final_plan(final_plan, user_uuid)
         
         # Display final summary
         display_final_summary(final_plan)
         
         print(f"\nCongratulations! Your personalized media plan is ready.")
-        print(f"   You can find the complete plan in 'final_media_plan.json'")
     else:
         print(f"\nGoing back to plan editing...")
         # Re-enter the editing loop
@@ -502,23 +516,23 @@ def run_interactive_mode():
         
         # Try confirmation again
         if user_final_confirmation(final_plan):
-            save_final_plan(final_plan)
+            save_final_plan(final_plan, user_uuid)
             display_final_summary(final_plan)
             print(f"\nCongratulations! Your personalized media plan is ready.")
         else:
             print(f"\nPlan creation cancelled. You can run the program again to start over.")
 
-def run_demo_mode():
-    """Run the demo mode showing complete workflow."""
-    print("\n" + "="*60)
-    print(" " * 15 + "DEMO MODE")
-    print("="*60)
+def generate_plan_for_user(user_uuid, candidates, duration_months=2, effort_level="medium"):
+    """Generate a plan for a user with real data."""
+    if not user_uuid or not candidates:
+        return None
+        
+    num_weeks = get_plan_duration_weeks(duration_months)
+    plan = generate_smart_weekly_plan(candidates, num_weeks, effort_level)
     
-    # Show features
-    show_plan_features()
-    
-    # Run complete workflow demo
-    demo_complete_workflow()
+    # Save the plan
+    save_final_plan(plan, user_uuid)
+    return plan
 
 def show_plan_features():
     """Show the key features of the plan agent."""
@@ -548,67 +562,7 @@ def show_plan_features():
     for media_type in media_types:
         print(f"   - {media_type}")
 
-def demo_complete_workflow():
-    """Demonstrate the complete plan_agent workflow."""
-    print("\n" + "="*60)
-    print("PLAN AGENT - COMPLETE WORKFLOW DEMO")
-    print("="*60)
-    
-    # Step 1: Load candidates
-    print("\nStep 1: Loading ranked candidates...")
-    candidates = load_ranked_candidates("ranked_candidates_sample.json")
-    if not candidates:
-        print("Error: Could not load candidates")
-        return
-    
-    print(f"Loaded {len(candidates)} candidates successfully")
-    
-    # Step 2: Generate initial plan
-    print("\nStep 2: Generating smart weekly plan...")
-    plan = generate_smart_weekly_plan(candidates, 12, "medium")
-    print("Plan generated successfully")
-    
-    # Step 3: Display plan
-    print("\nStep 3: Displaying generated plan...")
-    display_plan(plan, "medium")
-    analyze_plan_diversity(plan)
-    
-    # Step 4: User confirmation (simulated)
-    print("\nStep 4: User confirmation process...")
-    print("(In real usage, this would be interactive)")
-    
-    # Simulate user confirming the plan
-    confirmed = True  # For demo purposes
-    
-    if confirmed:
-        print("User confirmed the plan")
-        
-        # Step 5: Save final plan
-        print("\nStep 5: Saving final plan...")
-        if save_final_plan(plan, "demo_plan.json"):
-            print("Plan saved successfully")
-        
-        # Step 6: Display final summary
-        print("\nStep 6: Displaying final summary...")
-        display_final_summary(plan)
-        
-        print("\nDemo completed successfully!")
-        print("Check 'demo_plan.json' for the saved plan")
-    else:
-        print("User rejected the plan (would go back to editing)")
 
-def run_comparison_mode():
-    """Run the comparison mode showing all configurations."""
-    print("\n" + "="*60)
-    print(" " * 15 + "COMPARISON MODE")
-    print("="*60)
-    
-    # Show comparisons
-    show_effort_level_comparison()
-    show_duration_options()
-    
-    # Demo different plans
-    demo_different_plans()
 
 def show_effort_level_comparison():
     """Show comparison between different effort levels."""
@@ -656,63 +610,7 @@ def show_duration_options():
         
         print(f"{duration} month(s) | {chill_total:5.0f}h | {medium_total:6.0f}h | {intense_total:7.0f}h")
 
-def demo_different_plans():
-    """Demonstrate different plan configurations."""
-    print("\n" + "="*60)
-    print("PLAN CONFIGURATION EXAMPLES")
-    print("="*60)
-    
-    # Load candidates
-    candidates = load_ranked_candidates("ranked_candidates_sample.json")
-    print(f"Loaded {len(candidates)} candidates")
-    
-    # Demo configurations
-    configurations = [
-        {"duration": 1, "effort": "chill", "name": "Quick Chill"},
-        {"duration": 2, "effort": "medium", "name": "Balanced Medium"},
-        {"duration": 3, "effort": "intense", "name": "Comprehensive Intense"}
-    ]
-    
-    for config in configurations:
-        print(f"\n" + "="*50)
-        print(f"EXAMPLE: {config['name']} Plan")
-        print("="*50)
-        
-        duration_months = config["duration"]
-        effort_level = config["effort"]
-        num_weeks = get_plan_duration_weeks(duration_months)
-        weekly_budget = calculate_weekly_time_budget(effort_level)
-        total_budget = weekly_budget * num_weeks
-        
-        print(f"Configuration:")
-        print(f"   Duration: {duration_months} month(s) ({num_weeks} weeks)")
-        print(f"   Effort level: {effort_level.title()}")
-        print(f"   Weekly budget: {weekly_budget} hours")
-        print(f"   Total budget: {total_budget} hours")
-        
-        # Generate plan
-        plan = generate_smart_weekly_plan(candidates, num_weeks, effort_level)
-        
-        # Show statistics
-        all_items = [item for week_items in plan.values() for item in week_items]
-        total_time = sum(get_media_time_estimate(item.get('type', '')) for item in all_items)
-        
-        print(f"\nPlan Statistics:")
-        print(f"   Items included: {len(all_items)}")
-        print(f"   Time utilized: {total_time}h / {total_budget}h ({total_time/total_budget*100:.1f}%)")
-        print(f"   Average per week: {total_time/num_weeks:.1f}h")
 
-def run_quick_demo_mode():
-    """Run the quick demo mode."""
-    print("\n" + "="*60)
-    print(" " * 15 + "QUICK DEMO MODE")
-    print("="*60)
-    
-    # Show usage options
-    show_usage_options()
-    
-    # Run quick confirmation demo
-    quick_confirmation_demo()
 
 def show_usage_options():
     """Show different usage options."""
@@ -735,78 +633,11 @@ def show_usage_options():
     print("   - Type 'quick' during final confirmation")
     print("   - Skip detailed review and save immediately")
 
-def quick_confirmation_demo():
-    """Demonstrate the quick confirmation workflow."""
-    print("\n" + "="*50)
-    print("QUICK CONFIRMATION DEMO")
-    print("="*50)
-    
-    # Load and generate plan
-    print("\n1. Loading candidates and generating plan...")
-    candidates = load_ranked_candidates("ranked_candidates_sample.json")
-    plan = generate_smart_weekly_plan(candidates, 12, "medium")
-    
-    print(f"Generated plan with {len([item for week_items in plan.values() for item in week_items])} items")
-    
-    # Show plan overview
-    print("\n2. Plan overview:")
-    display_plan(plan, "medium")
-    
-    # Quick confirmation (simulated)
-    print("\n3. Quick confirmation process:")
-    print("   User: 'confirm' (in interactive mode)")
-    print("   System: 'Quick confirmation selected. Proceeding to save the plan...'")
-    
-    # Save plan
-    print("\n4. Saving plan...")
-    if save_final_plan(plan, "quick_demo_plan.json"):
-        print("   Plan saved successfully!")
-    
-    # Show final summary
-    print("\n5. Final summary:")
-    display_final_summary(plan)
-    
-    print("\n" + "="*50)
-    print("Quick confirmation demo completed!")
-    print("In real usage, you can:")
-    print("- Type 'confirm' during editing to skip to save")
-    print("- Type 'quick' during final confirmation to skip detailed review")
 
 def main():
-    """Main function to run the plan agent."""
-    print("Welcome to the Smart Media Plan Generator!")
-    print("="*60)
-    
-    while True:
-        # Show mode selection
-        mode = show_mode_selection()
-        
-        if mode == '1':
-            # Interactive Mode
-            run_interactive_mode()
-        elif mode == '2':
-            # Demo Mode
-            run_demo_mode()
-        elif mode == '3':
-            # Comparison Mode
-            run_comparison_mode()
-        elif mode == '4':
-            # Quick Demo Mode
-            run_quick_demo_mode()
-        elif mode == '5':
-            # Exit
-            print("\nThank you for using the Smart Media Plan Generator!")
-            print("Goodbye!")
-            break
-        
-        # Ask if user wants to continue
-        if mode != '5':
-            print("\n" + "="*60)
-            continue_choice = input("Would you like to try another mode? (y/n): ").lower().strip()
-            if continue_choice not in ['y', 'yes']:
-                print("\nThank you for using the Smart Media Plan Generator!")
-                print("Goodbye!")
-                break
+    """Main function - requires user_uuid and candidates as parameters."""
+    print("Plan agent requires user_uuid and candidates to be provided by calling application.")
+    print("Use generate_plan_for_user() or run_interactive_mode() functions directly.")
 
 if __name__ == "__main__":
     main() 

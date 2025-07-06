@@ -92,7 +92,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
     fetchPlan();
   }, [userUuid, viewDuration, viewIntensity]);
 
-  // Filter weekly plan based on selected duration
+  // Filter weekly plan based on selected duration and remove duplicates
   const getFilteredPlan = () => {
     if (!weeklyPlan) {
       console.log('No weekly plan data available');
@@ -103,13 +103,26 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
     const maxWeeks = viewDuration * 4; // 4 weeks per month
     const filteredPlan: WeeklyPlan = {};
     
+    // Track seen titles to prevent duplicates across weeks
+    const seenTitles = new Set<string>();
+    
     Object.entries(weeklyPlan)
       .slice(0, maxWeeks)
       .forEach(([week, items]) => {
-        filteredPlan[week] = items;
+        // Filter out duplicates within this week and across all weeks
+        const uniqueItems = items.filter(item => {
+          const title = item.title || '';
+          if (!title || seenTitles.has(title)) {
+            console.log(`Removing duplicate item: ${title}`);
+            return false;
+          }
+          seenTitles.add(title);
+          return true;
+        });
+        filteredPlan[week] = uniqueItems;
       });
     
-    console.log('Filtered plan:', filteredPlan);
+    console.log('Filtered plan (deduplicated):', filteredPlan);
     return filteredPlan;
   };
 
@@ -682,7 +695,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                                 console.log(`Item: ${item.title}, Type: ${itemType}, Hours: ${estimatedHours}`);
                                 
                                 return (
-                                  <div key={item.id || `${globalWeek}-${index}`} 
+                                  <div key={`${globalWeek}-${item.title}-${index}`} 
                                        className={`p-3 rounded-xl border-3 ${typeColor} hover:scale-105 hover:rotate-1 transition-all duration-300 transform hover:shadow-2xl overflow-hidden relative`} 
                                        style={{ 
                                          minHeight: '85px',
