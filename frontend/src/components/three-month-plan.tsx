@@ -571,7 +571,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       </div>
 
       {/* Statistics */}
-      <div className="max-w-3xl mx-auto mb-6 px-4 lg:px-8" style={{ width: '90%' }}>
+      <div className="max-w-3xl mx-auto mb-12 px-4 lg:px-8" style={{ width: '90%' }}>
         <h2 className="arteme-title text-lg mb-3 text-center" style={{ color: 'var(--color-primary-white)' }}>Plan Overview</h2>
         <div className="grid grid-cols-4 gap-3 w-full">
           <div className="text-center min-w-0">
