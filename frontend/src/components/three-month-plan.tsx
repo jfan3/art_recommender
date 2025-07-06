@@ -461,8 +461,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       </div>
 
       {/* Plan Controls */}
-      <div className="max-w-4xl mx-auto mb-12 px-4 lg:px-8">
-        <div className="bg-white rounded-2xl shadow-xl p-6">
+      <div className="max-w-4xl mx-auto mb-16 px-4 lg:px-8">
+        <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {/* Duration Selection */}
             <div className="space-y-4">
