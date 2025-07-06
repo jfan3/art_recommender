@@ -607,9 +607,9 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       <div className="w-full px-4 lg:px-8">
         <div className="max-w-4xl mx-auto" style={{ width: '100%', maxWidth: '1024px' }}>
           <div className="space-y-12" style={{ width: '100%' }}>
-            {/* ALWAYS render ALL 3 months - never hide any to maintain consistent width */}
-            {[1, 2, 3].map((month) => (
-              <div key={month} className="arteme-card p-6 lg:p-8" style={{ width: '100%', minHeight: '500px', opacity: month > viewDuration ? 0.3 : 1 }}>
+            {/* Render only selected duration months */}
+            {[1, 2, 3].filter(month => month <= viewDuration).map((month) => (
+              <div key={month} className="arteme-card p-6 lg:p-8" style={{ width: '100%', minHeight: '500px' }}>
                 {/* Month Header */}
                 <div className="text-center mb-8">
                   <h3 className="arteme-title text-2xl lg:text-3xl mb-4" style={{ color: 'var(--color-primary-black)' }}>
@@ -622,11 +622,6 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4" style={{ width: '100%', minHeight: '400px' }}>
                   {Array.from({length: 4}, (_, weekInMonth) => {
                     const globalWeek = (month - 1) * 4 + weekInMonth + 1;
-                    const maxWeeks = viewDuration * 4;
-                    
-                    // Always render week cards, but show different content for weeks beyond duration
-                    const isBeyondDuration = globalWeek > maxWeeks;
-                    
                     const weekKey = `week_${globalWeek}`;
                     const items = displayPlan?.[weekKey] || [];
                     
@@ -634,8 +629,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                       <div key={weekKey} className="bg-white border-2 border-gray-300 rounded-lg hover:shadow-lg transition-all flex flex-col" style={{ 
                         width: '100%', 
                         minHeight: '360px', 
-                        maxHeight: '360px',
-                        opacity: isBeyondDuration ? 0.3 : 1 
+                        maxHeight: '360px'
                       }}>
                         {/* Week Header */}
                         <div className="p-2 border-b border-gray-200 flex-shrink-0">
@@ -651,11 +645,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                         
                         {/* Week Content - Items stacked vertically */}
                         <div className="flex-1 p-2 overflow-y-auto">
-                          {isBeyondDuration ? (
-                            <div className="text-center py-4 text-gray-400">
-                              <p className="text-xs">Beyond selected duration</p>
-                            </div>
-                          ) : items.length === 0 ? (
+                          {items.length === 0 ? (
                             <div className="text-center py-4 text-gray-500">
                               <p className="text-xs">No items scheduled</p>
                             </div>
