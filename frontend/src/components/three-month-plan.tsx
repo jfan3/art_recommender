@@ -463,14 +463,6 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       {/* Plan Controls */}
       <div className="max-w-4xl mx-auto mb-12 px-4 lg:px-8">
         <div className="bg-white rounded-2xl shadow-xl p-6">
-          {/* Section Header */}
-          <div className="text-center mb-6">
-            <h2 className="arteme-title text-xl lg:text-2xl mb-2" style={{ color: 'var(--color-primary-black)' }}>
-              Customize Your Journey
-            </h2>
-            <div className="w-16 h-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mx-auto"></div>
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {/* Duration Selection */}
             <div className="space-y-4">
