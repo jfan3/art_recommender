@@ -461,7 +461,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       </div>
 
       {/* Plan Controls */}
-      <div className="max-w-5xl mx-auto mb-12 px-4 mx-8">
+      <div className="max-w-4xl mx-auto mb-12 px-4 lg:px-8">
         <div className="bg-white rounded-2xl shadow-xl p-6">
           {/* Section Header */}
           <div className="text-center mb-6">
@@ -579,7 +579,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       </div>
 
       {/* Statistics */}
-      <div className="max-w-4xl mx-auto mb-6 mx-8">
+      <div className="max-w-3xl mx-auto mb-6 px-4 lg:px-8">
         <div className="arteme-card p-4">
           <h2 className="arteme-title text-lg mb-3">Plan Overview</h2>
           <div className="grid grid-cols-4 gap-3">
@@ -604,8 +604,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       </div>
 
       {/* Weekly Plan - Horizontal Layout */}
-      <div className="w-full px-12 lg:px-24">
-        <div className="max-w-5xl mx-auto">
+      <div className="w-full px-4 lg:px-8">
+        <div className="max-w-4xl mx-auto">
           <div className="space-y-12">
             {getMonthHeaders().map((month) => (
               <div key={month} className="arteme-card p-6 lg:p-8">
@@ -618,7 +618,7 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
                 </div>
 
                 {/* Weekly Layout - 4 weeks side by side horizontally */}
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
                   {Array.from({length: 4}, (_, weekInMonth) => {
                     const globalWeek = (month - 1) * 4 + weekInMonth + 1;
                     const maxWeeks = viewDuration * 4;
@@ -801,8 +801,8 @@ const ThreeMonthPlan: React.FC<ThreeMonthPlanProps> = ({ userUuid }) => {
       </div>
 
       {/* Footer */}
-      <div className="text-center mt-12 mb-8 mx-8">
-        <div className="arteme-card p-6 max-w-2xl mx-auto">
+      <div className="text-center mt-12 mb-8 px-4 lg:px-8">
+        <div className="arteme-card p-6 max-w-xl mx-auto">
           <h3 className="arteme-title text-xl mb-3">Ready to Start Your Journey?</h3>
           <p className="text-gray-700 mb-4">
             Your personalized art journey has been carefully curated based on your preferences.<br />
